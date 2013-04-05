@@ -1,0 +1,9 @@
+TRAIT health:
+	START:
+		ADD <INTEGER: current=50>
+
+CHARACTER PLAYER
+	START:
+ADD health
+SET current ON health TO 100
+PRINT “Hello, I am a character”
