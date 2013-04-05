@@ -1,0 +1,48 @@
+TRAIT health:
+	START:
+		ADD {INTEGER current=50}
+		ADD {INTEGER max=100}
+	FUNCTIONS:
+		update WITH amount:
+			INCREASE current BY amount
+			IF current > max:
+				SET current TO max
+
+TRAIT experience:
+	START:
+		ADD {INTEGER current=0}
+		ADD {INTEGER level=1}
+	FUNCTIONS:
+		update WITH amount:
+			INCREASE current BY amount
+			IF current > level ^ 2:
+				INCREASE level BY 1
+				PRINT "You gained a level!"
+				PRINT "You are now level " . level
+
+ITEM apple:
+	START:
+		ADD {INTEGER healing_value=100}
+		ADD {INTEGER experience_value=5}
+	ACTIONS:
+		"get"
+			REMOVE apple FROM LOCATION ON apple
+			ADD apple TO PLAYER
+
+		"eat"
+			IF PLAYER HAS apple
+				EXECUTE update ON health ON PLAYER WITH healing_value
+				EXECUTE update ON experience ON PLAYER WITH experience_value
+				REMOVE apple FROM PLAYER
+		
+SETTING house:
+	"You are at the house."
+	START:
+		ADD apple
+		
+CHARACTER PLAYER:
+	START:
+		ADD health
+		ADD experience
+		MOVE TO house
+
