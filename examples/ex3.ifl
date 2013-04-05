@@ -1,0 +1,87 @@
+TRAIT health
+	START:
+		ADD {INTEGER current=50}
+		ADD {INTEGER max=100}
+	FUNCTIONS:
+		update WITH amount:
+			INCREASE current BY amount
+			IF current > max
+				SET current TO max
+
+TRAIT experience 
+	START:
+		ADD {INTEGER: current=0}
+		ADD {INTEGER: level=1}
+	FUNCTIONS:
+		update WITH amount:
+			INCREASE current BY amount
+			IF current > level ^ 2:
+				INCREASE level BY 1
+				PRINT "You gained a level!"
+				PRINT "You are now level " . level
+			
+ITEM apple
+	START:
+		ADD {INTEGER: healing_value=100}
+		ADD {INTEGER: experience_value=5}
+	ACTIONS:
+		"get"
+			REMOVE apple FROM LOCATION ON apple
+			ADD apple TO PLAYER
+
+		"eat"
+			IF PLAYER HAS apple
+				EXECUTE update ON health ON PLAYER WITH healing_value
+				EXECUTE update ON experience ON PLAYER WITH experience_value
+				REMOVE apple FROM PLAYER
+		
+CHARACTER maid
+	"I am a maid of the house."
+	START:
+		USES Text.txt
+		ADD apple
+	ACTIONS:
+		"talk"
+			IF HAS apple:
+				INITIATE DIALOGUE AT #LABEL A#
+			ELSE:
+				INITIATE DIALOGUE AT #LABEL D#
+	DIALOGUE:
+		#LABEL A#:
+			IF LAST_INPUT EQUALS "1":
+				GOTO #LABEL B#
+			ELSE IF LAST_INPUT EQUALS "2":
+				GOTO #LABEL C#
+		#LABEL B#:
+			IF LAST_INPUT EQUALS "1":
+				REMOVE apple
+				ADD apple TO PLAYER
+				GOTO #LABEL C#
+			ELSE IF LAST_INPUT EQUALS "2":
+				EXIT
+		#LABEL C#:
+			IF LAST_INPUT EQUALS "1":
+				GOTO #LABEL A#
+			ELSE IF LAST_INPUT EQUALS "2":
+				EXIT
+			ELSE
+				GOTO #LABEL D#
+		#LABEL D#:
+			IF LAST_INPUT EQUALS "1":
+				GOTO #LABEL B#
+		#LABEL E#:
+			IF LAST_INPUT EQUALS "2":
+				EXIT
+
+
+SETTING house
+	"You are at the house."
+	START:
+		ADD maid
+
+CHARACTER PLAYER
+	START:
+		ADD health
+		ADD experience
+		MOVE TO House
+

@@ -78,7 +78,7 @@ def generate_lexer():
   t_ignore = ' '
   
   t_INDENT = r'\t'
-  t_LABEL = r'\#[\w ]+'
+  t_LABEL = r'\#[^\#]+\#'
   t_COLON = r':'
   t_CONCAT = r'\.'
   t_INTEGER_VAL = r'([1-9]\d*|0)'
