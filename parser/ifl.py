@@ -39,7 +39,8 @@ def generate_lexer():
       'TF' : 'TF',
       'STRING' : 'STRING',
       'TRUE' : 'TRUE',
-      'FALSE' : 'FALSE'
+      'FALSE' : 'FALSE',
+      'USING' : 'USING'
   }
   tokens = [
       'ID',
@@ -47,6 +48,7 @@ def generate_lexer():
       'COLON',
       'INDENT',
       'CONCAT',
+      'COMMENT',
       'INTEGER_VAL',
       'DECIMAL_VAL',
       'STRING_VAL',
@@ -72,9 +74,19 @@ def generate_lexer():
     t.type = reserved.get(t.value, 'ID')
     return t
   
+  def t_COMMENT(t):
+    r'//.*'
+    pass
+  
   def t_newline(t):
-        r'\n+'
-        t.lexer.lineno += len(t.value)
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+  
+  def t_error(t):
+    import sys
+    sys.stderr.write("Illegal character '%s'\n" % t.value[0])
+    t.lexer.skip(1)
+
   t_ignore = ' '
   
   t_INDENT = r'\t'
@@ -101,5 +113,5 @@ def generate_lexer():
   t_RPAREN = r'\)'
   
   lexer = lex.lex()
-  return lexer
+  return (lexer, tokens)
 
