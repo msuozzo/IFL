@@ -37,26 +37,26 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_statement_list(p):
-    'statement_list : compound_statement_list'
-    '               | empty'
-    p[0] = p[1]
+    '''statement_list : compound_statement_list
+                      | empty'''
+    p[0] = p[1] if p[1] else []
 
   def p_compound_statement_list(p):
-    'compound_statement_list : statement statement_list'
-    p[0] = p[2] + [p[1]]
+    'compound_statement_list : INDENT INDENT statement statement_list'
+    p[0] = p[4] + [p[3]]
 
   def p_statement(p):
-#    'statement : execute'
-#    '          | print'
-    'statement : print'
-    '          | add'
-    '          | remove'
-    '          | move'
-    '          | increase'
-    '          | decrease'
-    '          | initiate'
-    '          | conditional'
-    '          | using'
+    '''statement : print
+                 | add
+                 | remove
+                 | move
+                 | increase
+                 | decrease
+                 | initiate
+                 | using'''
+#'''statement : execute
+#             | print
+#             | conditional
     p[0] = p[1]
 
 #TODO: implement functions
@@ -77,13 +77,13 @@ def generate_parser(lexer, tokens):
     p[0] = tuple(p[1:])
 
   def p_add(p):
-    'add : ADD quantity object_identifier to_or_nothing'
-    '    | ADD primitive to_or_nothing'
+    '''add : ADD quantity object_identifier to_or_nothing
+           | ADD primitive to_or_nothing'''
     p[0] = tuple(p[1:])
 
   def p_quantity(p):
-    'quantity : arithmetic_expression'
-    '         | empty'
+    '''quantity : arithmetic_expression
+                | empty'''
     p[0] = p[1]
 
   def p_arithmetic_expression(p):
@@ -96,16 +96,18 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_to_or_nothing(p):
-    'to_or_nothing : TO object_chain'
-    '              | empty'
+    '''to_or_nothing : TO object_chain
+                     | empty'''
     if len(p) == 3:
       p[0] = p[2]
     elif len(p) == 2:
       p[0] = None
 
+  #RECURSIVE
   def p_object_chain(p):
-    'object_chain : object_identifier ON object_chain'
-    '             | object_identifier'
+    '''object_chain : object_chain ON object_identifier
+                    | object_identifier'''
+#    'object_chain : object_identifier ON object_chain'
     if len(p) == 4:
       p[0] = [p[1]] + p[3]
     elif len(p) == 2:
@@ -129,13 +131,13 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_remove(p):
-    'remove : REMOVE quantity object_identifier from_or_nothing'
-    '       | REMOVE primitive from_or_nothing'
+    '''remove : REMOVE quantity object_identifier from_or_nothing
+              | REMOVE primitive from_or_nothing'''
     p[0] = tuple(p[1:])
 
   def p_from_or_nothing(p):
-    'from_or_nothing : FROM object_chain'
-    '              | empty'
+    '''from_or_nothing : FROM object_chain
+                       | empty'''
     if len(p) == 3:
       p[0] = p[2]
     elif len(p) == 2:
@@ -146,8 +148,8 @@ def generate_parser(lexer, tokens):
     p[0] = p[2]
 
   def p_character_or_nothing(p):
-    'character_or_nothing : character_identifier'
-    '                     | empty'
+    '''character_or_nothing : character_identifier
+                            | empty'''
     p[0] = p[1]
 
   def p_character_identifier(p):

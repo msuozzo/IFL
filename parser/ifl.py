@@ -70,7 +70,7 @@ def generate_lexer():
   ] + list(reserved.values())
   
   def t_ID(t):
-    r'[a-zA-Z][\w]+'
+    r'[a-zA-Z][\w]*'
     t.type = reserved.get(t.value, 'ID')
     return t
   
