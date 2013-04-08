@@ -1,14 +1,21 @@
 import ply.yacc as yacc
 
 def generate_parser(lexer, tokens):
+  start = 'program'
+
+  precedence = (
+      ('left', 'OR', 'AND'),
+      ('right', 'NOT')
+  )
   def p_empty(p):
     'empty :'
     pass
   
-  def p_prod(p):
+  def p_program(p):
     'program : definition'
     '        | program definition'
     p[0] = p[1]
+    for sec in p[0]: print sec
 
   def p_definition(p):
     'definition : trait_definition'
@@ -54,9 +61,9 @@ def generate_parser(lexer, tokens):
                  | decrease
                  | initiate
                  | using'''
-#'''statement : execute
-#             | print
-#             | conditional
+#    '''statement : execute
+#                 | print
+#                 | conditional
     p[0] = p[1]
 
 #TODO: implement functions
@@ -103,32 +110,93 @@ def generate_parser(lexer, tokens):
     elif len(p) == 2:
       p[0] = None
 
-  #RECURSIVE
   def p_object_chain(p):
-    '''object_chain : object_chain ON object_identifier
+    '''object_chain : object_identifier ON object_chain
                     | object_identifier'''
-#    'object_chain : object_identifier ON object_chain'
     if len(p) == 4:
       p[0] = [p[1]] + p[3]
     elif len(p) == 2:
       p[0] = [p[1]]
 
   def p_primitive(p):
-    'primitive : integer_primitive'
-    #TODO: Add other primitives
+    '''primitive : integer_primitive
+                 | decimal_primitive
+                 | string_primitive
+                 | tf_primitive'''
     p[0] = p[1]
 
   def p_integer_primitive(p):
-    'integer_primitive : LBRACE INTEGER ID EQUALS arithmetic_expression'
+    'integer_primitive : LBRACE INTEGER ID ASSIGN arithmetic_expression'
+    p[0] = (p[2], p[3], p[5])
+
+  def p_decimal_primitive(p):
+    'decimal_primitive : LBRACE DECIMAL ID ASSIGN arithmetic_expression'
+    p[0] = (p[2], p[3], p[5])
+
+  def p_string_primitive(p):
+    'string_primitive : LBRACE STRING ID ASSIGN string_expression'
+    p[0] = (p[2], p[3], p[5])
+
+  def p_tf_primitive(p):
+    'tf_primitive : LBRACE TF ID ASSIGN tf_expression'
     p[0] = (p[2], p[3], p[5])
 
   def p_string_expression(p):
-    'string_expression : STRING_VAL'
-#    'string_expression : string_list'
-#    '                  | object_expression'
-#    '                  | STRING_VAL'
-    #TODO: FIX strings
+    '''string_expression : string_literal CONCAT string_expression
+                         | string_literal'''
+    if len(p) == 4:
+      p[0] = [p[1]] + p[3]
+    else:
+      p[0] = [p[1]]
+
+  def p_string_literal(p):
+    '''string_literal : STRING_VAL
+                      | object_chain'''
     p[0] = p[1]
+
+  def p_tf_expression(p):
+    '''tf_expression : tf_expression OR tf_expression
+                     | tf_expression AND tf_expression
+                     | NOT tf_expression
+                     | LPAREN tf_expression RPAREN
+                     | tf_literal'''
+    if len(p) == 4:
+      if p[1] == '(': p[0] = p[2]
+      else: p[0] = [p[1], p[2]] + p[3]
+    elif len(p) == 3: p[0] = [p[1], p[2]]
+    elif len(p) == 2: p[0] = p[1]
+
+  def p_tf_literal(p):
+    '''tf_literal : object_chain
+                  | has_expression
+                  | relational_expression
+                  | TRUE
+                  | FALSE'''
+    p[0] = p[1]
+
+  def p_has_expression(p):
+    '''has_expression : ID HAS ID
+                      | HAS ID'''
+    if len(p) == 4:
+      p[0] = (p[2], p[1], p[3])
+    else:
+      p[0] = (p[1], None, p[2])
+
+  def p_relational_expression(p):
+    'relational_expression : arithmetic_expression relational_operator arithmetic_expression'
+    p[0] = (p[2], p[1], p[3])
+
+  def p_relational_operator(p):
+    '''relational_operator : LTHAN
+                           | GTHAN
+                           | LTHANEQ
+                           | GTHANEQ
+                           | ISEQUAL
+                           | NOTEQUAL
+                           | EQUALS
+                           | NOT EQUALS''' 
+    if len(p) == 2: p[0] = p[1]
+    else: p[0] = '!='
 
   def p_remove(p):
     '''remove : REMOVE quantity object_identifier from_or_nothing

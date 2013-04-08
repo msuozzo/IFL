@@ -40,7 +40,11 @@ def generate_lexer():
       'STRING' : 'STRING',
       'TRUE' : 'TRUE',
       'FALSE' : 'FALSE',
-      'USING' : 'USING'
+      'USING' : 'USING',
+      'EQUALS' : 'EQUALS',
+      'NOT' : 'NOT',
+      'OR' : 'OR',
+      'AND' : 'AND'
   }
   tokens = [
       'ID',
@@ -54,7 +58,7 @@ def generate_lexer():
       'STRING_VAL',
       'LBRACE',
       'RBRACE',
-      'EQUALS',
+      'ASSIGN',
       'PLUS',
       'MINUS',
       'MULTIPLY',
@@ -64,6 +68,8 @@ def generate_lexer():
       'GTHAN',
       'LTHANEQ',
       'GTHANEQ',
+      'ISEQUAL',
+      'NOTEQUAL',
       'MODULUS',
       'LPAREN',
       'RPAREN'
@@ -98,7 +104,7 @@ def generate_lexer():
   t_STRING_VAL = r'"([^\\"]|\\")*"'
   t_LBRACE = r'{'
   t_RBRACE = r'}'
-  t_EQUALS = r'='
+  t_ASSIGN = r'='
   t_PLUS = r'\+'
   t_MINUS = r'-'
   t_MULTIPLY = r'\*'
@@ -108,6 +114,8 @@ def generate_lexer():
   t_GTHAN = r'>'
   t_LTHANEQ = r'<='
   t_GTHANEQ = r'>='
+  t_ISEQUAL = r'=='
+  t_NOTEQUAL = r'!='
   t_MODULUS = r'%'
   t_LPAREN = r'\('
   t_RPAREN = r'\)'
