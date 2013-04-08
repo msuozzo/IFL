@@ -44,7 +44,8 @@ def generate_lexer():
       'EQUALS' : 'EQUALS',
       'NOT' : 'NOT',
       'OR' : 'OR',
-      'AND' : 'AND'
+      'AND' : 'AND',
+      'END_BLOCK' : 'END_BLOCK'
   }
   tokens = [
       'ID',
