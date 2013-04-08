@@ -10,6 +10,11 @@ def generate_parser(lexer, tokens):
   def p_empty(p):
     'empty :'
     pass
+
+  def p_indentation(p):
+    '''indentation : INDENT indentation
+                   | empty'''
+    p[0] = [] if len(p) == 2 else [p[1]] + p[2]
   
   def p_program(p):
     '''program : definition program
@@ -23,15 +28,14 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_trait_definition(p):
-    'trait_definition : TRAIT trait_identifier COLON desc_or_nothing s_directive'
-#    'trait_definition : TRAIT trait_identifier INDENT description_string INDENT s_directive INDENT f_directive'
+    'trait_definition : TRAIT trait_identifier COLON indentation desc_or_nothing s_directive indentation f_directive'
     #TODO: Implement f_directive
-    p[0] = (p[2], p[4], p[5])
+    p[0] = (p[1], p[2], p[5], p[6], p[8])
 
   def p_desc_or_nothing(p):
-    '''desc_or_nothing : INDENT description_string
+    '''desc_or_nothing : description_string indentation
                        | empty'''
-    p[0] = p[1] if len(p) == 2 else p[2]
+    p[0] = p[1]
 
   def p_trait_identifier(p):
     'trait_identifier : ID'
@@ -42,17 +46,38 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_s_directive(p):
-    's_directive : INDENT START COLON start_list'
-    p[0] = p[5]
+    's_directive : START COLON start_list'
+    p[0] = (p[1], p[3])
 
   def p_start_list(p):
     'start_list : statement_list'
     p[0] = p[1]
 
+  def p_f_directive(p):
+    'f_directive : FUNCTIONS COLON function_list'
+    p[0] = (p[1], p[3])
+
+  def p_function_list(p):
+    '''function_list : indentation ID args_or_nothing COLON statement_list function_list
+                     | empty'''
+    if len(p) == 7: p[0] = [(p[2], p[3], p[5])] + p[6]
+    else: p[0] = []
+
+  def p_args_or_nothing(p):
+    '''args_or_nothing : WITH ID optional_args
+                       | empty'''
+    p[0] = [] if len(p) == 2 else [p[2]] + p[3]
+
+  def p_optional_args(p):
+    '''optional_args : COMMA ID optional_args
+                     | empty'''
+    p[0] = [] if len(p) == 2 else [p[2]] + p[3]
+
+
   def p_statement_list(p):
-    '''statement_list : INDENT INDENT statement statement_list
+    '''statement_list : indentation statement statement_list
                       | empty'''
-    p[0] = p[4] + [p[3]] if p[1] else []
+    p[0] = p[3] + [p[2]] if p[1] else []
 
   def p_statement(p):
     '''statement : print
@@ -68,9 +93,19 @@ def generate_parser(lexer, tokens):
 #                 | print
     p[0] = p[1]
 
-
   def p_conditional(p):
-    '''conditional : IF tf_expression'''
+    '''conditional : IF tf_expression COLON statement_list else_if_conditional else_conditional'''
+    #TODO: implement conditionals
+    pass
+
+  def p_else_if_conditional(p):
+    '''else_if_conditional : ELSE IF tf_expression COLON statement_list else_if_conditional
+                           | empty'''
+    pass
+
+  def p_else_conditional(p):
+    '''else_conditional : ELSE COLON statement_list
+                        | empty'''
     pass
 
 #TODO: implement functions
@@ -88,12 +123,13 @@ def generate_parser(lexer, tokens):
 
   def p_print(p):
     'print : PRINT string_expression'
-    p[0] = tuple(p[1:])
+    p[0] = [p[1], p[2]]
 
   def p_add(p):
     '''add : ADD quantity object_identifier to_or_nothing
            | ADD primitive to_or_nothing'''
-    p[0] = tuple(p[1:])
+    if len(p) == 5: p[0] = [p[1], p[3], p[4], p[2]]
+    else: p[0] = [p[1], p[2], p[3], None]
 
   def p_quantity(p):
     '''quantity : arithmetic_expression
@@ -101,7 +137,8 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_arithmetic_expression(p):
-    'arithmetic_expression : INTEGER_VAL'
+    '''arithmetic_expression : INTEGER_VAL
+                             | DECIMAL_VAL'''
     #TODO: Finish arithmetic expressions
     p[0] = p[1]
 
@@ -133,11 +170,11 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_integer_primitive(p):
-    'integer_primitive : LBRACE INTEGER ID ASSIGN arithmetic_expression RBRACE'
+    'integer_primitive : LBRACE INTEGER ID ASSIGN integral_literal RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_decimal_primitive(p):
-    'decimal_primitive : LBRACE DECIMAL ID ASSIGN arithmetic_expression RBRACE'
+    'decimal_primitive : LBRACE DECIMAL ID ASSIGN decimal_literal RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_string_primitive(p):
@@ -147,6 +184,18 @@ def generate_parser(lexer, tokens):
   def p_tf_primitive(p):
     'tf_primitive : LBRACE TF ID ASSIGN tf_expression RBRACE'
     p[0] = (p[2], p[3], p[5])
+
+  def p_integral_literal(p):
+    '''integral_literal : INTEGER_VAL
+                        | arithmetic_expression
+                        | object_chain'''
+    p[0] = p[1]
+
+  def p_decimal_literal(p):
+    '''decimal_literal : DECIMAL_VAL
+                       | arithmetic_expression
+                       | object_chain'''
+    p[0] = p[1]
 
   def p_string_expression(p):
     '''string_expression : string_literal CONCAT string_expression

@@ -50,6 +50,7 @@ def generate_lexer():
       'ID',
       'LABEL',
       'COLON',
+      'COMMA',
       'INDENT',
       'CONCAT',
       'COMMENT',
@@ -98,6 +99,7 @@ def generate_lexer():
   t_INDENT = r'\t'
   t_LABEL = r'\#[^\#]+\#'
   t_COLON = r':'
+  t_COMMA = r','
   t_CONCAT = r'\.'
   t_INTEGER_VAL = r'([1-9]\d*|0)'
   t_DECIMAL_VAL = r'\d+\.\d+'
