@@ -12,20 +12,26 @@ def generate_parser(lexer, tokens):
     pass
   
   def p_program(p):
-    'program : definition'
-    '        | program definition'
+    '''program : definition program
+               | empty'''
     p[0] = p[1]
-    for sec in p[0]: print sec
+    if p[0]:
+      for sec in p[0]: print sec
 
   def p_definition(p):
     'definition : trait_definition'
     p[0] = p[1]
 
   def p_trait_definition(p):
-    'trait_definition : TRAIT trait_identifier INDENT description_string INDENT s_directive'
+    'trait_definition : TRAIT trait_identifier COLON desc_or_nothing s_directive'
 #    'trait_definition : TRAIT trait_identifier INDENT description_string INDENT s_directive INDENT f_directive'
     #TODO: Implement f_directive
-    p[0] = (p[2], p[4], p[6], p[8])
+    p[0] = (p[2], p[4], p[5])
+
+  def p_desc_or_nothing(p):
+    '''desc_or_nothing : INDENT description_string
+                       | empty'''
+    p[0] = p[1] if len(p) == 2 else p[2]
 
   def p_trait_identifier(p):
     'trait_identifier : ID'
@@ -36,7 +42,7 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_s_directive(p):
-    's_directive : START COLON INDENT INDENT start_list'
+    's_directive : INDENT START COLON start_list'
     p[0] = p[5]
 
   def p_start_list(p):
@@ -44,13 +50,9 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_statement_list(p):
-    '''statement_list : compound_statement_list
+    '''statement_list : INDENT INDENT statement statement_list
                       | empty'''
-    p[0] = p[1] if p[1] else []
-
-  def p_compound_statement_list(p):
-    'compound_statement_list : INDENT INDENT statement statement_list'
-    p[0] = p[4] + [p[3]]
+    p[0] = p[4] + [p[3]] if p[1] else []
 
   def p_statement(p):
     '''statement : print
@@ -60,11 +62,16 @@ def generate_parser(lexer, tokens):
                  | increase
                  | decrease
                  | initiate
+                 | conditional
                  | using'''
 #    '''statement : execute
 #                 | print
-#                 | conditional
     p[0] = p[1]
+
+
+  def p_conditional(p):
+    '''conditional : IF tf_expression'''
+    pass
 
 #TODO: implement functions
 #  def p_execute(p):
@@ -126,19 +133,19 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_integer_primitive(p):
-    'integer_primitive : LBRACE INTEGER ID ASSIGN arithmetic_expression'
+    'integer_primitive : LBRACE INTEGER ID ASSIGN arithmetic_expression RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_decimal_primitive(p):
-    'decimal_primitive : LBRACE DECIMAL ID ASSIGN arithmetic_expression'
+    'decimal_primitive : LBRACE DECIMAL ID ASSIGN arithmetic_expression RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_string_primitive(p):
-    'string_primitive : LBRACE STRING ID ASSIGN string_expression'
+    'string_primitive : LBRACE STRING ID ASSIGN string_expression RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_tf_primitive(p):
-    'tf_primitive : LBRACE TF ID ASSIGN tf_expression'
+    'tf_primitive : LBRACE TF ID ASSIGN tf_expression RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_string_expression(p):
@@ -247,6 +254,7 @@ def generate_parser(lexer, tokens):
 
 
   def p_error(p):
+    print p
     print "Syntax error in input!"
 
   return yacc.yacc()
