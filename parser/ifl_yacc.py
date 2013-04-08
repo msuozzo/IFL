@@ -15,9 +15,10 @@ def generate_parser(lexer, tokens):
   def p_program(p):
     '''program : definition program
                | empty'''
-    p[0] = p[1]
-    if p[0]:
-      for sec in p[0]: print sec
+    if len(p) != 2: p[0] = (p[1],) + p[2]
+    else: p[0] = ()
+#    if p[0]:
+#      for sec in p[0]: print sec
 
   def p_definition(p):
     '''definition : trait_definition
