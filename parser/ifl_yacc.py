@@ -4,7 +4,8 @@ def generate_parser(lexer, tokens):
   start = 'program'
 
   precedence = (
-      ('left', 'OR', 'AND'),
+      ('left', 'OR', 'AND', 'PLUS', 'MINUS'),
+      ('left', 'DIVIDE', 'MULTIPLY'),
       ('right', 'NOT')
   )
   def p_empty(p):
@@ -19,24 +20,40 @@ def generate_parser(lexer, tokens):
       for sec in p[0]: print sec
 
   def p_definition(p):
-    'definition : trait_definition'
+    '''definition : trait_definition
+                  | character_definition
+                  | setting_definition
+                  | item_definition'''
     p[0] = p[1]
 
   def p_trait_definition(p):
-    'trait_definition : TRAIT trait_identifier COLON desc_or_nothing s_directive f_directive END_BLOCK'
+    'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_directive END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], p[6])
+
+  def p_character_definition(p):
+    'character_definition : CHARACTER id_or_player COLON desc_or_nothing s_directive a_or_nothing f_or_nothing d_or_nothing END_BLOCK'
+    p[0] = (p[1], p[2], p[4], p[5], p[6], p[7], p[8])
+
+  def p_setting_definition(p):
+    'setting_definition : SETTING ID COLON desc_or_nothing s_directive END_BLOCK'
+    p[0] = (p[1], p[2], p[4], p[5])
+
+  def p_item_definition(p):
+    'item_definition : ITEM ID COLON desc_or_nothing s_directive a_or_nothing f_or_nothing END_BLOCK'
+    p[0] = (p[1], p[2], p[4], p[5], p[6], p[7])
 
   def p_desc_or_nothing(p):
     '''desc_or_nothing : description_string
                        | empty'''
     p[0] = p[1]
 
-  def p_trait_identifier(p):
-    'trait_identifier : ID'
-    p[0] = p[1]
-
   def p_description_string(p):
     'description_string : string_value'
+    p[0] = p[1]
+
+  def p_id_or_player(p):
+    '''id_or_player : ID
+                    | PLAYER'''
     p[0] = p[1]
 
   def p_s_directive(p):
@@ -46,6 +63,41 @@ def generate_parser(lexer, tokens):
   def p_start_list(p):
     'start_list : statement_list'
     p[0] = tuple(p[1])
+
+  def p_d_or_nothing(p):
+    '''d_or_nothing : d_directive
+                    | empty'''
+    p[0] = p[1]
+
+  def p_d_directive(p):
+    'd_directive : DIALOGUE COLON dialogue_list END_BLOCK'
+    p[0] = (p[1], p[3])
+
+  def p_dialogue_list(p):
+    '''dialogue_list : LABEL COLON statement_list END_BLOCK dialogue_list
+                     | empty'''
+    if len(p) != 2: p[0] = ((p[1], p[3]),) + p[5]
+    else: p[0] = ()
+
+  def p_a_or_nothing(p):
+    '''a_or_nothing : a_directive
+                    | empty'''
+    p[0] = p[1]
+
+  def p_a_directive(p):
+    'a_directive : ACTIONS COLON action_list END_BLOCK'
+    p[0] = (p[1], p[3])
+
+  def p_action_list(p):
+    '''action_list : string_value COLON statement_list END_BLOCK action_list
+                   | empty'''
+    if len(p) != 2: p[0] = ((p[1], p[3]),) + p[5]
+    else: p[0] = ()
+
+  def p_f_or_nothing(p):
+    '''f_or_nothing : f_directive
+                    | empty'''
+    p[0] = p[1]
 
   def p_f_directive(p):
     'f_directive : FUNCTIONS COLON function_list END_BLOCK'
@@ -76,18 +128,19 @@ def generate_parser(lexer, tokens):
     '''statement : print
                  | add
                  | remove
+                 | set
                  | move
                  | increase
                  | decrease
                  | initiate
                  | conditional
                  | execute
+                 | goto
                  | using'''
-    p[0] = tuple(p[1])
+    p[0] = p[1]
 
   def p_conditional(p):
     '''conditional : IF tf_expression COLON statement_list END_BLOCK else_if_conditional else_conditional'''
-    #TODO: implement conditionals
     p[0] = (p[1], (p[2], p[4])) + p[6] + (p[7],)
 
   def p_else_if_conditional(p):
@@ -102,9 +155,13 @@ def generate_parser(lexer, tokens):
     if len(p) != 2: p[0] = (None, p[3])
     else: p[0] = None
 
+  def p_goto(p):
+    'goto : GOTO LABEL'
+    p[0] = (p[1], p[2])
+
   def p_execute(p):
     'execute : EXECUTE ID passed_args'
-    p[0] = (p[0], p[1], p[2])
+    p[0] = (p[1], p[2], p[3])
 
   def p_passed_args(p):
     '''passed_args : WITH arg optional_passed_args
@@ -165,7 +222,8 @@ def generate_parser(lexer, tokens):
     '''primitive : integer_primitive
                  | decimal_primitive
                  | string_primitive
-                 | tf_primitive'''
+                 | tf_primitive
+                 | ID'''
     p[0] = p[1]
 
   def p_integer_primitive(p):
@@ -238,7 +296,7 @@ def generate_parser(lexer, tokens):
     else: p[0] = (p[1], None, p[2])
 
   def p_relational_expression(p):
-    'relational_expression : arithmetic_expression relational_operator arithmetic_expression'
+    'relational_expression : arg relational_operator arg'
     p[0] = (p[2], p[1], p[3])
 
   def p_relational_operator(p):
@@ -264,6 +322,10 @@ def generate_parser(lexer, tokens):
                        | empty'''
     if len(p) == 3: p[0] = p[2]
     elif len(p) == 2: p[0] = None
+
+  def p_set(p):
+    '''set : SET object_chain TO primitive'''
+    p[0] = (p[1], p[2], p[4])
 
   def p_move(p):
     'move : MOVE character_or_nothing TO object_chain'
