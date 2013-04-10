@@ -82,10 +82,6 @@ def generate_lexer():
     t.type = reserved.get(t.value, 'ID')
     return t
   
-  def t_COMMENT(t):
-    r'//.*'
-    pass
-  
   def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
@@ -101,6 +97,7 @@ def generate_lexer():
   t_LABEL = r'\#[^\#]+\#'
   t_COLON = r':'
   t_COMMA = r','
+  t_ignore_COMMENT = r'//.*'
   t_CONCAT = r'\.'
   t_INTEGER_VAL = r'([1-9]\d*|0)'
   t_DECIMAL_VAL = r'\d+\.\d+'

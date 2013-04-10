@@ -4,21 +4,20 @@ def generate_parser(lexer, tokens):
   start = 'program'
 
   precedence = (
-      ('left', 'OR', 'AND', 'PLUS', 'MINUS'),
+      ('nonassoc', 'LTHAN', 'GTHAN', 'LTHANEQ', 'GTHANEQ', 'ISEQUAL', 'NOTEQUAL'),
+      ('left', 'OR', 'AND', 'PLUS', 'MINUS', 'MODULUS'),
       ('left', 'DIVIDE', 'MULTIPLY'),
-      ('right', 'NOT')
+      ('right', 'NOT', 'UMINUS'),
+      ('left', 'CONCAT', 'ON'),
   )
   def p_empty(p):
     'empty :'
     pass
 
   def p_program(p):
-    '''program : definition program
+    '''program : program definition
                | empty'''
-    if len(p) != 2: p[0] = (p[1],) + p[2]
-    else: p[0] = ()
-#    if p[0]:
-#      for sec in p[0]: print sec
+    p[0] = () if len(p) == 2 else (p[2],) + p[1]
 
   def p_definition(p):
     '''definition : trait_definition
@@ -63,7 +62,7 @@ def generate_parser(lexer, tokens):
 
   def p_start_list(p):
     'start_list : statement_list'
-    p[0] = tuple(p[1])
+    p[0] = p[1]
 
   def p_d_or_nothing(p):
     '''d_or_nothing : d_directive
@@ -105,9 +104,9 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], p[3])
 
   def p_function_list(p):
-    '''function_list : ID args_or_nothing COLON statement_list function_list END_BLOCK
+    '''function_list : function_list ID args_or_nothing COLON statement_list END_BLOCK
                      | empty'''
-    if len(p) != 2: p[0] = ((p[1], p[2], p[4]),) + p[5]
+    if len(p) != 2: p[0] = ((p[2], p[3], p[5]),) + p[1]
     else: p[0] = ()
 
   def p_args_or_nothing(p):
@@ -116,14 +115,14 @@ def generate_parser(lexer, tokens):
     p[0] = None if len(p) == 2 else (p[2],) + p[3]
 
   def p_optional_args(p):
-    '''optional_args : COMMA ID optional_args
+    '''optional_args : optional_args COMMA ID
                      | empty'''
-    p[0] = () if len(p) == 2 else (p[2],) + p[3]
+    p[0] = () if len(p) == 2 else (p[3],) + p[1]
 
   def p_statement_list(p):
-    '''statement_list : statement statement_list
+    '''statement_list : statement_list statement
                       | empty'''
-    p[0] = () if not p[1] else p[2] + (p[1],)
+    p[0] = () if len(p) == 2 else p[1] + (p[2],)
 
   def p_statement(p):
     '''statement : print
@@ -145,16 +144,14 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], (p[2], p[4])) + p[6] + (p[7],)
 
   def p_else_if_conditional(p):
-    '''else_if_conditional : ELSE IF tf_expression COLON statement_list END_BLOCK else_if_conditional
+    '''else_if_conditional : else_if_conditional ELSE IF tf_expression COLON statement_list END_BLOCK
                            | empty'''
-    if len(p) != 2: p[0] = ((p[3], p[5]),) + p[7]
-    else: p[0] = ()
+    p[0] = () if len(p) == 2 else ((p[4], p[6]),) + p[1]
 
   def p_else_conditional(p):
     '''else_conditional : ELSE COLON statement_list END_BLOCK
                         | empty'''
-    if len(p) != 2: p[0] = (None, p[3])
-    else: p[0] = None
+    p[0] = None if len(p) == 2 else (None, p[3])
 
   def p_goto(p):
     'goto : GOTO LABEL'
@@ -167,17 +164,15 @@ def generate_parser(lexer, tokens):
   def p_passed_args(p):
     '''passed_args : WITH arg optional_passed_args
                    | empty'''
-    if len(p) != 2: p[0] = (p[2],) + p[3]
-    else: p[0] = None
+    p[0] = None if len(p) == 2 else (p[2],) + p[3]
 
   def p_optional_passed_args(p):
-    '''optional_passed_args : COMMA arg optional_passed_args
+    '''optional_passed_args : optional_passed_args COMMA arg
                             | empty'''
-    p[0] = () if len(p) == 2 else (p[2],) + p[3]
+    p[0] = () if len(p) == 2 else (p[3],) + p[1]
 
   def p_arg(p):
-    '''arg : object_chain
-           | arithmetic_expression
+    '''arg : arithmetic_expression
            | string_expression
            | tf_expression'''
     p[0] = p[1]
@@ -187,7 +182,7 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], p[2])
 
   def p_add(p):
-    '''add : ADD quantity object_identifier to_or_nothing
+    '''add : ADD quantity ID to_or_nothing
            | ADD primitive to_or_nothing'''
     if len(p) == 5: p[0] = (p[1], p[3], p[4], p[2])
     else: p[0] = (p[1], p[2], p[3], None)
@@ -198,14 +193,26 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_arithmetic_expression(p):
-    '''arithmetic_expression : INTEGER_VAL
+    '''arithmetic_expression : arithmetic_expression PLUS arithmetic_expression
+                             | arithmetic_expression MINUS arithmetic_expression
+                             | arithmetic_expression MODULUS arithmetic_expression
+
+                             | arithmetic_expression DIVIDE arithmetic_expression
+                             | arithmetic_expression MULTIPLY arithmetic_expression
+
+                             | arithmetic_expression POWER arithmetic_expression
+
+                             | MINUS arithmetic_expression %prec UMINUS
+                             | LPAREN arithmetic_expression RPAREN
+                             | INTEGER_VAL
                              | DECIMAL_VAL'''
     #TODO: Finish arithmetic expressions
-    p[0] = p[1]
-
-  def p_object_identifier(p):
-    'object_identifier : ID'
-    p[0] = p[1]
+    if len(p) == 4:
+      if p[1] == '(': p[0] = p[2]
+      else: p[0] = (p[2], p[1], p[3])
+    elif len(p) == 3:
+      p[0] = (p[1], p[2])
+    else: p[0] = p[1]
 
   def p_to_or_nothing(p):
     '''to_or_nothing : TO object_chain
@@ -214,9 +221,9 @@ def generate_parser(lexer, tokens):
     elif len(p) == 2: p[0] = None
 
   def p_object_chain(p):
-    '''object_chain : object_identifier ON object_chain
-                    | object_identifier'''
-    if len(p) == 4: p[0] = (p[1],) + p[3]
+    '''object_chain : object_chain ON ID
+                    | ID'''
+    if len(p) == 4: p[0] = (p[3],) + p[1]
     elif len(p) == 2: p[0] = (p[1],)
 
   def p_primitive(p):
@@ -228,11 +235,11 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_integer_primitive(p):
-    'integer_primitive : LBRACE INTEGER ID ASSIGN integral_literal RBRACE'
+    'integer_primitive : LBRACE INTEGER ID ASSIGN numeric_literal RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_decimal_primitive(p):
-    'decimal_primitive : LBRACE DECIMAL ID ASSIGN decimal_literal RBRACE'
+    'decimal_primitive : LBRACE DECIMAL ID ASSIGN numeric_literal RBRACE'
     p[0] = (p[2], p[3], p[5])
 
   def p_string_primitive(p):
@@ -243,15 +250,8 @@ def generate_parser(lexer, tokens):
     'tf_primitive : LBRACE TF ID ASSIGN tf_expression RBRACE'
     p[0] = (p[2], p[3], p[5])
 
-  def p_integral_literal(p):
-    '''integral_literal : INTEGER_VAL
-                        | arithmetic_expression
-                        | object_chain'''
-    p[0] = p[1]
-
-  def p_decimal_literal(p):
-    '''decimal_literal : DECIMAL_VAL
-                       | arithmetic_expression
+  def p_numeric_literal(p):
+    '''numeric_literal : arithmetic_expression
                        | object_chain'''
     p[0] = p[1]
 
@@ -260,9 +260,9 @@ def generate_parser(lexer, tokens):
     p[0] = p[1].strip('"')
 
   def p_string_expression(p):
-    '''string_expression : string_literal CONCAT string_expression
+    '''string_expression : string_expression CONCAT string_literal
                          | string_literal'''
-    if len(p) == 4: p[0] = (p[1],) + p[3]
+    if len(p) == 4: p[0] = (p[3],) + p[1]
     else: p[0] = (p[1],)
 
   def p_string_literal(p):
@@ -283,11 +283,16 @@ def generate_parser(lexer, tokens):
     elif len(p) == 2: p[0] = p[1]
 
   def p_tf_literal(p):
-    '''tf_literal : object_chain
-                  | has_expression
+    '''tf_literal : has_expression
                   | relational_expression
                   | TRUE
                   | FALSE'''
+    p[0] = p[1]
+
+  def p_relational_operand(p):
+    '''relational_operand : tf_literal
+                          | object_chain
+                          | arithmetic_expression'''
     p[0] = p[1]
 
   def p_has_expression(p):
@@ -297,7 +302,7 @@ def generate_parser(lexer, tokens):
     else: p[0] = (p[1], None, p[2])
 
   def p_relational_expression(p):
-    'relational_expression : arg relational_operator arg'
+    'relational_expression : relational_operand relational_operator relational_operand'
     p[0] = (p[2], p[1], p[3])
 
   def p_relational_operator(p):
@@ -313,7 +318,7 @@ def generate_parser(lexer, tokens):
     else: p[0] = '!='
 
   def p_remove(p):
-    '''remove : REMOVE quantity object_identifier from_or_nothing
+    '''remove : REMOVE quantity ID from_or_nothing
               | REMOVE primitive from_or_nothing'''
     if len(p) == 5: p[0] = (p[1], p[3], p[4], p[2])
     else: p[0] = (p[1], p[2], p[3], None)
