@@ -136,7 +136,8 @@ def generate_parser(lexer, tokens):
                  | conditional
                  | execute
                  | goto
-                 | using'''
+                 | using
+                 | EXIT'''
     p[0] = p[1]
 
   def p_conditional(p):
@@ -196,17 +197,13 @@ def generate_parser(lexer, tokens):
     '''arithmetic_expression : arithmetic_expression PLUS arithmetic_expression
                              | arithmetic_expression MINUS arithmetic_expression
                              | arithmetic_expression MODULUS arithmetic_expression
-
                              | arithmetic_expression DIVIDE arithmetic_expression
                              | arithmetic_expression MULTIPLY arithmetic_expression
-
                              | arithmetic_expression POWER arithmetic_expression
-
                              | MINUS arithmetic_expression %prec UMINUS
                              | LPAREN arithmetic_expression RPAREN
                              | INTEGER_VAL
                              | DECIMAL_VAL'''
-    #TODO: Finish arithmetic expressions
     if len(p) == 4:
       if p[1] == '(': p[0] = p[2]
       else: p[0] = (p[2], p[1], p[3])
