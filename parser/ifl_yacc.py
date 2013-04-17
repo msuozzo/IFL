@@ -27,7 +27,7 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_trait_definition(p):
-    'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_directive END_BLOCK'
+    'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], p[6])
 
   def p_character_definition(p):
@@ -194,14 +194,14 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_arithmetic_expression(p):
-    '''arithmetic_expression : arithmetic_expression PLUS arithmetic_expression
-                             | arithmetic_expression MINUS arithmetic_expression
-                             | arithmetic_expression MODULUS arithmetic_expression
-                             | arithmetic_expression DIVIDE arithmetic_expression
-                             | arithmetic_expression MULTIPLY arithmetic_expression
-                             | arithmetic_expression POWER arithmetic_expression
-                             | MINUS arithmetic_expression %prec UMINUS
-                             | LPAREN arithmetic_expression RPAREN
+    '''arithmetic_expression : arithmetic_or_object PLUS arithmetic_or_object
+                             | arithmetic_or_object MINUS arithmetic_or_object
+                             | arithmetic_or_object MODULUS arithmetic_or_object
+                             | arithmetic_or_object DIVIDE arithmetic_or_object
+                             | arithmetic_or_object MULTIPLY arithmetic_or_object
+                             | arithmetic_or_object POWER arithmetic_or_object
+                             | MINUS arithmetic_or_object %prec UMINUS
+                             | LPAREN arithmetic_or_object RPAREN
                              | INTEGER_VAL
                              | DECIMAL_VAL'''
     if len(p) == 4:
@@ -327,7 +327,8 @@ def generate_parser(lexer, tokens):
     elif len(p) == 2: p[0] = None
 
   def p_set(p):
-    '''set : SET object_chain TO primitive'''
+    '''set : SET object_chain TO numeric_literal'''
+    #TODO: add possible expressions
     p[0] = (p[1], p[2], p[4])
 
   def p_move(p):
@@ -343,12 +344,17 @@ def generate_parser(lexer, tokens):
     'character_identifier : ID'
     p[0] = p[1]
 
+  def p_arithmetic_or_object(p):
+      '''arithmetic_or_object : arithmetic_expression
+                            | object_chain'''
+      p[0] = p[1]
+
   def p_increase(p):
-    'increase : INCREASE object_chain BY arithmetic_expression'
+    'increase : INCREASE object_chain BY arithmetic_or_object'
     p[0] = (p[1], p[2], p[4])
 
   def p_decrease(p):
-    'decrease : DECREASE object_chain BY arithmetic_expression'
+    'decrease : DECREASE object_chain BY arithmetic_or_object'
     p[0] = (p[1], p[2], p[4])
 
   def p_initiate(p):
