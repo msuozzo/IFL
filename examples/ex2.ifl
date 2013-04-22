@@ -25,12 +25,12 @@ ITEM apple:
 		ADD {INTEGER healing_value=100}
 		ADD {INTEGER experience_value=5}
 	ACTIONS:
-		"get"
+		"get":
 			REMOVE apple FROM LOCATION ON apple
 			ADD apple TO PLAYER
 
-		"eat"
-			IF PLAYER HAS apple
+		"eat":
+			IF PLAYER HAS apple:
 				EXECUTE update ON health ON PLAYER WITH healing_value
 				EXECUTE update ON experience ON PLAYER WITH experience_value
 				REMOVE apple FROM PLAYER

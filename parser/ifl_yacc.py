@@ -159,7 +159,7 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], p[2])
 
   def p_execute(p):
-    'execute : EXECUTE ID passed_args'
+    'execute : EXECUTE object_chain passed_args'
     p[0] = (p[1], p[2], p[3])
 
   def p_passed_args(p):
