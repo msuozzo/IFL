@@ -18,7 +18,7 @@ TRAIT experience:
 				INCREASE level BY 1
 				PRINT "You gained a level!"
 				PRINT "You are now level " . level
-ITEM apple
+ITEM apple:
 	START:
 		ADD {INTEGER healing_value=100}
 		ADD {INTEGER experience_value=5}
@@ -32,13 +32,13 @@ ITEM apple
 				EXECUTE update ON health ON PLAYER WITH healing_value
 				EXECUTE update ON experience ON PLAYER WITH experience_value
 				REMOVE apple FROM PLAYER
-CHARACTER maid
+CHARACTER maid:
 	"I am a maid of the house."
 	START:
-		USES Text.txt
+		USING "Text.txt"
 		ADD apple
 	ACTIONS:
-		"talk"
+		"talk":
 			IF HAS apple:
 				INITIATE DIALOGUE AT #LABEL A#
 			ELSE:
@@ -61,7 +61,7 @@ CHARACTER maid
 				GOTO #LABEL A#
 			ELSE IF LAST_INPUT EQUALS "2":
 				EXIT
-			ELSE
+			ELSE:
 				GOTO #LABEL D#
 		#LABEL D#:
 			IF LAST_INPUT EQUALS "1":
@@ -69,11 +69,11 @@ CHARACTER maid
 		#LABEL E#:
 			IF LAST_INPUT EQUALS "2":
 				EXIT
-SETTING house
+SETTING house:
 	"You are at the house."
 	START:
 		ADD maid
-CHARACTER PLAYER
+CHARACTER PLAYER:
 	START:
 		ADD health
 		ADD experience

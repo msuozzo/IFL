@@ -31,7 +31,7 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], p[2], p[4], p[5], p[6])
 
   def p_character_definition(p):
-    'character_definition : CHARACTER id_or_player COLON desc_or_nothing s_directive a_or_nothing f_or_nothing d_or_nothing END_BLOCK'
+    'character_definition : CHARACTER ID COLON desc_or_nothing s_directive a_or_nothing f_or_nothing d_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], p[6], p[7], p[8])
 
   def p_setting_definition(p):
@@ -51,10 +51,10 @@ def generate_parser(lexer, tokens):
     'description_string : string_value'
     p[0] = p[1]
 
-  def p_id_or_player(p):
-    '''id_or_player : ID
-                    | PLAYER'''
-    p[0] = p[1]
+#  def p_id_or_player(p):
+#    '''id_or_player : ID
+#                    | PLAYER'''
+#    p[0] = p[1]
 
   def p_s_directive(p):
     's_directive : START COLON start_list END_BLOCK'
@@ -289,7 +289,8 @@ def generate_parser(lexer, tokens):
   def p_relational_operand(p):
     '''relational_operand : tf_literal
                           | object_chain
-                          | arithmetic_expression'''
+                          | arithmetic_expression
+                          | string_value'''
     p[0] = p[1]
 
   def p_has_expression(p):

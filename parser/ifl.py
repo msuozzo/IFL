@@ -3,7 +3,6 @@ import ply.lex as lex
 def generate_lexer():
 
   reserved = {
-      'PLAYER' : 'PLAYER',
       'ITEM' : 'ITEM',
       'CHARACTER' : 'CHARACTER',
       'TRAIT' : 'TRAIT',
@@ -15,9 +14,7 @@ def generate_lexer():
       'INITIATE' : 'INITIATE',
       'AT' : 'AT',
       'GOTO' : 'GOTO',
-      'EXIT' : 'EXIT',
       'LOCATION' : 'LOCATION',
-      'LAST_INPUT' : 'LAST_INPUT',
       'ADD' : 'ADD',
       'SET' : 'SET',
       'ON' : 'ON',
@@ -45,6 +42,10 @@ def generate_lexer():
       'NOT' : 'NOT',
       'OR' : 'OR',
       'AND' : 'AND',
+#TODO: Player and Last_Input will be handled by the semantic analyzer
+#      'PLAYER' : 'PLAYER',
+#      'LAST_INPUT' : 'LAST_INPUT',
+      'EXIT' : 'EXIT',
       'END_BLOCK' : 'END_BLOCK'
   }
   tokens = [
