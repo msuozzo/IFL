@@ -1,4 +1,4 @@
-class Trait():
+class Trait:
 
 	def __init__(self):
 		self.d = dict();
