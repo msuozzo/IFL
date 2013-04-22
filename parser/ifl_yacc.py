@@ -27,7 +27,7 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_trait_definition(p):
-    'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_directive END_BLOCK'
+    'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], p[6])
 
   def p_character_definition(p):
