@@ -3,9 +3,9 @@ class Character:
 	def __init__(self):
 		self.d = dict();
 
-	def setValue(key, value):
+	def setValue(self, key, value):
 		self.d[key] = value
 
-	def getValue(key):
+	def getValue(self, key):
 		return self.d[key]
 
