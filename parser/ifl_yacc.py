@@ -189,7 +189,7 @@ def generate_parser(lexer, tokens):
     else: p[0] = (p[1], None, p[2], None)
 
   def p_quantity(p):
-    '''quantity : arithmetic_expression
+    '''quantity : LBRACK arithmetic_expression RBRACK
                 | empty'''
     p[0] = p[1]
 
@@ -227,8 +227,7 @@ def generate_parser(lexer, tokens):
     '''primitive : integer_primitive
                  | decimal_primitive
                  | string_primitive
-                 | tf_primitive
-                 | ID'''
+                 | tf_primitive'''
     p[0] = p[1]
 
   def p_integer_primitive(p):
