@@ -184,9 +184,9 @@ def generate_parser(lexer, tokens):
 
   def p_add(p):
     '''add : ADD quantity ID to_or_nothing
-           | ADD primitive to_or_nothing'''
-    if len(p) == 5: p[0] = (p[1], p[3], p[4], p[2])
-    else: p[0] = (p[1], p[2], p[3], None)
+           | ADD primitive'''
+    if len(p) == 5: p[0] = (p[1], p[2], p[3], p[4])
+    else: p[0] = (p[1], None, p[2], None)
 
   def p_quantity(p):
     '''quantity : arithmetic_expression
@@ -294,7 +294,7 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_has_expression(p):
-    '''has_expression : ID HAS ID
+    '''has_expression : object_chain HAS ID
                       | HAS ID'''
     if len(p) == 4: p[0] = (p[2], p[1], p[3])
     else: p[0] = (p[1], None, p[2])
@@ -312,14 +312,14 @@ def generate_parser(lexer, tokens):
                            | NOTEQUAL
                            | EQUALS
                            | NOT EQUALS''' 
-    if len(p) == 2: p[0] = p[1]
+    if len(p) == 2:
+      if p[1] == 'EQUALS': p[0] = '=='
+      else: p[0] = p[1]
     else: p[0] = '!='
 
   def p_remove(p):
-    '''remove : REMOVE quantity ID from_or_nothing
-              | REMOVE primitive from_or_nothing'''
-    if len(p) == 5: p[0] = (p[1], p[3], p[4], p[2])
-    else: p[0] = (p[1], p[2], p[3], None)
+    '''remove : REMOVE quantity ID from_or_nothing'''
+    p[0] = (p[1], p[2], p[3], p[4])
 
   def p_from_or_nothing(p):
     '''from_or_nothing : FROM object_chain
@@ -328,21 +328,16 @@ def generate_parser(lexer, tokens):
     elif len(p) == 2: p[0] = None
 
   def p_set(p):
-    '''set : SET object_chain TO numeric_literal'''
-    #TODO: add possible expressions
+    '''set : SET object_chain TO arg'''
     p[0] = (p[1], p[2], p[4])
 
   def p_move(p):
     'move : MOVE character_or_nothing TO object_chain'
-    p[0] = p[2]
+    p[0] = (p[1], p[2], p[4])
 
   def p_character_or_nothing(p):
-    '''character_or_nothing : character_identifier
+    '''character_or_nothing : object_chain
                             | empty'''
-    p[0] = p[1]
-
-  def p_character_identifier(p):
-    'character_identifier : ID'
     p[0] = p[1]
 
   def p_arithmetic_or_object(p):
@@ -359,17 +354,12 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], p[2], p[4])
 
   def p_initiate(p):
-    'initiate : INITIATE DIALOGUE AT label_identifier'
+    'initiate : INITIATE DIALOGUE AT LABEL'
     p[0] = (p[1], p[4])
-
-  def p_label_identifier(p):
-    'label_identifier : LABEL'
-    p[0] = p[1]
 
   def p_using(p):
     'using : USING string_value'
     p[0] = (p[1], p[2])
-
 
 
   def p_error(p):
