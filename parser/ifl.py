@@ -61,6 +61,8 @@ def generate_lexer():
       'STRING_VAL',
       'LBRACE',
       'RBRACE',
+      'LBRACK',
+      'RBRACK',
       'ASSIGN',
       'PLUS',
       'MINUS',
@@ -105,6 +107,8 @@ def generate_lexer():
   t_STRING_VAL = r'"([^\\"]|\\")*"'
   t_LBRACE = r'{'
   t_RBRACE = r'}'
+  t_LBRACK = r'\['
+  t_RBRACK = r'\]'
   t_ASSIGN = r'='
   t_PLUS = r'\+'
   t_MINUS = r'-'
