@@ -27,11 +27,20 @@ class DefinitionNode(object):
 		self.actions = []
 		self.dialogues = []
 
+#Increase health on player by 100
 class StatementNode(object):
 	"""StatementNode"""
 	def __init__(self, type):
 		self.type = type
 
-	def add_parameters(*args):
+	def add_parameters(args):
 		self.parameters = args
-		
+
+	def validate(self):
+		pass
+		# if type == "print":
+		# 	if (args.type != string)
+		# 		print "error"
+
+	def evaulate_chain(obj):
+		pass
