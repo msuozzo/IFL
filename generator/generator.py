@@ -14,14 +14,17 @@ class Node(object):
 	def add_child_front(self, object):
 		self.children.insert(0, object)
 
-def debug(node, tabs_count = 0):
-	text = ""
+	def get_children(self):
+		return self.children
 
+def debug(node, tabs_count = 0):
+	"""Prints out all of the children of a Node."""
+	text = ""
 	tabs = " "
 	for i in range(tabs_count):
 		tabs = tabs + "\t"
 
-	for n in node.children:
+	for n in node.get_children():
 		if type(n) is Node:
 			text = text + tabs + debug(n, tabs_count + 1)
 			text = text + "\n"
@@ -31,8 +34,14 @@ def debug(node, tabs_count = 0):
 	return text
 
 
+def code_generator(node):
+	if node.get_children()[0] == "":
+		return trait_generator(node)
+
+
+
 def construct_tree(data):
-	
+	"""Create a tree based on the input from the parser."""
 	root = Node("root")
 	current_parent = root
 	stack = []
@@ -41,12 +50,17 @@ def construct_tree(data):
 		# push tokens unto stack until ")" is detected
 		# when ")" is detected, pop the stack and create children to be inserted
 		if token == ")":
-			n = Node("parent")
+			n = Node("")
 
 			symbol = stack.pop()
+
 			while (symbol) != "(":
 				n.add_child_front(symbol)
 				symbol = stack.pop()
+
+			# semantic analyzer can be implemented here
+
+			#n = code_generator(n)
 
 			stack.append(n)
 
@@ -55,27 +69,31 @@ def construct_tree(data):
 
 	return stack.pop()
 
+def traverse_tree(file, tree):
+	"""Traverse through the tree in a DFS format to generate code"""
+
+	for node in tree.get_children():
+		pass
 
 def main():
 
     # set up the header
     file = open("output.py", 'w')
-    file.write('from Trait import Trait\n')
-    file.write('from Character import Character\n')
-   
+
+    # cleanse input from the tree
     data = open("tree1.txt").read()
     data = re.split("(\(|\)|,+\s)", data)
     data = filter(lambda a: a != ", ", data) 
     data = filter(lambda a: a != "", data)
 
-  #   for item in data:
-		# print "*" + item + "*"
+    tree = construct_tree(data)
 
-    t = construct_tree(data)
+    print "The tree is: "
+    print debug(tree)
 
-    print debug(t)
+    #traverse_tree(file, tree)
 
-#    health = Trait()
+#   health = Trait()
 #	health.setValue('current', 50)
 
 #	health.setValue('current', 100)
