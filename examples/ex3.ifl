@@ -28,7 +28,7 @@ ITEM apple:
 			ADD apple TO PLAYER
 
 		"eat":
-			IF PLAYER HAS apple
+			IF PLAYER HAS apple:
 				EXECUTE update ON health ON PLAYER WITH healing_value
 				EXECUTE update ON experience ON PLAYER WITH experience_value
 				REMOVE apple FROM PLAYER
