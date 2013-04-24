@@ -20,6 +20,9 @@ while True:
 
 tree = parser.parse(cleaned_data)
 
+print "tree is "
+print tree
+
 t = construct_tree(tree)
 
 print debug(t)

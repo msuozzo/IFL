@@ -1,10 +1,4 @@
-from parser import ifl_yacc, ifl
-from nodes import Node
-
-l = ifl.generate_lexer()
-lexer = l[0]
-tokens = l[1]
-parser = ifl_yacc.generate_parser(lexer, tokens)
+from nodes import Node, DefinitionNode, StatementNode
 
 def debug(node, tabs_count = 0):
 	"""Prints out all of the children of a Node."""
@@ -14,8 +8,6 @@ def debug(node, tabs_count = 0):
 		tabs = tabs + "\t"
 
 	for n in node.get_children():
-		print "n is "
-		print n
 		if type(n) is Node:
 			text = text + tabs + debug(n, tabs_count + 1)
 			text = text + "\n"
@@ -25,6 +17,40 @@ def debug(node, tabs_count = 0):
 			text = text + "\n" + tabs + n
 
 	return text
+
+def tree_traversal(node):
+	"""Goes through each node and each node's children once"""
+	for n in node.get_children():
+		if type(n) is Node:
+			tree_traversal(n)
+		elif n is None:
+			pass
+		else:
+			pass
+
+def add_definition_node(node):
+	children = node.get_children()
+	d = DefinitionNode(children[0], children[2])
+	node.node_type = d
+	return node
+
+
+def add_statement_node(node):
+	s = StatementNode(node.children[0])
+	s.add_parameters(node.children[1:])
+	node.node_type = s
+	return node
+
+
+
+def semantic_analyze(node):
+	children = node.get_children()
+	if children[0] in ["CHARACTER", "TRAIT", "ITEM", "SETTING"]:
+		return add_definition_node(node)
+	else:
+		return add_statement_node(node)
+
+
 
 def construct_tree(data):
 	"""Create a tree based on the input from the parser."""
@@ -37,4 +63,15 @@ def construct_tree(data):
 		else:
 			current_parent.add_child(token)
 
-	return current_parent
+	return semantic_analyze(current_parent)
+
+
+
+
+
+
+
+
+
+
+
