@@ -33,7 +33,7 @@ class StatementNode(object):
 	def __init__(self, type):
 		self.type = type
 
-	def add_parameters(args):
+	def add_parameters(self, args):
 		self.parameters = args
 
 	def validate(self):

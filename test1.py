@@ -2,7 +2,7 @@ from parser.ifl import generate_lexer
 from parser.ifl_yacc import generate_parser
 from parser.preprocessor import clean_input
 from analyzer.nodes import Node
-from analyzer.semantic_analyzer import construct_tree, debug
+from analyzer.semantic_analyzer import construct_tree, debug, tree_traversal
 
 
 lexer, tokens = generate_lexer()

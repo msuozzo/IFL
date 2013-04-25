@@ -9,7 +9,7 @@ def debug(node, tabs_count = 0):
 
 	for n in node.get_children():
 		if type(n) is Node:
-			text = text + tabs + debug(n, tabs_count + 1)
+			text = text + "Node Type: " + tabs + debug(n, tabs_count + 1)
 			text = text + "\n"
 		elif n is None:
 			text = text + "\n" + tabs + "None"
@@ -64,11 +64,6 @@ def construct_tree(data):
 			current_parent.add_child(token)
 
 	return semantic_analyze(current_parent)
-
-
-
-
-
 
 
 
