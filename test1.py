@@ -25,17 +25,18 @@ print tree
 
 t = construct_tree(tree)
 
+print debug(t)
 
-
-# print debug(t)
-
-
-
-
-
-
-
-
+# for a in t.parameters:
+# 	print "a"
+# 	print a.type
+# 	print a.ID
+# 	for b in a.parameters:
+# 		print b
+# 		if hasattr(b, "parameters"):
+# 			for c in b.parameters:
+# 				print c.type
+# 				print c
 
 
 

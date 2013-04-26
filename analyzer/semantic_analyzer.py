@@ -20,32 +20,59 @@ from nodes import Node, DefinitionNode, StatementNode
 
 def debug(node, tabs_count = 0):
 	"""Prints out the type, ID if available, and parameters of a node."""
-	print "node is:"
+
+	print "*****node is:*****"
 	print node
-	print "\n"
+	print type(node)
 
-
-	tabs = " "
+	# generate the correct number of tabs
+	tabs = "\t"
 	for i in range(tabs_count):
 		tabs = tabs + "\t"
 
 	text = ""
 
-	if node.ID is not None:
-		text = text + ": " + node.ID
+	if hasattr(node, "type"):
+		text = text + node.type
+		print text
 
-	for n in node.parameters:
-		if not isinstance(n, str):
-			text = text + tabs + debug(n, tabs_count + 1)
-			text = text + "\n"
-		elif n is None:
-			text = text + "\n" + tabs + "None"
-		else:
-			text = text + "\n" + tabs + n
+	if hasattr(node, 'ID'):
+		text = text + ": " + node.ID
+		print text
+
+	if isinstance(node, str):
+		text = text + "\n" + tabs + node
+		print text
+
+	if node is None:
+		text = text + "\n" + tabs + "None"
+		print text
+
+	if type(node) is list:
+		print "in type(node) is list"
+		for l in node:
+			text = text + "\n" + tabs + debug(l, tabs_count + 1)
+		print text
+
+	if hasattr(node, "parameters"):
+		print "- node parameters: "
+		print node.parameters
+
+		for n in node.parameters:
+			print "n is :"
+			print n
+
+			if isinstance(n, str):
+				print "inside if isinstance(n, str)"
+				text = text + "\n" + tabs + n
+			elif type(node) is DefinitionNode or type(node) is StatementNode:
+				print "inside elif type(node) is DefinitionNode"
+				text = text + "\n" + tabs + debug(n.parameters, tabs_count + 1)
+			else:
+				print "inside of else"
+				text = text + "\n" + tabs + debug(n, tabs_count + 1)
 
 	return text
-
-
 
 
 
@@ -60,28 +87,27 @@ def tree_traversal(node):
 		else:
 			pass
 
-def add_definition_node(node):
-	children = node.get_children()
-	d = DefinitionNode(children[0], children[2])
-	node.node_type = d
-	return node
+# def add_definition_node(node):
+# 	children = node.get_children()
+# 	d = DefinitionNode(children[0], children[2])
+# 	node.node_type = d
+# 	return node
 
 
-def add_statement_node(node):
-	s = StatementNode(node.children[0])
-	s.add_parameters(node.children[1:])
-	node.node_type = s
-	return node
+# def add_statement_node(node):
+# 	s = StatementNode(node.children[0])
+# 	s.add_parameters(node.children[1:])
+# 	node.node_type = s
+# 	return node
 
 
 
-def semantic_analyze(node):
-	children = node.get_children()
-	if children[0] in ["CHARACTER", "TRAIT", "ITEM", "SETTING"]:
-		return add_definition_node(node)
-	else:
-		return add_statement_node(node)
-
+# def semantic_analyze(node):
+# 	children = node.get_children()
+# 	if children[0] in ["CHARACTER", "TRAIT", "ITEM", "SETTING"]:
+# 		return add_definition_node(node)
+# 	else:
+# 		return add_statement_node(node)
 
 
 # def construct_tree(data):
@@ -103,39 +129,36 @@ def construct_tree(data, root=None):
 	# unique case where the root is initially empty
 	if root is None:
 
-		#print "Inside if type(root) is None"
-
 		current_node = DefinitionNode("ROOT", "root")
+
 		for token in data:
-				if type(token) is tuple:
-					current_node.add_parameters(construct_tree(token, current_node))
-				else:
-					current_node.add_parameters(token)
+			current_node.add_parameters(construct_tree(token, current_node))
+
 		return current_node
 
-	elif len(data) != 0:
+	else:
 
-		#print "Inside elif len(data) != 0"
+		if type(data[0]) is tuple:
+			iteration_start = 0
+			current_node = root
 
-		if (data[0] == "TRAIT" or
+		elif (data[0] == "TRAIT" or
 			data[0] == "CHARACTER" or
 			data[0] == "SETTING" or
 			data[0] == "ITEM"):
 			current_node = DefinitionNode(data[0], data[1])
-
-			for token in data[2:]:
-				if type(token) is tuple:
-					current_node.add_parameters(construct_tree(token, current_node))
-				else:
-					current_node.add_parameters(token)
-
+			iteration_start = 2
 		else:
 			current_node = StatementNode(data[0])
+			iteration_start = 1
 
-			for token in data[1:]:
-				if type(token) is tuple:
-					current_node.add_parameters(construct_tree(token, current_node))
-				else:
-					current_node.add_parameters(token)
+		for token in data[iteration_start:]:
+			if type(token) is tuple:
+				current_node.add_parameters(construct_tree(token, current_node))
+			elif token is None:
+				current_node.add_parameters("None")
+			else:
+				current_node.add_parameters(token)
+
 		return current_node
 

@@ -31,6 +31,7 @@ class DefinitionNode(object):
 		# self.functions = []
 		# self.actions = []
 		# self.dialogues = []
+		print "***DefintionNode " + type + " is created***"
 
 	def add_parameters(self, parameter):
 		self.parameters.append(parameter)
@@ -40,7 +41,8 @@ class StatementNode(object):
 	"""StatementNode"""
 	def __init__(self, type):
 		self.type = type
-		self.parameters = [] 
+		self.parameters = []
+		print "***StatementNode " + type + " is created***"
 
 	def add_parameters(self, parameter):
 		self.parameters.append(parameter)
