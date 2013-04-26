@@ -18,23 +18,32 @@ class DefinitionNode(object):
 		character_definitions
 		setting_definitions
 		item_definitions
+
+		DefinitionNodes must contain a type
+		TRAIT/CHARACTER/SETTING/ITEM along with an ID
 	"""
-	def __init__(self, type, description):
+	def __init__(self, type, ID):
 		self.type = type
-		self.description = description
-		self.start = []
-		self.functions = []
-		self.actions = []
-		self.dialogues = []
+		self.ID = ID
+		self.parameters = []
+		# self.description = []
+		# self.start = []
+		# self.functions = []
+		# self.actions = []
+		# self.dialogues = []
+
+	def add_parameters(self, parameter):
+		self.parameters.append(parameter)
 
 #Increase health on player by 100
 class StatementNode(object):
 	"""StatementNode"""
 	def __init__(self, type):
 		self.type = type
+		self.parameters = [] 
 
-	def add_parameters(self, args):
-		self.parameters = args
+	def add_parameters(self, parameter):
+		self.parameters.append(parameter)
 
 	def validate(self):
 		pass

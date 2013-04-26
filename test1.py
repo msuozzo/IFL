@@ -25,10 +25,9 @@ print tree
 
 t = construct_tree(tree)
 
-print debug(t)
 
 
-
+# print debug(t)
 
 
 
