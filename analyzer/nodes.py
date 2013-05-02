@@ -36,6 +36,9 @@ class DefinitionNode(object):
 	def add_parameters(self, parameter):
 		self.parameters.append(parameter)
 
+	def __str__(self):
+		return "Definition Node - Type: " + self.type + " ID: " + self.ID
+
 #Increase health on player by 100
 class StatementNode(object):
 	"""StatementNode"""
@@ -55,3 +58,6 @@ class StatementNode(object):
 
 	def evaulate_chain(obj):
 		pass
+
+	def __str__(self):
+		return "Statement Node - Type: " + self.type
