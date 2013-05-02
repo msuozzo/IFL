@@ -34,7 +34,7 @@ def debug(node, tabs_count = 0):
 		# print text
 
 	if hasattr(node, 'ID'):
-		text = text + ", ID:  " + node.ID
+		text = text + ", ID: " + node.ID
 		# print text
 
 	if isinstance(node, str):
@@ -52,6 +52,7 @@ def debug(node, tabs_count = 0):
 
 	if hasattr(node, "parameters"):
 		for n in node.parameters:
+
 			if n is None:
 				text = text + "\n" + tabs + "None"
 			elif isinstance(n, str):
@@ -59,7 +60,7 @@ def debug(node, tabs_count = 0):
 				text = text + "\n" + tabs + n
 			elif type(node) is DefinitionNode or type(node) is StatementNode:
 				# print "inside elif type(node) is DefinitionNode"
-				text = text + "\n" + tabs + debug(n.parameters, tabs_count + 1)
+				text = text + "\n" + tabs + debug(n, tabs_count + 1)
 			else:
 				# print "inside of else"
 				text = text + "\n" + tabs + debug(n, tabs_count + 1)
