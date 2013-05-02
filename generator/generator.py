@@ -32,13 +32,7 @@ def main():
     data = filter(lambda a: a != ", ", data) 
     data = filter(lambda a: a != "", data)
 
-    for i in data:
-    	print "*" + i + "*"
-
-    tree = construct_tree(data)
-
-    print "The tree is: "
-    print debug(tree)
+    #print debug(tree)
 
     # in progress
     if isinstance(xx, DefinitionNode):
