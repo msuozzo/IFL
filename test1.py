@@ -1,14 +1,14 @@
 from parser.ifl import generate_lexer
 from parser.ifl_yacc import generate_parser
 from parser.preprocessor import clean_input
-from analyzer.nodes import Node
-from analyzer.semantic_analyzer import construct_tree, debug, tree_traversal
+from analyzer.nodes import Program
+from analyzer.semantic_analyzer import *
 
 
 lexer, tokens = generate_lexer()
 
 parser = generate_parser(lexer, tokens)
-data = open("examples/ex1.ifl").read()
+data = open("examples/ex4.ifl").read()
 cleaned_data = '\n'.join(clean_input(data))
 
 lexer.input(cleaned_data)
@@ -23,25 +23,7 @@ tree = parser.parse(cleaned_data)
 print "tree is "
 print tree
 
-t = construct_tree(tree)
-
-print debug(t)
-
-# for a in t.parameters:
-# 	print "a"
-# 	print a.type
-# 	print a.ID
-# 	for b in a.parameters:
-# 		print b
-# 		if hasattr(b, "parameters"):
-# 			for c in b.parameters:
-# 				print c.type
-# 				print c
-
-
-
-
-
-
-
+print get_definitions(tree)
+t = Program()
+t = const_tree(tree, t, 0)
 
