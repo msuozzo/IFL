@@ -1,63 +1,66 @@
-class Node(object):
-	def __init__(self, data):
-		self.data = data
-		self.children = []
+from errors import errors
 
-	def add_child(self, object):
-		self.children.append(object)
+class Program():
+    def __init__(self):
+        pass
 
-	def add_child_front(self, object):
-		self.children.insert(0, object)
+class Definition():
+    """ Possible DefinitionNodes include:
+        trait_definitions
+        character_definitions
+        setting_definitions
+        item_definitions
 
-	def get_children(self):
-		return self.children
+        DefinitionNodes must contain a type
+        TRAIT/CHARACTER/SETTING/ITEM along with an ID
+    """
+    def __init__(self, definition_type, description):
+        self.definition_type = definition_type
+        self.description = description
 
-class DefinitionNode(object):
-	""" Possible DefinitionNodes include:
-		trait_definitions
-		character_definitions
-		setting_definitions
-		item_definitions
+    def __str__(self):
+        return "Definition Node - Type: " + self.type + " ID: " + self.ID
 
-		DefinitionNodes must contain a type
-		TRAIT/CHARACTER/SETTING/ITEM along with an ID
-	"""
-	def __init__(self, type, ID):
-		self.type = type
-		self.ID = ID
-		self.parameters = []
-		# self.description = []
-		# self.start = []
-		# self.functions = []
-		# self.actions = []
-		# self.dialogues = []
-		print "***DefintionNode " + type + " is created***"
+class StartDirective():
+    def __init__(self):
+        self.stmt_list = []
 
-	def add_parameters(self, parameter):
-		self.parameters.append(parameter)
+class ActionsDirective():
+    def __init__(self):
+        pass
 
-	def __str__(self):
-		return "Definition Node - Type: " + self.type + " ID: " + self.ID
+class FunctionsDirective():
+    def __init__(self):
+        pass
 
-#Increase health on player by 100
-class StatementNode(object):
-	"""StatementNode"""
-	def __init__(self, type):
-		self.type = type
-		self.parameters = []
-		print "***StatementNode " + type + " is created***"
+class DialogueDirective():
+    def __init__(self):
+        pass
 
-	def add_parameters(self, parameter):
-		self.parameters.append(parameter)
+class StatementNode():
+    def __init__(self, method):
+        self.method = method
+        self.params = []
 
-	def validate(self):
-		pass
-		# if type == "print":
-		# 	if (args.type != string)
-		# 		print "error"
+    def evaulate_chain(obj):
+        pass
 
-	def evaulate_chain(obj):
-		pass
+    def validate_add(self):
+        #Adding a primitive
+        if len(self.params) == 3:
+            if (self.params[0]):
+                error = errors["quantity_primitive"]
+            primitive = self.params[1]
 
-	def __str__(self):
-		return "Statement Node - Type: " + self.type
+
+        return error
+    validate_map = {
+        "ADD": validate_add
+    }
+
+    def validate(self):
+        global validate_map
+        error = validate_map[self.type]
+        return error
+
+
