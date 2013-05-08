@@ -1,3 +1,4 @@
 errors = {
-    "quantity_primitive": "CANNOT ADD A QUANTITY OF A PRIMITIVE"
+    "quantity_primitive": "CANNOT ADD A QUANTITY OF A PRIMITIVE",
+    "": ""
 }

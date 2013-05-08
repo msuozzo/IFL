@@ -14,7 +14,8 @@ class Definition():
         DefinitionNodes must contain a type
         TRAIT/CHARACTER/SETTING/ITEM along with an ID
     """
-    def __init__(self, definition_type, description):
+    def __init__(self, ID, definition_type, description):
+        self.ID = ID
         self.definition_type = definition_type
         self.description = description
 
@@ -52,14 +53,12 @@ class StatementNode():
                 error = errors["quantity_primitive"]
             primitive = self.params[1]
 
-
         return error
     validate_map = {
         "ADD": validate_add
     }
 
     def validate(self):
-        global validate_map
         error = validate_map[self.type]
         return error
 

@@ -2,6 +2,7 @@ from nodes import *
 from pprint import pprint
 
 definitions = []
+errors = []
 
 def get_definitions(data):
     global definitions
@@ -16,7 +17,7 @@ def const_tree(data, root, depth):
             tlt_name = tlt[1]
             tlt_description = tlt[2]
 
-            df = Definition(tlt_type, tlt_description)
+            df = Definition(tlt_name, tlt_type, tlt_description)
             setattr(root, tlt_name, df)
 
             #Iterate through the tld and get all the top level directives by checking whether they are tuples
@@ -38,6 +39,7 @@ def const_tree(data, root, depth):
             const_tree(stmt_list, start, 2)
         elif tld_type == 'ACTIONS':
             actions = ActionsDirective()
+            functions_list = []
         elif tld_type == 'FUNCTIONS':
             functions = FunctionsDirective()
         elif tld_type == 'DIALOGUE':
@@ -51,7 +53,10 @@ def const_tree(data, root, depth):
                 stmt_node.params = stmt[1:]
                 root.stmt_list.append(stmt_node)
 
-                error = stmt_node.validate();
+                # error = stmt_node.validate();
+                # if error:
+                #     errors.append(error)
+
         elif isinstance(root, ActionsDirective):
             pass
         elif isinstance(root, FunctionsDirective):
