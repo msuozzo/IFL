@@ -58,7 +58,7 @@ def generate_add(n):
 
         return "" + targ + "." + n["obj"].ID + " = " + n["obj"].value + "\n"
 
-#
+
 # def generate_decrease(n):
 #     return "self." + n(target) + "+="  + n(value) +"\n"
 #
