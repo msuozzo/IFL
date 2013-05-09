@@ -2,7 +2,7 @@ from parser.ifl import generate_lexer
 from parser.ifl_yacc import generate_parser
 from parser.preprocessor import clean_input
 from analyzer.nodes import Program
-from analyzer.semantic_analyzer import *
+from analyzer.semantic_analyzer import gen_tree
 from generator.generator import generator
 
 
@@ -19,15 +19,15 @@ while True:
     if not tok: break
     print tok
 
-tree = parser.parse(cleaned_data)
+tree = parser.parse(cleaned_data, debug=0)
 
 print "tree is "
 print tree
 
-print get_definitions(tree)
-t = Program()
-t = const_tree(tree, t, 0)
+for tlt in gen_tree(tree).tlts:
+  for s in tlt.start: print s
 
-generator(t)
+
+#generator(t)
 
 print "done"

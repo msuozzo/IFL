@@ -7,7 +7,7 @@ class Program:
     self.tlts = [TLT(*tlt) for tlt in tree]
     self.tlt_names = [tlt.id_ for tlt in self.tlts]
     def_pairs = []
-    for tlt in self.tlts: def_pairs.extend(tlt.get_add_fields)
+    for tlt in self.tlts: def_pairs.extend(tlt.get_add_fields())
     tlt_name_map = dict(zip(self.tlt_names, self.tlts))
 
     self.def_names = {}
@@ -143,7 +143,7 @@ class Statement:
 
   def get_add_fields(self):
     if self.type_ == Statement.ADD:
-      canonical_name = ".".join(reversed(self.to))
+      canonical_name = ".".join(self.to)
       datatype = self.primitive.type_ if self.primitive else TLT.UNKNOWN
       return [(canonical_name, self.id_)]
     return []

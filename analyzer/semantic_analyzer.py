@@ -1,163 +1,59 @@
-from nodes import *
-from pprint import pprint
+from nodes1 import TLT, Statement, Program
 
-definitions = {}
-error_list = []
+class Dummy: pass
 
-def get_definitions(data):
-    global definitions
-    for tlt in data:
-        definitions[tlt[1]] = tlt[0]
 
-class Primitive():
-    def __init__(self, params):
-        self.ID = params[1]
-        self.value = params[2]
+def gen_tree(ast):
+  prog = Program(ast)
+  prog.validate_defs()
+  return prog
+  import sys; sys.exit()
 
-class DefinitionObject():
-    def __init__(self, params):
-        self.ID = params
-        self.value = params.capitalize() + "()"
-        self.definition_type = definitions[params]
-
-def const_tree(data, root, depth):
-    '''
-    Keyword Arguments
-    '''
-    if depth == 0:
-        for tlt in data:
-            tlt_type = tlt[0]
-            tlt_id = tlt[1]
-            tlt_description = tlt[2]
-
-            df = Definition(tlt_id, tlt_type, tlt_description)
-            setattr(root, tlt_id, df)
-
-            #Iterate through the tld and get all the top level directives by checking whether they are tuples
-            for tld in tlt:
-                if type(tld) is tuple:
-                    const_tree(tld, df, 1)
-
-    elif depth == 1:
-        tld_type = data[0]
-
-        if tld_type == 'START':
-            start_dir = StartDirective()
-            stmt_list = data[1]
-
-            #Add the start directive to the definition
-            setattr(root, tld_type, start_dir)
-
-            #Recursive call on the list of statements to add to the start directive
-            const_tree(stmt_list, start_dir, 2)
-
-        elif tld_type == 'ACTIONS':
-            actions_dir = ActionsDirective()
-            func_list = data[1]
-
-            setattr(root, tld_type, actions_dir)
-            const_tree(func_list, actions_dir, 2)
-
-        elif tld_type == 'FUNCTIONS':
-            func = FunctionsDirective()
-
-        elif tld_type == 'DIALOGUE':
-            dialogue = DialogueDirective()
-
-    elif depth == 2:
-        if isinstance(root, StartDirective):
-            stmt_list = parse_stmt_list(data)
-            root.stmt_list = stmt_list
-
-                # error = stmt_node.validate();
-                # if error:
-                #     errors.append(error)
-
-        elif isinstance(root, ActionsDirective):
-            for function in data:
-                func_name = function[0]
-                stmt_list = parse_stmt_list(function[1])
-                root.actions_list[func_name] = stmt_list
-
-        elif isinstance(root, FunctionsDirective):
-            pass
-        elif isinstance(root, DialogueDirective):
-            pass
-
-    return root
-
-def parse_stmt_list(stmt_list):
-    stmt_node_list = []
-    for stmt in stmt_list:
-        stmt_node_list.append(parse_stmt(stmt))
-
-    return stmt_node_list
-
-def parse_stmt(stmt):
-    stmt_map = {
-        'ADD': parse_add,
-        'SET': parse_set,
-        'PRINT': parse_print,
-        'INCREASE': parse_increase,
-        'DECREASE': parse_decrease,
-        'MOVE': parse_move,
-        'REMOVE': parse_remove,
-        'IF': parse_conditional,
-    }
-
-    stmt_type = stmt[0]
-    stmt_params = stmt[1:]
-
-    params = stmt_map[stmt_type](stmt_params)
-    stmt_node = StatementNode(stmt_type, params)
-
-    # error = stmt_node.validate()
-    # error_list.append(error)
-
-    return stmt_node
-
-def parse_add(params):
-    param_map = {}
-    try:
-        param_map['quantity'] = params[0]
-        if type(params[1]) == tuple:
-            param_map['obj'] = Primitive(params[1])
-        else:
-            param_map['obj'] = DefinitionObject(params[1])
-        param_map['target'] = list(params[2])
-
-    except(ValueError):
-        pass
-
-    return param_map
-
-def parse_set(params):
-    param_map = {}
-    try:
-        param_map['target'] = list(params[0])
-        param_map['value'] = params[1]
-    except(ValueError):
-        pass
-
-    return param_map
-
-def parse_increase(params):
+def type_check(stat):
+  if stat.type_ == Statement.ADD:
+    if stat.primitive:
+      pass
+#      stat.primitive.type_ == 
+  elif self.type_ == Statement.PRINT:
     pass
-def parse_decrease(params):
+  elif self.type_ == Statement.REMOVE:
+    pass
+  elif self.type_ == Statement.SET:
+    pass
+  elif self.type_ == Statement.MOVE:
+    pass
+  elif self.type_ == Statement.INCREASE:
+    pass
+  elif self.type_ == Statement.DECREASE:
+    pass
+  elif self.type_ == Statement.NUMBER:
+    pass
+  elif self.type_ == Statement.INITIATE:
+    pass
+  elif self.type_ == Statement.EXECUTE:
+    pass
+  elif self.type_ == Statement.GOTO:
+    pass
+  elif self.type_ == Statement.USING:
     pass
 
-def parse_print(params):
-    param_map = {}
-    param_map['value'] = str(params[0][0])
 
-    return param_map
-
-def parse_move(params):
+get_dummy_name = lambda obj: "a_dummy."+".".join(obj[1:]) if obj[0] == "OBJ" else None
+def arithmetic_sub(stat, obj_list):
+  if stat[0] in ["+", "%", "/", "*", "^"]:
+    op = "**" if stat[1] == "^" else stat[1]
+    name = get_dummy_name(stat[1])
+    if name: obj_list.append(name)
+    name = get_dummy_name(stat[2])
+    if name: obj_list.append(name)
+    arg1 = arithmetic_sub(stat[1], obj_list)
+    arg2 = arithmetic_sub(stat[2], obj_list)
+    return "("+str(arg1)+")"+op+"("+str(arg2)+")"
+  elif stat[0] == "-":
+    pass
+  elif stat[0] == "LIT":
+    pass
+  else:
     pass
 
-def parse_remove(params):
-    pass
 
-def parse_conditional(params):
-    if_condition = params[0]
-    else_condition = params[-1]

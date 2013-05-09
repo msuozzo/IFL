@@ -186,13 +186,13 @@ def generate_parser(lexer, tokens):
   def p_add(p):
     '''add : ADD quantity ID TO object_chain
            | ADD primitive TO object_chain'''
-    if len(p) == 5: p[0] = (p[1], p[2], p[3], p[5])
-    else: p[0] = (p[1], None, p[2], p[4])
+    if len(p) == 5: p[0] = (p[1], p[2], p[3], p[4])
+    else: p[0] = (p[1], None, p[2], p[3])
 
   def p_quantity(p):
     '''quantity : LBRACK arithmetic_expression RBRACK
                 | empty'''
-    p[0] = p[2]
+    p[0] = p[2] if len(p) == 4 else None
 
   def p_arithmetic_expression(p):
     '''arithmetic_expression : arithmetic_or_object PLUS arithmetic_or_object
@@ -206,11 +206,11 @@ def generate_parser(lexer, tokens):
                              | INTEGER_VAL
                              | DECIMAL_VAL'''
     if len(p) == 4:
-      if p[1] == '(': p[0] = p[2]
+      if p[1] == '(': p[0] = (p[2],)
       else: p[0] = (p[2], p[1], p[3])
     elif len(p) == 3:
       p[0] = (p[1], p[2])
-    else: p[0] = p[1]
+    else: p[0] = ("LIT", p[1])
 
   def p_object_chain(p):
     '''object_chain : object_chain ON ID
