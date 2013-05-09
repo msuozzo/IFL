@@ -1,35 +1,8 @@
 TRAIT health:
 	START:
-		ADD {INTEGER current=50}
+		ADD {INTEGER current=50} TO SELF
 CHARACTER PLAYER:
 	START:
-		ADD health
-		SET current ON health TO 100
+		ADD health TO SELF
+		SET current ON health ON SELF TO 100
 		PRINT "Hello, I am a character"
-
--------
-health.py
-
-class Health:
-    def __init(self):
-        self.current = 50
-
--------
-player.py
-
-class Player:
-    def __init(self):
-        health = Health()
-        self.health.current = 100
-        print "Hello, I am a character"
-
--------
-game.py
-
-
-
-player = Player()
-
-while true:
-    input = raw_input("What would you like to do now?")
-
