@@ -22,8 +22,8 @@ TRAIT experience:
 
 ITEM apple:
 	START:
-		ADD {INTEGER healing_value=100} ON SELF
-		ADD {INTEGER experience_value=5} ON SELF
+		ADD {INTEGER healing_value=100} TO SELF
+		ADD {INTEGER experience_value=5} TO SELF
 	ACTIONS:
 		"get":
 			REMOVE apple FROM LOCATION ON apple

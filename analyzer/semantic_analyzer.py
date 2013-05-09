@@ -100,6 +100,9 @@ def parse_stmt(stmt):
         'PRINT': parse_print,
         'INCREASE': parse_increase,
         'DECREASE': parse_decrease,
+        'MOVE': parse_move,
+        'REMOVE': parse_remove,
+        'IF': parse_conditional,
     }
 
     stmt_type = stmt[0]
@@ -149,3 +152,12 @@ def parse_print(params):
 
     return param_map
 
+def parse_move(params):
+    pass
+
+def parse_remove(params):
+    pass
+
+def parse_conditional(params):
+    if_condition = params[0]
+    else_condition = params[-1]
