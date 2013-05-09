@@ -153,7 +153,7 @@ def generate_parser(lexer, tokens):
   def p_else_conditional(p):
     '''else_conditional : ELSE COLON statement_list END_BLOCK
                         | empty'''
-    p[0] = None if len(p) == 2 else (p[1], p[3])
+    p[0] = (True, ()) if len(p) == 2 else (True, p[3])
 
   def p_goto(p):
     'goto : GOTO LABEL'
