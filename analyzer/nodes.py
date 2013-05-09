@@ -50,7 +50,11 @@ class Statement:
   def __init__(self, tup, tlt_name):
     self.type_ = tup[0]
     if self.type_ == Statement.ADD:
-      self.id_ = tup[2]
+      self.primitive = None
+      if isinstance(tup[2], tuple):
+        self.primitive = Primitive(tup[2])
+        self.id_ = self.primitive.name
+      else: self.id_ = tup[2]
       self.quant = tup[1] if tup[1] else 1
       self.to = tup[3] if tup[3] else (tlt_name,)
     elif self.type_ == Statement.PRINT:
@@ -81,7 +85,6 @@ class Statement:
     elif self.type_ == Statement.USING:
       self.filename = tup[1]
 
-  #FIX: "PLAYER ON House" may be stupid but it fails
   def get_add_fields(self):
     return [(self.to[0], self.id_)] if self.type_ == Statement.ADD else []
 
@@ -100,21 +103,23 @@ class Conditional(Statement):
 
 class Function:
   def __init__(self, tup, tlt_name):
-    self.arguments = 
-    self.statements
+    self.name = tup[0]
+    self.arg_names = tup[1]
+    self.statements = [stat_or_cond(stat, tlt_name) for stat in tup[2]]
     self.get_add_fields = lambda: get_add_fields(self.statements)
  
 
 class Action:
   def __init__(self, tup, tlt_name):
     self.action_phrase = tup[0]
-    self.statements = []
+    self.statements = [stat_or_cond(stat, tlt_name) for stat in tup[1]]
     self.get_add_fields = lambda: get_add_fields(self.statements)
-    pass
 
 class Primitive:
   def __init__(self, tup, tlt_name):
-    pass
+    self.type_ = tup[0]
+    self.name = tup[1]
+    self.val = tup[2]
 
 
 
@@ -126,65 +131,3 @@ def get_add_fields(lst):
 def stat_or_cond(tup, tlt_name):
   return Conditional(tup, tlt_name) if tup[0] == "IF" else Statement(tup, tlt_name)
 
-class Node:
-	def __init__(self, data):
-		self.data = data
-		self.children = []
-
-	def add_child(self, obj):
-		self.children.append(obj)
-
-	def add_child_front(self, obj):
-		self.children.insert(0, obj)
-
-	def get_children(self):
-		return self.children
-
-class DefinitionNode(Node):
-	""" Possible DefinitionNodes include:
-		trait_definitions
-		character_definitions
-		setting_definitions
-		item_definitions
-
-		DefinitionNodes must contain a type
-		TRAIT/CHARACTER/SETTING/ITEM along with an ID
-	"""
-	def __init__(self, type_, ID):
-		self.type_ = type_
-		self.ID = ID
-		self.parameters = []
-		# self.description = []
-		# self.start = []
-		# self.functions = []
-		# self.actions = []
-		# self.dialogues = []
-		print "***DefintionNode " + type_ + " is created***"
-
-	def add_parameters(self, parameter):
-		self.parameters.append(parameter)
-
-	def __str__(self):
-		return "Definition Node - Type: " + self.type_ + " ID: " + self.ID
-
-class StatementNode(Node):
-	"""StatementNode"""
-	def __init__(self, type_):
-		self.type_ = type_
-		self.parameters = []
-		print "***StatementNode " + type_ + " is created***"
-
-	def add_parameters(self, parameter):
-		self.parameters.append(parameter)
-
-	def validate(self):
-		pass
-		# if type == "print":
-		# 	if (args.type != string)
-		# 		print "error"
-
-	def evaulate_chain(obj):
-		pass
-
-	def __str__(self):
-		return "Statement Node - Type: " + self.type_
