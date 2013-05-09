@@ -99,6 +99,8 @@ def parse_stmt(stmt):
         'ADD': parse_add,
         'SET': parse_set,
         'PRINT': parse_print,
+        'INCREASE': parse_increase,
+        'DECREASE': parse_decrease,
     }
 
     stmt_type = stmt[0]
@@ -137,9 +139,14 @@ def parse_set(params):
 
     return param_map
 
+def parse_increase(params):
+    pass
+def parse_decrease(params):
+    pass
+
 def parse_print(params):
     param_map = {}
-    param_map['value'] = str(params[0])
+    param_map['value'] = str(params[0][0])
 
     return param_map
 
