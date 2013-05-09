@@ -42,7 +42,7 @@ SETTING house:
 		
 CHARACTER PLAYER:
 	START:
-		ADD health
+		ADD {INTEGER max=5}
 		ADD experience
 		MOVE TO house
 

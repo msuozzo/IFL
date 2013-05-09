@@ -139,7 +139,7 @@ def parse_set(params):
 
 def parse_print(params):
     param_map = {}
-    param_map['value'] = params[0]
+    param_map['value'] = str(params[0])
 
     return param_map
 
