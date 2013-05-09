@@ -1,16 +1,15 @@
+from generator_functions import *
 import os
 
 def generate_code(node):
-    # if node.method == "ADD":
-    #     return generate_add(node.params)
-    #
-    # elif node.method == "SET":
-    #     return generate_set(node.params)
-    #
-    # elif node.method == "PRINT":
-    #     return generate_print(node.params)
-    return "pass\n"
+    if node.func_name == "ADD":
+        return generate_add(node.params)
 
+    elif node.func_name == "SET":
+        return generate_set(node.params)
+
+    elif node.func_name == "PRINT":
+        return generate_print(node.params)
 
 
 def generate_classes(tree):
