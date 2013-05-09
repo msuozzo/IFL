@@ -1,4 +1,4 @@
-from errors import errors
+from validate import *
 
 class Program():
     def __init__(self):
@@ -14,7 +14,8 @@ class Definition():
         DefinitionNodes must contain a type
         TRAIT/CHARACTER/SETTING/ITEM along with an ID
     """
-    def __init__(self, definition_type, description):
+    def __init__(self, ID, definition_type, description):
+        self.ID = ID
         self.definition_type = definition_type
         self.description = description
 
@@ -27,7 +28,7 @@ class StartDirective():
 
 class ActionsDirective():
     def __init__(self):
-        pass
+        self.actions_list = {}
 
 class FunctionsDirective():
     def __init__(self):
@@ -37,30 +38,29 @@ class DialogueDirective():
     def __init__(self):
         pass
 
+class FunctionNode():
+    def __init__(self, func_name, params, stmt_list):
+        self.func_name = func_name
+        self.params = params
+        self.stmt_list = []
+
 class StatementNode():
-    def __init__(self, method):
-        self.method = method
-        self.params = []
+    def __init__(self, func_name, params):
+        self.func_name = func_name
+        self.params = params
 
     def evaulate_chain(obj):
         pass
 
-    def validate_add(self):
-        #Adding a primitive
-        if len(self.params) == 3:
-            if (self.params[0]):
-                error = errors["quantity_primitive"]
-            primitive = self.params[1]
-
-
-        return error
-    validate_map = {
-        "ADD": validate_add
-    }
-
     def validate(self):
-        global validate_map
-        error = validate_map[self.type]
-        return error
+        error_msg = validate_map[self.func_name](self.params)
+        return error(str(self), error_msg)
 
+    def __str__(self):
+        return self.func_name + str(self.params)
+
+class error():
+    def __init__(self, line, error_msg):
+        self.line = line
+        self.error_msg = error_msg
 

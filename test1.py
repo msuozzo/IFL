@@ -8,7 +8,7 @@ from analyzer.semantic_analyzer import *
 lexer, tokens = generate_lexer()
 
 parser = generate_parser(lexer, tokens)
-data = open("examples/ex4.ifl").read()
+data = open("examples/ex2.ifl").read()
 cleaned_data = '\n'.join(clean_input(data))
 
 lexer.input(cleaned_data)
@@ -26,4 +26,4 @@ print tree
 print get_definitions(tree)
 t = Program()
 t = const_tree(tree, t, 0)
-
+print "done"
