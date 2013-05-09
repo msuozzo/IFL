@@ -191,7 +191,8 @@ def generate_parser(lexer, tokens):
   def p_quantity(p):
     '''quantity : LBRACK arithmetic_expression RBRACK
                 | empty'''
-    p[0] = p[1]
+    if len(p) == 4: p[0] = p[2]
+    else: p[0] = p[1]
 
   def p_arithmetic_expression(p):
     '''arithmetic_expression : arithmetic_or_object PLUS arithmetic_or_object
