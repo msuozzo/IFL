@@ -41,6 +41,8 @@ def generate_lexer():
       'NOT' : 'NOT',
       'OR' : 'OR',
       'AND' : 'AND',
+      'NUMBER' : 'NUMBER',
+      'OF' : 'OF',
 #TODO: Player and Last_Input will be handled by the semantic analyzer
 #      'PLAYER' : 'PLAYER',
 #      'LAST_INPUT' : 'LAST_INPUT',

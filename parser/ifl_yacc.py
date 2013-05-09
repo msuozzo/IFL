@@ -132,6 +132,7 @@ def generate_parser(lexer, tokens):
                  | move
                  | increase
                  | decrease
+                 | number
                  | initiate
                  | conditional
                  | execute
@@ -334,6 +335,10 @@ def generate_parser(lexer, tokens):
   def p_decrease(p):
     'decrease : DECREASE object_chain BY arithmetic_or_object'
     p[0] = (p[1], p[2], p[4])
+
+  def p_number(p):
+    'number : NUMBER OF ID ON object_chain'
+    p[0] = (p[1], p[3], p[5])
 
   def p_initiate(p):
     'initiate : INITIATE DIALOGUE AT LABEL'

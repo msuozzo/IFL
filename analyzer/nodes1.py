@@ -33,6 +33,12 @@ class Program:
   def validate_defs(self):
     for name, fields in self.definitions.iteritems():
       name_reduction = name.rsplit(".", 1)
+      if len(name[0].split(".")) == 1:
+        if name[0] not in self.tlt_names and name[0] not in ["SELF", "LAST_INPUT"]:
+          raise Exception #TODO invalid root object
+
+
+
       for field in fields:
         pass
 
@@ -75,6 +81,7 @@ class Statement:
   MOVE="MOVE"
   INCREASE="INCREASE"
   DECREASE="DECREASE"
+  NUMBER="NUMBER"
   INITIATE="INITIATE"
   EXECUTE="EXECUTE"
   GOTO="GOTO"
@@ -108,6 +115,9 @@ class Statement:
     elif self.type_ == Statement.DECREASE:
       self.target = tup[1]
       self.val = tup[2]
+    elif self.type_ == Statement.NUMBER:
+      self.obj = tup[1]
+      self.target = tup[2]
     elif self.type_ == Statement.INITIATE:
       self.label = tup[1]
     elif self.type_ == Statement.EXECUTE:
