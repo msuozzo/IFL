@@ -1,7 +1,7 @@
 # generates a print statement
 #'print : PRINT string_expression'
 def generate_print(n):
-    return "print " + n["value"] + "\n"
+    return "print '" + n["value"] + "'\n"
 
 def generate_set(n):
     targ = ""
@@ -58,10 +58,6 @@ def generate_add(n):
 
         return "" + targ + "." + n["obj"].ID + " = " + n["obj"].value + "\n"
 
-
-
-# def generate_set(n):
-#     return "self." + n(target) + "=" + n(value) +"\n"
 #
 # def generate_decrease(n):
 #     return "self." + n(target) + "+="  + n(value) +"\n"
