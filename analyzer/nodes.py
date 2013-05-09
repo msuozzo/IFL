@@ -1,63 +1,90 @@
-class Node(object):
-	def __init__(self, data):
-		self.data = data
-		self.children = []
+from validate import *
 
-	def add_child(self, object):
-		self.children.append(object)
+class Program():
+    def __init__(self):
+        pass
 
-	def add_child_front(self, object):
-		self.children.insert(0, object)
+class Definition():
+    """ Possible DefinitionNodes include:
+        trait_definitions
+        character_definitions
+        setting_definitions
+        item_definitions
 
-	def get_children(self):
-		return self.children
+        DefinitionNodes must contain a type
+        TRAIT/CHARACTER/SETTING/ITEM along with an ID
+    """
+    def __init__(self, ID, definition_type, description):
+        self.ID = ID
+        self.definition_type = definition_type
+        self.description = description
 
-class DefinitionNode(object):
-	""" Possible DefinitionNodes include:
-		trait_definitions
-		character_definitions
-		setting_definitions
-		item_definitions
+    def __str__(self):
+        return "Definition Node - Type: " + self.type + " ID: " + self.ID
 
-		DefinitionNodes must contain a type
-		TRAIT/CHARACTER/SETTING/ITEM along with an ID
-	"""
-	def __init__(self, type, ID):
-		self.type = type
-		self.ID = ID
-		self.parameters = []
-		# self.description = []
-		# self.start = []
-		# self.functions = []
-		# self.actions = []
-		# self.dialogues = []
-		print "***DefintionNode " + type + " is created***"
+class StartDirective():
+    def __init__(self):
+        self.stmt_list = []
 
-	def add_parameters(self, parameter):
-		self.parameters.append(parameter)
+class ActionsDirective():
+    def __init__(self):
+        self.actions_list = {}
 
-	def __str__(self):
-		return "Definition Node - Type: " + self.type + " ID: " + self.ID
+class FunctionsDirective():
+    def __init__(self):
+        pass
 
-#Increase health on player by 100
-class StatementNode(object):
-	"""StatementNode"""
-	def __init__(self, type):
-		self.type = type
-		self.parameters = []
-		print "***StatementNode " + type + " is created***"
+class DialogueDirective():
+    def __init__(self):
+        pass
 
-	def add_parameters(self, parameter):
-		self.parameters.append(parameter)
+class FunctionNode():
+    def __init__(self, func_name, params, stmt_list):
+        self.func_name = func_name
+        self.params = params
+        self.stmt_list = []
 
-	def validate(self):
-		pass
-		# if type == "print":
-		# 	if (args.type != string)
-		# 		print "error"
+class IfConditionalNode():
+    def __init__(self, conditional, stmt_list):
+        self.conditional = conditional
+        self.stmt_list = stmt_list
 
-	def evaulate_chain(obj):
-		pass
+class ElifConditionalNode():
+    def __init__(self, conditional, stmt_list):
+        self.conditional = conditional
+        self.stmt_list = stmt_list
 
-	def __str__(self):
-		return "Statement Node - Type: " + self.type
+class ElseConditionalNode():
+    def __init__(self, stmt_list):
+        self.stmt_list = stmt_list
+
+class ConditionalAggregator():
+    def __init__(self, if_conditional, elif_conditional=None, else_conditional=None):
+        self.if_conditional = IfConditionalNode(if_conditional[0], if_conditional[1])
+
+        self.elif_conditional = []
+        for conditional in elif_conditional:
+            self.elif_condtionals.append(ElifConditionalNode(conditional[0], conditional[1]))
+
+        self.else_conditional = ElseConditionalNode(else_conditional[0])
+
+class StatementNode():
+    def __init__(self, func_name, params):
+        self.func_name = func_name
+        self.params = params
+
+    def evaulate_chain(obj):
+        pass
+
+    def validate(self):
+        error_msg = validate_map[self.func_name](self.params)
+        return error(str(self), error_msg)
+
+    def __str__(self):
+        return self.func_name + str(self.params)
+
+class error():
+    def __init__(self, line, error_msg):
+        self.line = line
+        self.error_msg = error_msg
+

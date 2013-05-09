@@ -1,160 +1,163 @@
-from nodes import Node, DefinitionNode, StatementNode
+from nodes import *
 from pprint import pprint
 
-# def debug(node, tabs_count = 0):
-# 	"""Prints out all of the children of a Node."""
-# 	text = ""
-# 	tabs = " "
-# 	for i in range(tabs_count):
-# 		tabs = tabs + "\t"
+definitions = {}
+error_list = []
 
-# 	for n in node.get_children():
-# 		if type(n) is Node:
-# 			text = text + tabs + debug(n, tabs_count + 1)
-# 			text = text + "\n"
-# 		elif n is None:
-# 			text = text + "\n" + tabs + "None"
-# 		else:
-# 			text = text + "\n" + tabs + n
+def get_definitions(data):
+    global definitions
+    for tlt in data:
+        definitions[tlt[1]] = tlt[0]
 
-# 	return text
+class Primitive():
+    def __init__(self, params):
+        self.ID = params[1]
+        self.value = params[2]
 
-def debug(node, tabs_count = 0):
-	"""Prints out the type, ID if available, and parameters of a node."""
+class DefinitionObject():
+    def __init__(self, params):
+        self.ID = params
+        self.value = params.capitalize() + "()"
+        self.definition_type = definitions[params]
 
-	# generate the correct number of tabs
-	tabs = "\t"
-	for i in range(tabs_count):
-		tabs = tabs + "\t"
+def const_tree(data, root, depth):
+    '''
+    Keyword Arguments
+    '''
+    if depth == 0:
+        for tlt in data:
+            tlt_type = tlt[0]
+            tlt_id = tlt[1]
+            tlt_description = tlt[2]
 
-	text = ""
+            df = Definition(tlt_id, tlt_type, tlt_description)
+            setattr(root, tlt_id, df)
 
-	if hasattr(node, "type"):
-		text = text + "Type: " + node.type
-		# print text
+            #Iterate through the tld and get all the top level directives by checking whether they are tuples
+            for tld in tlt:
+                if type(tld) is tuple:
+                    const_tree(tld, df, 1)
 
-	if hasattr(node, 'ID'):
-		text = text + ", ID: " + node.ID
-		# print text
+    elif depth == 1:
+        tld_type = data[0]
 
-	if isinstance(node, str):
-		text = text + "\n" + tabs + node
-		# print text
+        if tld_type == 'START':
+            start_dir = StartDirective()
+            stmt_list = data[1]
 
-	if node is None:
-		text = text + "\n" + tabs + "None"
-		# print text
+            #Add the start directive to the definition
+            setattr(root, tld_type, start_dir)
 
-	if type(node) is list:
-		for l in node:
-			text = text + "\n" + tabs + debug(l, tabs_count + 1)
-		# print text
+            #Recursive call on the list of statements to add to the start directive
+            const_tree(stmt_list, start_dir, 2)
 
-	if hasattr(node, "parameters"):
-		for n in node.parameters:
+        elif tld_type == 'ACTIONS':
+            actions_dir = ActionsDirective()
+            func_list = data[1]
 
-			if n is None:
-				text = text + "\n" + tabs + "None"
-			elif isinstance(n, str):
-				# print "inside if isinstance(n, str)"
-				text = text + "\n" + tabs + n
-			elif type(node) is DefinitionNode or type(node) is StatementNode:
-				# print "inside elif type(node) is DefinitionNode"
-				text = text + "\n" + tabs + debug(n, tabs_count + 1)
-			else:
-				# print "inside of else"
-				text = text + "\n" + tabs + debug(n, tabs_count + 1)
+            setattr(root, tld_type, actions_dir)
+            const_tree(func_list, actions_dir, 2)
 
-	return text
+        elif tld_type == 'FUNCTIONS':
+            func = FunctionsDirective()
 
+        elif tld_type == 'DIALOGUE':
+            dialogue = DialogueDirective()
 
+    elif depth == 2:
+        if isinstance(root, StartDirective):
+            stmt_list = parse_stmt_list(data)
+            root.stmt_list = stmt_list
 
+                # error = stmt_node.validate();
+                # if error:
+                #     errors.append(error)
 
-def tree_traversal(node):
-	"""Goes through each node and each node's children once"""
-	for n in node.get_children():
-		if type(n) is Node:
-			tree_traversal(n)
-		elif n is None:
-			pass
-		else:
-			pass
+        elif isinstance(root, ActionsDirective):
+            for function in data:
+                func_name = function[0]
+                stmt_list = parse_stmt_list(function[1])
+                root.actions_list[func_name] = stmt_list
 
-# def add_definition_node(node):
-# 	children = node.get_children()
-# 	d = DefinitionNode(children[0], children[2])
-# 	node.node_type = d
-# 	return node
+        elif isinstance(root, FunctionsDirective):
+            pass
+        elif isinstance(root, DialogueDirective):
+            pass
 
+    return root
 
-# def add_statement_node(node):
-# 	s = StatementNode(node.children[0])
-# 	s.add_parameters(node.children[1:])
-# 	node.node_type = s
-# 	return node
+def parse_stmt_list(stmt_list):
+    stmt_node_list = []
+    for stmt in stmt_list:
+        stmt_node_list.append(parse_stmt(stmt))
 
+    return stmt_node_list
 
+def parse_stmt(stmt):
+    stmt_map = {
+        'ADD': parse_add,
+        'SET': parse_set,
+        'PRINT': parse_print,
+        'INCREASE': parse_increase,
+        'DECREASE': parse_decrease,
+        'MOVE': parse_move,
+        'REMOVE': parse_remove,
+        'IF': parse_conditional,
+    }
 
-# def semantic_analyze(node):
-# 	children = node.get_children()
-# 	if children[0] in ["CHARACTER", "TRAIT", "ITEM", "SETTING"]:
-# 		return add_definition_node(node)
-# 	else:
-# 		return add_statement_node(node)
+    stmt_type = stmt[0]
+    stmt_params = stmt[1:]
 
+    params = stmt_map[stmt_type](stmt_params)
+    stmt_node = StatementNode(stmt_type, params)
 
-# def construct_tree(data):
-# 	"""Create a tree based on the input from the parser."""
-# 	current_parent = Node("parent")
+    # error = stmt_node.validate()
+    # error_list.append(error)
 
-# 	for token in data:
-# 		if type(token) is tuple:
-# 			n = construct_tree(token)
-# 			current_parent.add_child(n)
-# 		else:
-# 			current_parent.add_child(token)
+    return stmt_node
 
-# 	return semantic_analyze(current_parent)
+def parse_add(params):
+    param_map = {}
+    try:
+        param_map['quantity'] = params[0]
+        if type(params[1]) == tuple:
+            param_map['obj'] = Primitive(params[1])
+        else:
+            param_map['obj'] = DefinitionObject(params[1])
+        param_map['target'] = list(params[2])
 
-def construct_tree(data, root=None):
-	"""Create a tree based on the input from the parser."""
+    except(ValueError):
+        pass
 
-	# unique case where the root is initially empty
-	if root is None:
-		current_node = DefinitionNode("ROOT", "root")
+    return param_map
 
-		for token in data:
-			current_node.add_parameters(construct_tree(token, current_node))
+def parse_set(params):
+    param_map = {}
+    try:
+        param_map['target'] = list(params[0])
+        param_map['value'] = params[1]
+    except(ValueError):
+        pass
 
-		return current_node
+    return param_map
 
-	else:
+def parse_increase(params):
+    pass
+def parse_decrease(params):
+    pass
 
-		if type(data[0]) is tuple:
-			current_node = root
-			for token in data:
-				current_node.add_parameters(construct_tree(token, current_node))
-			
-			return None
+def parse_print(params):
+    param_map = {}
+    param_map['value'] = str(params[0][0])
 
-		if (data[0] == "TRAIT" or
-			data[0] == "CHARACTER" or
-			data[0] == "SETTING" or
-			data[0] == "ITEM"):
-			current_node = DefinitionNode(data[0], data[1])
-			iteration_start = 2
-		else:
-			current_node = StatementNode(data[0])
-			iteration_start = 1
+    return param_map
 
-		for token in data[iteration_start:]:
+def parse_move(params):
+    pass
 
-			if type(token) is tuple:
-				current_node.add_parameters(construct_tree(token, current_node))
-			elif token is None:
-				current_node.add_parameters("None")
-			else:
-				current_node.add_parameters(token)
+def parse_remove(params):
+    pass
 
-		return current_node
-
+def parse_conditional(params):
+    if_condition = params[0]
+    else_condition = params[-1]
