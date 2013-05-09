@@ -4,7 +4,7 @@ reserved_terms = (("SELF", ("LOCATION", "SETTING")),
 
 class Program:
   def __init__(self, tree):
-    self.tlts = [TLT(tlt) for tlt in tree]
+    self.tlts = [TLT(*tlt) for tlt in tree]
     self.tlt_names = [tlt.id_ for tlt in self.tlts]
     def_pairs = []
     for tlt in self.tlts: def_pairs.extend(tlt.get_add_fields)
@@ -28,7 +28,10 @@ class Program:
       if id_ in tlt_name_map and type_ != tlt_name_map[id_].type_:
         raise Exception #TODO Duplicate name error
       #FIX:possibility that 2 fields be added with same name but different type
-      self.def_types[fullname] = type_
+      if fullname in self.def_types: 
+        self.def_types[fullname] = None
+        #TODO: warn that initiated with 2 different types
+      else: self.def_types[fullname] = type_
 
   def validate_defs(self):
     for name, fields in self.def_names.iteritems():
@@ -58,14 +61,14 @@ class TLT:
   SETTING = "SETTING"
   UNKNOWN = "UNKNOWN"
 
-  def __init__(self, type_, id_, desc, start, action, function, dialogue):
+  def __init__(self, type_, id_, desc, start, action=None, function=None, dialogue=None):
     self.type_ = type_
     self.id_ = id_
     self.desc = desc if desc is None else gen_desc(type_, id_)
     self.start = [stat_or_cond(tup, self.id_) for tup in start]
-    self.actions = [Action(tup, self.id_) for tup in action[1]]
-    self.functions = [Function(tup, self.id_) for tup in function[1]]
-    self.dialogue = Dialogue(dialogue, self.id_)
+    self.actions = [Action(tup, self.id_) for tup in action[1]] if action else None
+    self.functions = [Function(tup, self.id_) for tup in function[1]] if function else None
+    self.dialogue = Dialogue(dialogue, self.id_) if dialogue else None
 
   def gen_possible_fields(self):
     names = []
@@ -75,9 +78,11 @@ class TLT:
   def get_add_fields(self):
     ret = []
     for stat in self.start: ret.extend(stat.get_add_fields())
-    for action in self.actions: ret.extend(action.get_add_fields())
-    for function in self.functions: ret.extend(function.get_add_fields())
-    ret.extend(self.dialogue.get_add_fields())
+    if self.actions:
+      for action in self.actions: ret.extend(action.get_add_fields())
+    if self.functions:
+      for function in self.functions: ret.extend(function.get_add_fields())
+    if self.dialogue: ret.extend(self.dialogue.get_add_fields())
     return ret
 
 
@@ -149,9 +154,9 @@ class Conditional(Statement):
     # contains 2-tuples of (case, statement_list)
     self.cases = []
     for sec in tup[1:]:
-      if not sec: continue  #should activate on abscent ELSE clause
+      if not sec[1]: continue  #should activate on abscent ELSE clause
       case = sec[0]
-      statements = [stat_or_cond(stat, tlt_name) for stat in sec[1:]]
+      statements = [stat_or_cond(stat, tlt_name) for stat in sec[1]]
       self.cases.append((case, statements))
     self.get_add_fields = lambda: get_add_fields(self.cases)
 
@@ -170,12 +175,28 @@ class Action:
     self.statements = [stat_or_cond(stat, tlt_name) for stat in tup[1]]
     self.get_add_fields = lambda: get_add_fields(self.statements)
 
+
 class Primitive:
   def __init__(self, tup, tlt_name):
     self.type_ = tup[0]
     self.name = tup[1]
     self.val = tup[2]
 
+
+class Dialogue:
+  def __init__(self, tup, tlt_name):
+    self.label_map = {}
+    for pair in tup[1:]:
+      label = pair[0]
+      statements = [stat_or_cond(stat, tlt_name) for stat in pair[1]]
+      if label in self.label_map:
+        raise Exception #TODO label used multiple times
+      self.label_map[label] = statements
+    self.labels = self.label_map.keys()
+    self.all_statements = []
+    for label, statements in self.label_map.iteritems():
+      self.all_statements.extend(statements)
+    self.get_add_fields = lambda: get_add_fields(self.all_statements)
 
 
 def get_add_fields(lst):
@@ -187,5 +208,5 @@ def stat_or_cond(tup, tlt_name):
   return Conditional(tup, tlt_name) if tup[0] == "IF" else Statement(tup, tlt_name)
 
 def self_replace(lst, tlt_name):
-  return [tlt_name if elem=="SELF" else elem for elem in lst]
+  return [tlt_name if elem=="SELF" else elem for elem in lst[1:]]
 

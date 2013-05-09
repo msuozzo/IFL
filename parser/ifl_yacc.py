@@ -192,7 +192,7 @@ def generate_parser(lexer, tokens):
   def p_quantity(p):
     '''quantity : LBRACK arithmetic_expression RBRACK
                 | empty'''
-    p[0] = p[1]
+    p[0] = p[2]
 
   def p_arithmetic_expression(p):
     '''arithmetic_expression : arithmetic_or_object PLUS arithmetic_or_object
@@ -215,8 +215,8 @@ def generate_parser(lexer, tokens):
   def p_object_chain(p):
     '''object_chain : object_chain ON ID
                     | ID'''
-    if len(p) == 4: p[0] = (p[3],) + p[1]
-    elif len(p) == 2: p[0] = (p[1],)
+    if len(p) == 4: p[0] = ("OBJ", p[3],) + p[1][1:]
+    elif len(p) == 2: p[0] = ("OBJ", p[1],)
 
   def p_primitive(p):
     '''primitive : integer_primitive
