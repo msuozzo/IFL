@@ -9,7 +9,7 @@ from generator.generator import generator
 lexer, tokens = generate_lexer()
 
 parser = generate_parser(lexer, tokens)
-data = open("examples/ex1.ifl").read()
+data = open("examples/ex2.ifl").read()
 cleaned_data = '\n'.join(clean_input(data))
 
 lexer.input(cleaned_data)
@@ -19,13 +19,13 @@ while True:
     if not tok: break
     print tok
 
-tree = parser.parse(cleaned_data, debug=0)
+tree = parser.parse(cleaned_data, debug=1)
 
 print "tree is "
 print tree
 
 for tlt in gen_tree(tree).tlts:
-  for s in tlt.start: print s
+  for s in tlt.start: print s.type_
 
 
 #generator(t)
