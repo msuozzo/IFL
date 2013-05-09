@@ -10,8 +10,18 @@ def get_definitions(data):
         definitions.append(tlt[1])
     #What goes in the symbol table?
 
+class Object():
+    def __init__(self, object_type, params):
+        self.object_type = object_type #primitive or object
 
-def const_tree(data, root, depth, tlt=None):
+        if object_type == 'primitive':
+            self.ID = params[1]
+            self.value = params[2]
+        else:
+            self.ID = params
+            self.value = params.capitalize() + "()"
+
+def const_tree(data, root, depth):
     '''
     Keyword Arguments
     '''
@@ -40,14 +50,14 @@ def const_tree(data, root, depth, tlt=None):
             setattr(root, tld_type, start_dir)
 
             #Recursive call on the list of statements to add to the start directive
-            const_tree(stmt_list, start_dir, 2, root.ID)
+            const_tree(stmt_list, start_dir, 2)
 
         elif tld_type == 'ACTIONS':
             actions_dir = ActionsDirective()
             func_list = data[1]
 
             setattr(root, tld_type, actions_dir)
-            const_tree(func_list, actions_dir, 2, root.ID)
+            const_tree(func_list, actions_dir, 2)
 
         elif tld_type == 'FUNCTIONS':
             func = FunctionsDirective()
@@ -57,7 +67,7 @@ def const_tree(data, root, depth, tlt=None):
 
     elif depth == 2:
         if isinstance(root, StartDirective):
-            stmt_list = parse_stmt_list(data, tlt)
+            stmt_list = parse_stmt_list(data)
             root.stmt_list = stmt_list
 
                 # error = stmt_node.validate();
@@ -77,14 +87,14 @@ def const_tree(data, root, depth, tlt=None):
 
     return root
 
-def parse_stmt_list(stmt_list, tlt):
+def parse_stmt_list(stmt_list):
     stmt_node_list = []
     for stmt in stmt_list:
-        stmt_node_list.append(parse_stmt(stmt, tlt))
+        stmt_node_list.append(parse_stmt(stmt))
 
     return stmt_node_list
 
-def parse_stmt(stmt, tlt):
+def parse_stmt(stmt):
     stmt_map = {
         'ADD': parse_add,
         'SET': parse_set,
@@ -94,7 +104,7 @@ def parse_stmt(stmt, tlt):
     stmt_type = stmt[0]
     stmt_params = stmt[1:]
 
-    params = stmt_map[stmt_type](stmt_params, tlt)
+    params = stmt_map[stmt_type](stmt_params)
     stmt_node = StatementNode(stmt_type, params)
 
     # error = stmt_node.validate()
@@ -102,30 +112,34 @@ def parse_stmt(stmt, tlt):
 
     return stmt_node
 
-def parse_add(params, tlt):
+def parse_add(params):
     param_map = {}
     try:
         param_map['quantity'] = params[0]
         if type(params[1]) == tuple:
-            param_map['obj'] = Primitive(params[1])
+            param_map['obj'] = Object('primitive', params[1])
         else:
-            param_map['obj'] = params[1]
-        param_map['target'] = tlt if params[2] is None else params[2]
+            param_map['obj'] = Object('object', params[1])
+        param_map['target'] = list(params[2])
 
     except(ValueError):
         pass
 
     return param_map
 
-def parse_set(params, tlt):
-    pass
+def parse_set(params):
+    param_map = {}
+    try:
+        param_map['target'] = list(params[0])
+        param_map['value'] = params[1]
+    except(ValueError):
+        pass
 
-def parse_print(params, tlt):
-    pass
+    return param_map
 
-class Primitive():
-    def __init__(self, params):
-        self.kind = params[0]
-        self.ID = params[1]
-        self.value = params[2]
+def parse_print(params):
+    param_map = {}
+    param_map['value'] = params[0]
+
+    return param_map
 
