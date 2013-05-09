@@ -31,16 +31,24 @@ class Program:
       self.def_types[fullname] = type_
 
   def validate_defs(self):
-    for name, fields in self.definitions.iteritems():
-      name_reduction = name.rsplit(".", 1)
-      if len(name[0].split(".")) == 1:
+    for name, fields in self.def_names.iteritems():
+      name_parts = name.split(".")
+      if "LAST_INPUT" in name_parts + fields + self.tlt_names:
+        raise Exception #TODO improper use of reserved word LAST_INPUT
+      if "SELF" in name_parts and name_parts[0] != "SELF":
+        raise Exception #TODO SELF used as a non-root field
+      if "SELF" in fields + self.tlt_names:
+        raise Exception #TODO improper use of reserved word SELF
+      if len(name_reduction[0].split(".")) == 1:
         if name[0] not in self.tlt_names and name[0] not in ["SELF", "LAST_INPUT"]:
           raise Exception #TODO invalid root object
-
-
-
-      for field in fields:
-        pass
+      if len(name_parts) > 1:
+        previous = ".".join(name_parts[:-1])
+        current = name_parts[-1]
+        if previous not in self.def_names:
+          raise Exception #TODO invalid path
+        if current not in self.def_names[previous]:
+          raise Exception #TODO invalid path, current never added to previous
 
 
 class TLT:
@@ -96,32 +104,32 @@ class Statement:
         self.id_ = self.primitive.name
       else: self.id_ = tup[2]
       self.quant = tup[1] if tup[1] else 1
-      self.to = tup[3]
+      self.to = self_replace(tup[3], tlt_name)
     elif self.type_ == Statement.PRINT:
       self.string_expr = tup[1]
     elif self.type_ == Statement.REMOVE:
       self.id_ = tup[2]
       self.quant = tup[1] if tup[1] else 1
-      self.from_ = tup[3]
+      self.from_ = self_replace(tup[3], tlt_name)
     elif self.type_ == Statement.SET:
-      self.target = tup[1]
+      self.target = self_replace(tup[1], tlt_name)
       self.val = tup[2]
     elif self.type_ == Statement.MOVE:
-      self.target = tup[1]
+      self.target = self_replace(tup[1], tlt_name)
       self.new_loc = tup[2]
     elif self.type_ == Statement.INCREASE:
-      self.target = tup[1]
+      self.target = self_replace(tup[1], tlt_name)
       self.val = tup[2]
     elif self.type_ == Statement.DECREASE:
-      self.target = tup[1]
+      self.target = self_replace(tup[1], tlt_name)
       self.val = tup[2]
     elif self.type_ == Statement.NUMBER:
       self.obj = tup[1]
-      self.target = tup[2]
+      self.target = self_replace(tup[2], tlt_name)
     elif self.type_ == Statement.INITIATE:
       self.label = tup[1]
     elif self.type_ == Statement.EXECUTE:
-      self.func = tup[1]
+      self.func = self_replace(tup[1], tlt_name)
       self.args = tup[2]
     elif self.type_ == Statement.GOTO:
       self.label = tup[1]
@@ -177,4 +185,7 @@ def get_add_fields(lst):
 
 def stat_or_cond(tup, tlt_name):
   return Conditional(tup, tlt_name) if tup[0] == "IF" else Statement(tup, tlt_name)
+
+def self_replace(lst, tlt_name):
+  return [tlt_name if elem=="SELF" else elem for elem in lst]
 
