@@ -183,10 +183,10 @@ def generate_parser(lexer, tokens):
     p[0] = (p[1], p[2])
 
   def p_add(p):
-    '''add : ADD quantity ID to_or_nothing
-           | ADD primitive'''
-    if len(p) == 5: p[0] = (p[1], p[2], p[3], p[4])
-    else: p[0] = (p[1], None, p[2], None)
+    '''add : ADD quantity ID TO object_chain
+           | ADD primitive TO object_chain'''
+    if len(p) == 6: p[0] = (p[1], p[2], p[3], p[5])
+    else: p[0] = (p[1], None, p[2], p[4])
 
   def p_quantity(p):
     '''quantity : LBRACK arithmetic_expression RBRACK
