@@ -20,10 +20,21 @@ def generate_classes(tree):
     for element in definition_nodes:
         node = getattr(tree, element)
 
-        if hasattr(node, "definition_type") and node.ID is not "PLAYER":
+        #if hasattr(node, "definition_type") and node.ID is not "PLAYER":
+        if hasattr(node, "definition_type"):
 
             # create the file
             file = open("./game/" + node.ID + ".py", 'w')
+
+
+            for element in definition_nodes:
+                nod = getattr(tree, element)
+                if hasattr(nod, "definition_type") and node.ID != nod.ID :
+                    file.write("from %s import *\n" % nod.ID)
+
+                    file.write("\n")
+
+
 
             # write the first line
             file.write("class %s:" % node.ID.title() + "\n")
@@ -70,16 +81,15 @@ def generate_game(tree):
     for element in definition_nodes:
         node = getattr(tree, element)
         if hasattr(node, "definition_type"):
-            file.write("import %s\n" % node.ID)
+            file.write("from %s import *\n" % node.ID)
 
     file.write("\n")
 
 
 
-
     file.write("player = Player()\n")
-    file.write("while true:\n")
-    file.write("\tinput = raw__input('What would you like to do now?')")
+    file.write("while True:\n")
+    file.write("\tinput = raw_input('What would you like to do now?')")
     file.close()
 
 
