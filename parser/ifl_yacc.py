@@ -185,7 +185,7 @@ def generate_parser(lexer, tokens):
   def p_add(p):
     '''add : ADD quantity ID TO object_chain
            | ADD primitive TO object_chain'''
-    if len(p) == 6: p[0] = (p[1], p[2], p[3], p[5])
+    if len(p) == 5: p[0] = (p[1], p[2], p[3], p[5])
     else: p[0] = (p[1], None, p[2], p[4])
 
   def p_quantity(p):
@@ -210,12 +210,6 @@ def generate_parser(lexer, tokens):
     elif len(p) == 3:
       p[0] = (p[1], p[2])
     else: p[0] = p[1]
-
-  def p_to_or_nothing(p):
-    '''to_or_nothing : TO object_chain
-                     | empty'''
-    if len(p) == 3: p[0] = p[2]
-    elif len(p) == 2: p[0] = None
 
   def p_object_chain(p):
     '''object_chain : object_chain ON ID
@@ -317,27 +311,16 @@ def generate_parser(lexer, tokens):
     else: p[0] = '!='
 
   def p_remove(p):
-    '''remove : REMOVE quantity ID from_or_nothing'''
-    p[0] = (p[1], p[2], p[3], p[4])
-
-  def p_from_or_nothing(p):
-    '''from_or_nothing : FROM object_chain
-                       | empty'''
-    if len(p) == 3: p[0] = p[2]
-    elif len(p) == 2: p[0] = None
+    '''remove : REMOVE quantity ID FROM object_chain'''
+    p[0] = (p[1], p[2], p[3], p[5])
 
   def p_set(p):
     '''set : SET object_chain TO arg'''
     p[0] = (p[1], p[2], p[4])
 
   def p_move(p):
-    'move : MOVE character_or_nothing TO object_chain'
+    'move : MOVE object_chain TO object_chain'
     p[0] = (p[1], p[2], p[4])
-
-  def p_character_or_nothing(p):
-    '''character_or_nothing : object_chain
-                            | empty'''
-    p[0] = p[1]
 
   def p_arithmetic_or_object(p):
       '''arithmetic_or_object : arithmetic_expression
