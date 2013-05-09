@@ -1,25 +1,24 @@
 from nodes import *
 from pprint import pprint
 
-definitions = []
+definitions = {}
 error_list = []
 
 def get_definitions(data):
     global definitions
     for tlt in data:
-        definitions.append(tlt[1])
-    #What goes in the symbol table?
+        definitions[tlt[1]] = tlt[0]
 
-class Object():
-    def __init__(self, object_type, params):
-        self.object_type = object_type #primitive or object
+class Primitive():
+    def __init__(self, params):
+        self.ID = params[1]
+        self.value = params[2]
 
-        if object_type == 'primitive':
-            self.ID = params[1]
-            self.value = params[2]
-        else:
-            self.ID = params
-            self.value = params.capitalize() + "()"
+class DefinitionObject():
+    def __init__(self, params):
+        self.ID = params
+        self.value = params.capitalize() + "()"
+        self.definition_type = definitions[params]
 
 def const_tree(data, root, depth):
     '''
@@ -101,6 +100,9 @@ def parse_stmt(stmt):
         'PRINT': parse_print,
         'INCREASE': parse_increase,
         'DECREASE': parse_decrease,
+        'MOVE': parse_move,
+        'REMOVE': parse_remove,
+        'IF': parse_conditional,
     }
 
     stmt_type = stmt[0]
@@ -119,9 +121,9 @@ def parse_add(params):
     try:
         param_map['quantity'] = params[0]
         if type(params[1]) == tuple:
-            param_map['obj'] = Object('primitive', params[1])
+            param_map['obj'] = Primitive(params[1])
         else:
-            param_map['obj'] = Object('object', params[1])
+            param_map['obj'] = DefinitionObject(params[1])
         param_map['target'] = list(params[2])
 
     except(ValueError):
@@ -150,3 +152,12 @@ def parse_print(params):
 
     return param_map
 
+def parse_move(params):
+    pass
+
+def parse_remove(params):
+    pass
+
+def parse_conditional(params):
+    if_condition = params[0]
+    else_condition = params[-1]
