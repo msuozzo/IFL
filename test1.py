@@ -3,6 +3,7 @@ from parser.ifl_yacc import generate_parser
 from parser.preprocessor import clean_input
 from analyzer.nodes import Program
 from analyzer.semantic_analyzer import *
+from generator.generator import generator
 
 
 lexer, tokens = generate_lexer()
@@ -26,4 +27,7 @@ print tree
 print get_definitions(tree)
 t = Program()
 t = const_tree(tree, t, 0)
+
+generator(t)
+
 print "done"

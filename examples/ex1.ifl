@@ -1,8 +1,8 @@
 TRAIT health:
 	START:
-		ADD {INTEGER current=50}
+		ADD {INTEGER current=50} TO SELF
 CHARACTER PLAYER:
 	START:
-		ADD health
-		SET current ON health TO 100
+		ADD health TO SELF
+		SET current ON health ON SELF TO 100
 		PRINT "Hello, I am a character"
