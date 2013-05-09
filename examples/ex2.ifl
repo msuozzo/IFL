@@ -44,5 +44,5 @@ CHARACTER PLAYER:
 	START:
 		ADD {INTEGER max=5} TO SELF
 		ADD experience TO SELF
-		MOVE TO house
+		MOVE SELF TO house
 

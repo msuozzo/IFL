@@ -1,4 +1,4 @@
-
+import itertools
 reserved_terms = (("SELF", ("LOCATION", "SETTING")),
                   )
 
@@ -7,7 +7,8 @@ class Program:
     self.tlts = [TLT(*tlt) for tlt in tree]
     self.tlt_names = [tlt.id_ for tlt in self.tlts]
     def_pairs = []
-    for tlt in self.tlts: def_pairs.extend(tlt.get_add_fields())
+    for tlt in self.tlts:
+      def_pairs.extend(tlt.get_add_fields())
     tlt_name_map = dict(zip(self.tlt_names, self.tlts))
 
     self.def_names = {}
@@ -22,9 +23,9 @@ class Program:
       type_ = id_and_type[1]
       fullname = ".".join([name, id_])
       if type_ == TLT.UNKNOWN:
-        try: type_ = tlt_name_map[id_[0]].type_
+        try: type_ = tlt_name_map[id_].type_
         except KeyError:
-          pass #TODO non-tlt name added to object 
+          raise Exception #TODO non-tlt name added to object 
       if id_ in tlt_name_map and type_ != tlt_name_map[id_].type_:
         raise Exception #TODO Duplicate name error
       #FIX:possibility that 2 fields be added with same name but different type
@@ -42,8 +43,8 @@ class Program:
         raise Exception #TODO SELF used as a non-root field
       if "SELF" in fields + self.tlt_names:
         raise Exception #TODO improper use of reserved word SELF
-      if len(name_reduction[0].split(".")) == 1:
-        if name[0] not in self.tlt_names and name[0] not in ["SELF", "LAST_INPUT"]:
+      if len(name_parts) == 1:
+        if name_parts[0] not in self.tlt_names and name_parts[0] not in ["SELF", "LAST_INPUT"]:
           raise Exception #TODO invalid root object
       if len(name_parts) > 1:
         previous = ".".join(name_parts[:-1])
@@ -65,7 +66,7 @@ class TLT:
     self.type_ = type_
     self.id_ = id_
     self.desc = desc if desc is None else gen_desc(type_, id_)
-    self.start = [stat_or_cond(tup, self.id_) for tup in start]
+    self.start = [stat_or_cond(tup, self.id_) for tup in start[1]]
     self.actions = [Action(tup, self.id_) for tup in action[1]] if action else None
     self.functions = [Function(tup, self.id_) for tup in function[1]] if function else None
     self.dialogue = Dialogue(dialogue, self.id_) if dialogue else None
@@ -145,7 +146,7 @@ class Statement:
     if self.type_ == Statement.ADD:
       canonical_name = ".".join(self.to)
       datatype = self.primitive.type_ if self.primitive else TLT.UNKNOWN
-      return [(canonical_name, self.id_)]
+      return [(canonical_name, (self.id_, datatype))]
     return []
 
 
@@ -158,7 +159,8 @@ class Conditional(Statement):
       case = sec[0]
       statements = [stat_or_cond(stat, tlt_name) for stat in sec[1]]
       self.cases.append((case, statements))
-    self.get_add_fields = lambda: get_add_fields(self.cases)
+    self.possible_statements = itertools.chain.from_iterable([pair[1] for pair in self.cases])
+    self.get_add_fields = lambda: get_add_fields(self.possible_statements)
 
 
 class Function:
@@ -177,7 +179,7 @@ class Action:
 
 
 class Primitive:
-  def __init__(self, tup, tlt_name):
+  def __init__(self, tup):
     self.type_ = tup[0]
     self.name = tup[1]
     self.val = tup[2]
@@ -198,6 +200,9 @@ class Dialogue:
       self.all_statements.extend(statements)
     self.get_add_fields = lambda: get_add_fields(self.all_statements)
 
+
+def gen_desc(type_, id_):
+  return id_.capitalize() + " is a " + type_.capitalize()
 
 def get_add_fields(lst):
   ret = []
