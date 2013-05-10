@@ -64,27 +64,6 @@ def generate_set(n, name, tree):
     return "" + targ + "=" + n.val[1] +"\n"
 
 
-def generate_append(n):
-    targ=""
-    if(len(n.target) > 1):
-		temp = 0
-		for iString in n.target: 
-			if(iString == "SELF"): 
-				iString = iString.lower()
-	
-			if (temp == 0): 
-				targ = targ + iString
-				temp += 1
-			else: 
-				targ = targ + "." + iString
-
-		else: 
-			if (n.target[0] == "SELF"): 
-				targ = n.target[0].lower()
-			targ = n.target[0]
-    return "" + targ + ".appened(" + n["X"] + ")" +"\n"
-
-
 
 def generate_remove(n):
 
@@ -108,52 +87,131 @@ def generate_remove(n):
 
 	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
 
-
 def generate_increase(n):
+    pass
+
+# moves player
+def generate_move(n, name, tree):
     targ = ""
 
-    if(len(n.target) > 1):
+     # checks to see how many parts of target list
+    if len(n.target) > 1 :
         temp = 0
+        # iterates through list of target
         for iString in n.target:
-            if(iString == "SELF"):
-                iString = iString.lower()
+            # special case of first one
+            if(iString == name):
+                iString = "self"
 
             if(temp == 0):
                 targ = targ + iString
                 temp += 1
-            else:
+            else: # all other iterations
                 targ = targ + "." + iString
 
-    else:
-        if (n.target[0] == "SELF"):
-            targ = n.target[0].lower()
-        targ = n.target[0]
+    else: # only one target
+        if n.target[0] == name:
+            targ = "self"
+        else:
+            targ = n.target[0]
 
-    return "" + targ + "+=" + n.val[1] +"\n"
+    return "" + targ + ".location = " + n.new_loc[1]
 
 
+# above works for sure
 
-def generate_decrease(n):
-    targ = ""
-
-    if(len(n["target"]) > 1):
-        temp = 0
-        for iString in n.target:
-            if(iString == "SELF"):
-                iString = iString.lower()
-
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
-            else:
-                targ = targ + "." + iString
-
-    else:
-        if (n.target[0] == "SELF"):
-            targ = n.target[0].lower()
-        targ = n.target[0]
-
-    return "" + targ + "-=" + n.val[1] +"\n"
+# def generate_append(n)
+#
+#     targ=""
+# 	if(len(n.target) > 1):
+# 		temp = 0
+# 		for iString in n.target:
+# 			if(iString == "SELF"):
+# 				iString = iString.lower()
+#
+# 			if (temp == 0):
+# 				targ = targ + iString
+# 				temp += 1
+# 			else:
+# 				targ = targ + "." + iString
+#
+# 		else:
+# 			if (n.target[0] == "SELF"):
+# 				targ = n.target[0].lower()
+# 			targ = n.target[0]
+#
+# 	return "" + targ + ".appened(" + n["X"] + ")" +"\n"
+#
+#
+#
+# def generate_remove(n)
+#
+# 	targ=""
+# 	if(len(n.target) > 1):
+# 		temp = 0
+# 		for iString in n.target:
+# 			if(iString == "SELF"):
+# 				iString = iString.lower()
+#
+# 			if (temp == 0):
+# 				targ = targ + iString
+# 				temp += 1
+# 			else:
+# 				targ = targ + "." + iString
+#
+# 		else:
+# 			if (n.target[0] == "SELF"):
+# 				targ = n.target[0].lower()
+# 			targ = n.target[0]
+#
+# 	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
+#
+#
+# def generate_increase(n):
+#     targ = ""
+#
+#     if(len(n.target) > 1):
+#         temp = 0
+#         for iString in n.target:
+#             if(iString == "SELF"):
+#                 iString = iString.lower()
+#
+#             if(temp == 0):
+#                 targ = targ + iString
+#                 temp += 1
+#             else:
+#                 targ = targ + "." + iString
+#
+#     else:
+#         if (n.target[0] == "SELF"):
+#             targ = n.target[0].lower()
+#         targ = n.target[0]
+#
+#     return "" + targ + "+=" + n.val[1] +"\n"
+#
+#
+#
+# def generate_decrease(n):
+#     targ = ""
+#
+#     if(len(n["target"]) > 1):
+#         temp = 0
+#         for iString in n.target:
+#             if(iString == "SELF"):
+#                 iString = iString.lower()
+#
+#             if(temp == 0):
+#                 targ = targ + iString
+#                 temp += 1
+#             else:
+#                 targ = targ + "." + iString
+#
+#     else:
+#         if (n.target[0] == "SELF"):
+#             targ = n.target[0].lower()
+#         targ = n.target[0]
+#
+#     return "" + targ + "-=" + n.val[1] +"\n"
 
 
 

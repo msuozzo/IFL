@@ -28,7 +28,7 @@ def generate_parser(lexer, tokens):
 
   def p_trait_definition(p):
     'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_or_nothing END_BLOCK'
-    p[0] = (p[1], p[2], p[4], p[5], p[6])
+    p[0] = (p[1], p[2], p[4], p[5], None, p[6])
 
   def p_character_definition(p):
     'character_definition : CHARACTER ID COLON desc_or_nothing s_directive a_or_nothing f_or_nothing d_or_nothing END_BLOCK'
@@ -352,6 +352,7 @@ def generate_parser(lexer, tokens):
   def p_error(p):
     print p
     print "Syntax error in input!"
+    import sys; sys.exit()
 
   return yacc.yacc()
 
