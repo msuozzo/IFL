@@ -352,6 +352,7 @@ def generate_parser(lexer, tokens):
   def p_error(p):
     print p
     print "Syntax error in input!"
+    import sys; sys.exit()
 
   return yacc.yacc()
 
