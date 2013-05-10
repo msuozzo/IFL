@@ -6,9 +6,9 @@ def generate_print(n):
 def generate_set(n):
     targ = ""
 
-    if(len(n["target"]) > 1):
+    if(len(n.target) > 1):
         temp = 0
-        for iString in n["target"]:
+        for iString in n.target:
             if(iString == "SELF"):
                 iString = iString.lower()
 
@@ -19,12 +19,12 @@ def generate_set(n):
                 targ = targ + "." + iString
 
     else:
-        if (n["target"][0] == "SELF"):
-            targ = n["target"][0].lower()
+        if (n.target[0] == "SELF"):
+            targ = n.target[0].lower()
         else:
-            targ = n["target"][0]
+            targ = n.target[0]
 
-    return "" + targ + "=" + n["value"] +"\n"
+    return "" + targ + "=" + n.val[1] +"\n"
 
 
 # generates add statement
