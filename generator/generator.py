@@ -1,24 +1,6 @@
 from generator_functions import *
 import os
 
-def generate_code(node, id, tree):
-    """Select the appropriate function based on the type of the node"""
-
-    if node.type_ == "ADD":
-        return generate_add(node, id, tree)
-
-    elif node.type_ == "SET":
-        return generate_set(node, id, tree)
-
-    elif node.type_ == "PRINT":
-        return generate_print(node, id, tree)
-    else:
-        return "pass"
-
-def generate_action(action_phrase, statement_list):
-    return "pass"
-
-
 
 def generate_classes(tree):
     """Traverse through the tlts in the tree to generate code for classes"""
