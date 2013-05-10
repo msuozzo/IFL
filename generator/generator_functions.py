@@ -1,10 +1,10 @@
 # generates a print statement
 #'print : PRINT string_expression'
-def generate_print(n):
-    return "print " + n.string_expr + "\n"
+def generate_print(n, name, tree):
+    return "print \"" + n.string_expr[0] + "\"\n"
 
 # generates add statement
-def generate_add(n, name):
+def generate_add(n, name, tree):
     targ = ""
 
     #if(n is None): --- IGNORE FOR NOW - need to fix quantity
@@ -32,15 +32,15 @@ def generate_add(n, name):
 
     # checks what type of add it is
     if n.primitive is None: # not a primitive add
-        if n.id_[0] == "trait":
-            return "" + targ + "." + n.id_[1] + " = " + n.id_[1].capitalize()  + "()\n"
+        if tree.def_types[n.id_] == "TRAIT":
+            return "" + targ + "." + n.id_ + " = " + n.id_.capitalize()  + "()\n"
     else: # primitive add
-        return "" + targ + "." + n.primitive.name + " = " + n.primitive.val[1]  + "()\n"
+        return "" + targ + "." + n.primitive.name + " = " + n.primitive.val[1]  + "\n"
 
     return ""
 
 
-def generate_set(n, name):
+def generate_set(n, name, tree):
     targ = ""
 
     if(len(n.target) > 1):
@@ -61,52 +61,52 @@ def generate_set(n, name):
         else:
             targ = n.target[0]
 
-    return "" + targ + "=" + n["value"] +"\n"
+    return "" + targ + "=" + n.val[1] +"\n"
 
-def generate_increase(n):
-	targ = ""
-
-	if(len(n["target"]) > 1):
-    	temp = 0
-    	for iString in n["target"]:
-        	if(iString == "SELF"):
-            	iString = iString.lower()
-
-        	if(temp == 0):
-            	targ = targ + iString
-            	temp += 1
-        	else:
-            	targ = targ + "." + iString
-
-    else: # only one target
-        if n["target"][0] == "SELF":
-            targ = n["target"][0].lower()
-        else:
-            targ = n["target"][0]
-
-	return "" + targ + "+=" + n["value"] +"\n"
-
-
-
-def generate_decrease(n):
-	targ = ""
-
-	if(len(n["target"]) > 1):
-    	temp = 0
-    	for iString in n["target"]:
-        	if(iString == "SELF"):
-            	iString = iString.lower()
-
-        	if(temp == 0):
-            	targ = targ + iString
-            	temp += 1
-        	else:
-            	targ = targ + "." + iString
-
-    else: # only one target
-        if n["target"][0] == "SELF":
-            targ = n["target"][0].lower()
-        else:
-            targ = n["target"][0]
-
-	return "" + targ + "-=" + n["value"] +"\n"
+# def generate_increase(n):
+# 	targ = ""
+#
+# 	if(len(n["target"]) > 1):
+#     	temp = 0
+#     	for iString in n["target"]:
+#         	if(iString == "SELF"):
+#             	iString = iString.lower()
+#
+#         	if(temp == 0):
+#             	targ = targ + iString
+#             	temp += 1
+#         	else:
+#             	targ = targ + "." + iString
+#
+#     else: # only one target
+#         if n["target"][0] == "SELF":
+#             targ = n["target"][0].lower()
+#         else:
+#             targ = n["target"][0]
+#
+# 	return "" + targ + "+=" + n["value"] +"\n"
+#
+#
+#
+# def generate_decrease(n):
+# 	targ = ""
+#
+# 	if(len(n["target"]) > 1):
+#     	temp = 0
+#     	for iString in n["target"]:
+#         	if(iString == "SELF"):
+#             	iString = iString.lower()
+#
+#         	if(temp == 0):
+#             	targ = targ + iString
+#             	temp += 1
+#         	else:
+#             	targ = targ + "." + iString
+#
+#     else: # only one target
+#         if n["target"][0] == "SELF":
+#             targ = n["target"][0].lower()
+#         else:
+#             targ = n["target"][0]
+#
+# 	return "" + targ + "-=" + n["value"] +"\n"
