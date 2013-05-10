@@ -18,7 +18,7 @@ TRAIT experience:
 			IF current > level ^ 2:
 				INCREASE level ON SELF BY 1
 				PRINT "You gained a level!"
-				PRINT "You are now level " . level
+				PRINT "You are now level " + level
 
 ITEM apple:
 	START:
