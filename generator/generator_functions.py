@@ -117,6 +117,9 @@ def generate_move(n, name, tree):
 
     return "" + targ + ".location = " + n.new_loc[1]
 
+def generate_conditionals(n):
+    pass
+
 
 # above works for sure
 

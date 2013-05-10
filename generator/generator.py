@@ -19,6 +19,7 @@ def generate_action(action_phrase, statement_list):
     return "pass"
 
 
+
 def generate_classes(tree):
     """Traverse through the tlts in the tree to generate code for classes"""
 
