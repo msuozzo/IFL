@@ -84,7 +84,7 @@ def generate_append(n)
 				targ = n.target[0].lower()
 			targ = n.target[0]
 
-	return "" + targ + ".appened(" + n["X"]
+	return "" + targ + ".appened(" + n["X"] + ")" +"\n"
 
 
 
@@ -108,7 +108,7 @@ def generate_remove(n)
 				targ = n.target[0].lower()
 			targ = n.target[0]
 
-	return "" + targ + ".remove(" + n["X"]
+	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
 
 
 def generate_increase(n):
