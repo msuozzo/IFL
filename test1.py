@@ -24,10 +24,9 @@ tree = parser.parse(cleaned_data, debug=1)
 print "tree is "
 print tree
 
-for tlt in gen_tree(tree).tlts:
-  for s in tlt.start: print s.type_
+t = gen_tree(tree)
 
 
-#generator(t)
+generator(t)
 
 print "done"

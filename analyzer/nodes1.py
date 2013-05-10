@@ -18,6 +18,7 @@ class Program:
       if id_ not in self.def_names[name]: self.def_names[name].append(id_)
 
     self.def_types = {}
+    for tlt in self.tlts: self.def_types[tlt.id_] = tlt.type_
     for name, id_and_type in def_pairs:
       id_ = id_and_type[0]
       type_ = id_and_type[1]
