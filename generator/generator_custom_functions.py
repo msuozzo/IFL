@@ -1,10 +1,10 @@
-def generate_function(n)
-  targ="" 
+def generate_function(n):
+	targ="" 
 	result=""
 	tab = ""
 
 for x in range(0, len((n.target)-1):
-		temp = 0
+	temp = 0
 		for iString in n.target: 
 			if(iString == "SELF"): 
 				iString = iString.lower()
