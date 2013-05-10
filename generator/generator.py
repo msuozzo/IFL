@@ -1,113 +1,128 @@
 from generator_functions import *
 import os
 
-def generate_code(node):
+def generate_code(node, id):
     """Select the appropriate function based on the type of the node"""
 
-    if node.func_name == "ADD":
-        return generate_add(node.params)
+    # if node.type_ == "ADD":
+    #     return generate_add(node, id)
+    #
+    # elif node.type_ == "SET":
+    #     return generate_set(node, id)
+    #
+    # elif node.type_ == "PRINT":
+    #     return generate_print(node, id)
+    return "pass"
 
-    elif node.func_name == "SET":
-        return generate_set(node.params)
 
-    elif node.func_name == "PRINT":
-        return generate_print(node.params)
+def generate_classes(tlts):
+    """Traverse through the tlts to generate code for classes"""
 
+    # loop through all of the Definition Nodes in the tlts
+    for node in tlts:
 
-def generate_classes(tree):
-    """Traverse through the tree in a DFS format to generate code for classes"""
+        # create the file
+        file = open("./game/" + node.id_ + ".py", 'w')
 
-    # loop through all of the Definition Nodes in the tree
-    definition_nodes = dir(tree)
-    for element in definition_nodes:
-        node = getattr(tree, element)
+        # add the appropriate imports by looping through all of the definition nodes in tlts
+        for element in tlts:
+            if node.id_ != element.id_:
+                file.write("from %s import *\n" % element.id_)
 
-        #if hasattr(node, "definition_type") and node.ID is not "PLAYER":
-        if hasattr(node, "definition_type"):
+        # class declaration begins here
+        file.write("\nclass %s:" % node.id_.title() + "\n")
 
-            # create the file
-            file = open("./game/" + node.ID + ".py", 'w')
+        # iterate through each statement in start and add it to constructor
+        file.write("\tdef __init__(self):\n")
 
-            # add the appropriate imports by looping through all of the definition nodes
-            for element in definition_nodes:
-                n = getattr(tree, element)
-                if hasattr(n, "definition_type") and node.ID != n.ID :
-                    file.write("from %s import *\n" % n.ID)
-                    file.write("\n")
+        # set the initial location of the player to None
+        if node.id_ == "PLAYER":
+            file.write("\t\tself.location = None\n")
 
-            # class declaration begins here
-            file.write("class %s:" % node.ID.title() + "\n")
+        for statement in node.start:
 
-            # iterate through each statement in START and add it to constructor
-            file.write("\tdef __init__(self):\n")
-            for statement in node.START.stmt_list:
+            # get the code, add the appropriate tabs, and write to file
+            # (Note that the code might be multi-lined)
+            s = generate_code(statement, node.id_)
+            for line in s.splitlines():
+                file.write("\t\t" + line + "\n")
 
-                # get the code, add the appropriate tabs, and write to file
-                # (Note that the code might be multi-lined)
-                s = generate_code(statement)
-                for line in s.splitlines():
-                    file.write("\t\t" + line + "\n")
+        # add the description if it has any
+        if node.desc is not None:
+            file.write("\t\tself.description = '%s'" % node.desc)
 
-            # create a function to return the description if it has one
-            if node.description is not None:
-                file.write("\tdef get_description(self):\n")
-                file.write("\t\t%s" % node.description)
+        # create a list of functions is there is any
+        if hasattr(node, "FUNCTIONS"):
+            pass
 
-            # create a list of functions is there is any
-            if hasattr(node, "FUNCTIONS"):
-                pass
+        # create a list of actions if there is any
+        if hasattr(node, "ACTIONS"):
+            pass
 
-            # create a list of actions if there is any
-            if hasattr(node, "ACTIONS"):
-                pass
+        # create a list of dialogues if there is any
+        if hasattr(node, "DIALOGUE"):
+            pass
 
-            # create a list of dialogues if there is any
-            if hasattr(node, "DIALOGUE"):
-                pass
-
-            file.close()
+        file.close()
 
     # end of the for loop here
 
-def generate_game(tree):
+def generate_game(tlts):
     """Generate the main class file for the game"""
 
     # create the file
     file = open("./game/game.py", 'w')
 
-    # add the appropriate imports by looping through all of the definition nodes
-    definition_nodes = dir(tree)
-    for element in definition_nodes:
-        node = getattr(tree, element)
-        if hasattr(node, "definition_type"):
-            file.write("from %s import *\n" % node.ID)
+    # loop through all of the Definition Nodes in the tlts and add the appropriate imports
+    # also initialize any settings that are available and add them to a dictionary called settings
+    settings = "\nsettings = {}\n"
+    for node in tlts:
+        file.write("from %s import *\n" % node.id_)
+        if node.type_ == "SETTING":
+            settings = settings + "settings['%s'] = %s()\n" %(node.id_, node.id_.title())
+
+    file.write(settings)
 
     # main body of the game file begins here
     main = """
 player = Player()
 
 while True:
-    if hasattr(player, "location"):
-        print player.location.description
+    if player.location is not None:
+        print "You are at a " + settings[player.location].description
 
-    print "What would you like to do now?"
-    print "Enter commands like 'get apple' (action noun):"
-    input = raw_input("Enter 'help' for more:")
+    print "\\nWhat would you like to do? (Enter 'help' for more):"
+    input = raw_input(">>")
 
     if input == "help":
-        # loop through all of the actions, items, character in setting and print them out
-        print "Hello world!"
-    """
+        help_string = "The following basic commands are supported: 'help', 'inventory', 'traits', 'quit'"
 
-    main = main + """
-    input = input.split()
-    action = input[0]
-    if len(input) > 1:
-	    noun = input[1]
-	    print "action is " + action
-	    print "noun is " + noun
+        print help_string
+
+    elif input == "inventory":
+        inventory_string = "The following items are in your inventory: "
+
+        print inventory_string
+
+    elif input == "traits":
+        traits_string = "You have the following traits: "
+
+        print traits_string
+
+    elif input == "quit":
+        print "Game Over"
+        quit()
+
+    elif " " in input:
+        input = input.split()
+        action = input[0]
+        noun = input[1]
+        print "action is " + action
+        print "noun is " + noun
+
+    else:
+        print "Command not recognized. Please try again."
 	    """
-
 
     file.write(main)
 
@@ -122,9 +137,9 @@ def generator(tree):
     if not os.path.exists("./game"):
         os.mkdir("./game")
 
-    # create the classes for each ITEM, CHARACTER, TRAIT, and SETTING
-    generate_classes(tree)
+    # create the classes for each ITEM, CHARACTER, TRAIT, and SETTING in the tlts
+    generate_classes(tree.tlts)
 
-    # create the while and infinite loop that asks the user for inputs
-    generate_game(tree)
+    # create the while gloop that asks the user for inputs
+    generate_game(tree.tlts)
 
