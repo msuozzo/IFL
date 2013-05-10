@@ -132,6 +132,7 @@ def generate_parser(lexer, tokens):
                  | move
                  | increase
                  | decrease
+                 | number
                  | initiate
                  | conditional
                  | execute
@@ -152,7 +153,7 @@ def generate_parser(lexer, tokens):
   def p_else_conditional(p):
     '''else_conditional : ELSE COLON statement_list END_BLOCK
                         | empty'''
-    p[0] = None if len(p) == 2 else (None, p[3])
+    p[0] = (True, ()) if len(p) == 2 else (True, p[3])
 
   def p_goto(p):
     'goto : GOTO LABEL'
@@ -191,7 +192,7 @@ def generate_parser(lexer, tokens):
   def p_quantity(p):
     '''quantity : LBRACK arithmetic_expression RBRACK
                 | empty'''
-    p[0] = p[1]
+    p[0] = p[2] if len(p) == 4 else None
 
   def p_arithmetic_expression(p):
     '''arithmetic_expression : arithmetic_or_object PLUS arithmetic_or_object
@@ -205,23 +206,17 @@ def generate_parser(lexer, tokens):
                              | INTEGER_VAL
                              | DECIMAL_VAL'''
     if len(p) == 4:
-      if p[1] == '(': p[0] = p[2]
+      if p[1] == '(': p[0] = (p[2],)
       else: p[0] = (p[2], p[1], p[3])
     elif len(p) == 3:
       p[0] = (p[1], p[2])
-    else: p[0] = p[1]
-
-  def p_to_or_nothing(p):
-    '''to_or_nothing : TO object_chain
-                     | empty'''
-    if len(p) == 3: p[0] = p[2]
-    elif len(p) == 2: p[0] = None
+    else: p[0] = ("LIT", p[1])
 
   def p_object_chain(p):
     '''object_chain : object_chain ON ID
                     | ID'''
-    if len(p) == 4: p[0] = (p[3],) + p[1]
-    elif len(p) == 2: p[0] = (p[1],)
+    if len(p) == 4: p[0] = ("OBJ", p[3],) + p[1][1:]
+    elif len(p) == 2: p[0] = ("OBJ", p[1],)
 
   def p_primitive(p):
     '''primitive : integer_primitive
@@ -317,27 +312,16 @@ def generate_parser(lexer, tokens):
     else: p[0] = '!='
 
   def p_remove(p):
-    '''remove : REMOVE quantity ID from_or_nothing'''
-    p[0] = (p[1], p[2], p[3], p[4])
-
-  def p_from_or_nothing(p):
-    '''from_or_nothing : FROM object_chain
-                       | empty'''
-    if len(p) == 3: p[0] = p[2]
-    elif len(p) == 2: p[0] = None
+    '''remove : REMOVE quantity ID FROM object_chain'''
+    p[0] = (p[1], p[2], p[3], p[5])
 
   def p_set(p):
     '''set : SET object_chain TO arg'''
     p[0] = (p[1], p[2], p[4])
 
   def p_move(p):
-    'move : MOVE character_or_nothing TO object_chain'
+    'move : MOVE object_chain TO object_chain'
     p[0] = (p[1], p[2], p[4])
-
-  def p_character_or_nothing(p):
-    '''character_or_nothing : object_chain
-                            | empty'''
-    p[0] = p[1]
 
   def p_arithmetic_or_object(p):
       '''arithmetic_or_object : arithmetic_expression
@@ -351,6 +335,10 @@ def generate_parser(lexer, tokens):
   def p_decrease(p):
     'decrease : DECREASE object_chain BY arithmetic_or_object'
     p[0] = (p[1], p[2], p[4])
+
+  def p_number(p):
+    'number : NUMBER OF ID ON object_chain'
+    p[0] = (p[1], p[3], p[5])
 
   def p_initiate(p):
     'initiate : INITIATE DIALOGUE AT LABEL'

@@ -44,6 +44,30 @@ class FunctionNode():
         self.params = params
         self.stmt_list = []
 
+class IfConditionalNode():
+    def __init__(self, conditional, stmt_list):
+        self.conditional = conditional
+        self.stmt_list = stmt_list
+
+class ElifConditionalNode():
+    def __init__(self, conditional, stmt_list):
+        self.conditional = conditional
+        self.stmt_list = stmt_list
+
+class ElseConditionalNode():
+    def __init__(self, stmt_list):
+        self.stmt_list = stmt_list
+
+class ConditionalAggregator():
+    def __init__(self, if_conditional, elif_conditional=None, else_conditional=None):
+        self.if_conditional = IfConditionalNode(if_conditional[0], if_conditional[1])
+
+        self.elif_conditional = []
+        for conditional in elif_conditional:
+            self.elif_condtionals.append(ElifConditionalNode(conditional[0], conditional[1]))
+
+        self.else_conditional = ElseConditionalNode(else_conditional[0])
+
 class StatementNode():
     def __init__(self, func_name, params):
         self.func_name = func_name
