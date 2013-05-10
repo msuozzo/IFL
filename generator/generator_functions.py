@@ -63,50 +63,101 @@ def generate_set(n, name, tree):
 
     return "" + targ + "=" + n.val[1] +"\n"
 
-# def generate_increase(n):
-# 	targ = ""
-#
-# 	if(len(n["target"]) > 1):
-#     	temp = 0
-#     	for iString in n["target"]:
-#         	if(iString == "SELF"):
-#             	iString = iString.lower()
-#
-#         	if(temp == 0):
-#             	targ = targ + iString
-#             	temp += 1
-#         	else:
-#             	targ = targ + "." + iString
-#
-#     else: # only one target
-#         if n["target"][0] == "SELF":
-#             targ = n["target"][0].lower()
-#         else:
-#             targ = n["target"][0]
-#
-# 	return "" + targ + "+=" + n["value"] +"\n"
-#
-#
-#
-# def generate_decrease(n):
-# 	targ = ""
-#
-# 	if(len(n["target"]) > 1):
-#     	temp = 0
-#     	for iString in n["target"]:
-#         	if(iString == "SELF"):
-#             	iString = iString.lower()
-#
-#         	if(temp == 0):
-#             	targ = targ + iString
-#             	temp += 1
-#         	else:
-#             	targ = targ + "." + iString
-#
-#     else: # only one target
-#         if n["target"][0] == "SELF":
-#             targ = n["target"][0].lower()
-#         else:
-#             targ = n["target"][0]
-#
-# 	return "" + targ + "-=" + n["value"] +"\n"
+
+def generate_append(n) 
+
+    targ="" 
+	if(len(n.target) > 1): 
+		temp = 0
+		for iString in n.target: 
+			if(iString == "SELF"): 
+				iString = iString.lower()
+	
+			if (temp == 0): 
+				targ = targ + iString
+				temp += 1
+			else: 
+				targ = targ + "." + iString
+
+		else: 
+			if (n.target[0] == "SELF"): 
+				targ = n.target[0].lower()
+			targ = n.target[0]
+
+	return "" + targ + ".appened(" + n["X"] + ")" +"\n"
+
+
+
+def generate_remove(n)
+
+	targ="" 
+	if(len(n.target) > 1): 
+		temp = 0
+		for iString in n.target: 
+			if(iString == "SELF"): 
+				iString = iString.lower()
+	
+			if (temp == 0): 
+				targ = targ + iString
+				temp += 1
+			else: 
+				targ = targ + "." + iString
+
+		else: 
+			if (n.target[0] == "SELF"): 
+				targ = n.target[0].lower()
+			targ = n.target[0]
+
+	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
+
+
+def generate_increase(n):
+    targ = ""
+
+    if(len(n.target) > 1):
+        temp = 0
+        for iString in n.target:
+            if(iString == "SELF"):
+                iString = iString.lower()
+
+            if(temp == 0):
+                targ = targ + iString
+                temp += 1
+            else:
+                targ = targ + "." + iString
+
+    else:
+        if (n.target[0] == "SELF"):
+            targ = n.target[0].lower()
+        targ = n.target[0]
+
+    return "" + targ + "+=" + n.val[1] +"\n"
+
+
+
+def generate_decrease(n):
+    targ = ""
+
+    if(len(n["target"]) > 1):
+        temp = 0
+        for iString in n.target:
+            if(iString == "SELF"):
+                iString = iString.lower()
+
+            if(temp == 0):
+                targ = targ + iString
+                temp += 1
+            else:
+                targ = targ + "." + iString
+
+    else:
+        if (n.target[0] == "SELF"):
+            targ = n.target[0].lower()
+        targ = n.target[0]
+
+    return "" + targ + "-=" + n.val[1] +"\n"
+
+
+
+
+
