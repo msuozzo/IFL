@@ -12,7 +12,11 @@ def generate_code(node, id, tree):
 
     elif node.type_ == "PRINT":
         return generate_print(node, id, tree)
+    else:
+        return "pass"
 
+def generate_action(action_phrase, statement_list):
+    return "pass"
 
 
 def generate_classes(tree):
@@ -29,21 +33,17 @@ def generate_classes(tree):
         for element in tree.tlts:
             if node.id_ != element.id_:
                 import_string += "from %s import *\n" % element.id_
-        file.write(import_string)
 
         # class declaration begins here
         class_string = "\nclass %s:" % node.id_.title() + "\n"
-        file.write(class_string)
 
         # constructor begins here
         constructor_string = "\tdef __init__(self):\n"
-        file.write(constructor_string)
 
-        # set the initial location of the player to None and set items to empty
+        # set the initial location of the player to None and items to empty
         if node.id_ == "PLAYER":
-
-            file.write("\t\tself.location = None\n")
-            file.write("\t\tself.items = {}\n")
+            constructor_string += "\t\tself.location = None\n"
+            constructor_string += "\t\tself.items = {}\n"
 
         # iterate through each statement in start and add it to constructor
         for statement in node.start:
@@ -52,19 +52,25 @@ def generate_classes(tree):
             # (Note that the code might be multi-lined)
             s = generate_code(statement, node.id_, tree)
             for line in s.splitlines():
-                file.write("\t\t" + line + "\n")
+                constructor_string += "\t\t" + line + "\n"
 
         # add the description if it has any
         if node.desc is not None:
-            file.write("\t\tself.description = '%s'" % node.desc)
+            constructor_string += "\t\tself.description = '%s'" % node.desc
+
+
 
         # add the action_list of all the items in setting to self.action_list
 
         # add the action_list of all the characters in setting to self.action_list
 
         # create a list of actions if there is any
-        if hasattr(node, "ACTIONS"):
-            pass
+        action_string = ""
+        if node.actions is not None:
+            for a in node.actions:
+                s = generate_action(a.action_phrase, a.statements)
+                for line in s.splitlines():
+                    action_string += "\t\t" + line + "\n"
             # create a self.action_list in the class
             # file.write("\t\tself.action_list.append(..)")
 
@@ -75,6 +81,11 @@ def generate_classes(tree):
         # create a list of dialogues if there is any
         if hasattr(node, "DIALOGUE"):
             pass
+
+        file.write(import_string)
+        file.write(class_string)
+        file.write(constructor_string)
+
 
         file.close()
 
