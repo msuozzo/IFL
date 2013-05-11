@@ -44,9 +44,11 @@ def generate_classes(tree):
 
 
         # create a list of actions if there is any and append them to the action_list
+        if node.type_ != "TRAIT":
+            constructor_string += "\t\tself.action_list = []\n"
+
         action_string = ""
         if len(node.actions) > 0:
-            constructor_string += "\t\tself.action_list = []\n"
             FG = FunctionGenerator(node.id_, tree)
             for a in node.actions:
                 s = FG.generate_action(a.action_phrase, a.statements)
@@ -73,12 +75,12 @@ def generate_classes(tree):
         # add the action_list of all the items and characters in SETTING to SETTING.action_list
         if node.type_ == "SETTING":
             constructor_string += """
-        for v in self.items.values():
-            self.action_list.extend(v[0].action_list)
+		for v in self.items.values():
+			self.action_list.extend(v[0].action_list)
 
-        for a in vars(self):
-            if hasattr(a, "action_list):
-                self.action_list.extend(a.action_list)
+		for a in vars(self):
+			if hasattr(a, "action_list"):
+				self.action_list.extend(a.action_list)
 
 """
 
@@ -121,17 +123,17 @@ player = Player()
 
 while True:
     if player.location is not None:
-        print "You are at a " + settings[player.location].description
+        print "\\nYou are at a " + settings[player.location].description
 
-    print "\\nWhat would you like to do? (Enter 'help' for more):"
+    print "What would you like to do? (Enter 'help' for more):"
     input = raw_input(">>")
 
     if input == "help":
-        help_string = "The following basic commands are supported: 'help', 'inventory', 'traits', 'inspect' 'quit'.\\n"
+        help_string = "The following basic commands are supported: 'help'; 'inventory'; 'traits'; 'inspect'; 'quit';\\n"
         help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
         help_string += "The following actions are available: "
-        for action in player.setting.action_list:
-            help_string += action + ", "
+        for action in settings[player.location].action_list:
+            help_string += "'" + action + "'; "
 
         print help_string
 
@@ -139,7 +141,7 @@ while True:
         inventory_string = "The following items are in your inventory:\\n"
         for k, v in player.items.iteritems():
             # ex: "3 apples"
-            inventory_string += "\t" + str(v[1]) + " " + k + "\\n"
+            inventory_string += "\\t" + str(v[1]) + " " + k + "\\n"
 
         print inventory_string
 

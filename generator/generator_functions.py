@@ -68,7 +68,7 @@ class FunctionGenerator():
         except IndexError:
             value = node.val[1]
 
-        return_stmt = "{target} = {value}".format(target=target, value=value)
+        return_stmt = "{target} = {value}\n".format(target=target, value=value)
         return return_stmt
 
     def generate_remove(self, node):
@@ -85,13 +85,26 @@ class FunctionGenerator():
 
         return return_stmt
 
-    # moves player
+    # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
-        return "" + target + ".location = " + node.new_loc[1]
+        return "" + target + ".location = " + node.new_loc[1] + "\n"
 
+    # generates code for execute statement
     def generate_execute(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.func)
+        param = ""
+
+        for (counter,arg) in enumerate(node.args):
+            for argArg in arg:
+                if counter == 0:
+                    param = param + argArg[1]
+                    counter+= 1
+                else:
+                    param = param + "," + argArg[1]
+
+        return_stmt = "" + target + "({param})\n".format(param=param)
+        return return_stmt
 
     def generate_increase(self, node):
         return "pass\n"
