@@ -193,7 +193,7 @@ class FunctionGenerator():
         return output
 
     def generate_action(self, action_phrase, stmt_list):
-        output = "def {action_phrase}():\n".format(action_phrase=action_phrase)
+        output = "def {action_phrase}(self):\n".format(action_phrase=action_phrase)
         for stmt in stmt_list:
             s = self.generate_statement(stmt)
             for line in s.splitlines():
