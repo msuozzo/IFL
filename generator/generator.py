@@ -60,8 +60,8 @@ def generate_classes(tree):
                     function_string += "\t" + line + "\n"
 
         # create a list of dialogues if there is any
-        dialogue_string = ""
-        if node.dialogue is not None:
+        dialogues_string = ""
+        if node.dialogues is not None:
             pass
 
         # add the action_list of all the items in setting to self.action_list in setting
