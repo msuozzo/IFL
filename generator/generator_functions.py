@@ -106,11 +106,19 @@ class FunctionGenerator():
         return_stmt = "" + target + "({param})\n".format(param=param)
         return return_stmt
 
+    # creates code for increase
     def generate_increase(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.target)
+        return_stmt = "" + target + "+=" + node.val[1]
 
+        return return_stmt
+
+    # creates code for decrease
     def generate_decrease(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.target)
+        return_stmt = "" + target + "-=" + node.val[1]
+
+        return return_stmt
 
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
