@@ -48,10 +48,10 @@ class FunctionGenerator():
             val = node.primitive.val[1]
             return_stmt = "{target}.{attr} = {value}".format(target=target, attr=attr, value=val)
         elif self.get_type(node.id_) == 'ITEM':
-            original_count = "{target}.items[{id_}][1]".format(target=target, id_=node.id_)
+            original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
             new_thing = node.id_.capitalize() + "()"
             return_stmt =\
-                "if {id_} in {target}.items:\n" \
+                "if '{id_}' in {target}.items:\n" \
                     "\t{target}.items['{id_}'][1] = {original_count} + {quantity}\n" \
                 "else:\n" \
                     "\t{target}.items['{id_}'] = ({new_item}, {quantity})\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant, new_item=new_thing)
@@ -63,14 +63,29 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_set(self, node):
-        target = self.resolve_target(node.target)
-        value = node.val[1]
-        return_stmt = "{target} = {value}".format(target=target, value=value)
+        # target = self.resolve_target(node.target)
+        # value = node.val[1]
+        # return_stmt = "{target} = {value}".format(target=target, value=value)
+        #
+        # return return_stmt
 
-        return return_stmt
+        return "pass\n"
 
     def generate_remove(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.from_)
+
+        return_stmt = ""
+
+        if self.get_type(node.id_) == 'ITEM':
+            original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
+            new_count = original_count + " - 1"
+            return_stmt ="if {id_} in {target}.items:\n" \
+                        "\t{target}.items['{id_}'][1] = {new_count}\n".format(target=target, id_=node.id_, new_count = new_count)
+        elif node.primitive:
+            attr = node.primitive.name
+            return_stmt = "del {target}.{attr}".format(target=target, attr=attr)
+
+        return return_stmt
 
     # moves player
     def generate_move(self, node):
@@ -138,7 +153,7 @@ class FunctionGenerator():
         return output
 
     def generate_action(self, action_phrase, stmt_list):
-        output = "def {action_phrase}():".format(action_phrase=action_phrase)
+        output = "def {action_phrase}():\n".format(action_phrase=action_phrase)
         for stmt in stmt_list:
             s = self.generate_statement(stmt)
             for line in s.splitlines():

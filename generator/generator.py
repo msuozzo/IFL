@@ -23,8 +23,8 @@ def generate_classes(tree):
         # constructor begins here
         constructor_string = "\tdef __init__(self):\n"
 
-        # set the initial location of the player to None and items to empty
-        if node.id_ == "PLAYER":
+        # set the initial location and items of Characters and Settings to empty
+        if node.type_ == "CHARACTER" or node.type_ == "SETTING":
             constructor_string += "\t\tself.location = None\n"
             constructor_string += "\t\tself.items = {}\n"
 
@@ -42,8 +42,9 @@ def generate_classes(tree):
                 constructor_string += "\t\t" + line + "\n"
 
         # create a list of actions if there is any and append them to the action_list
-        action_string = ""
         if node.actions is not None:
+            action_string = ""
+            constructor_string += "\t\tself.action_list = []\n"
             FG = FunctionGenerator(node.id_, tree)
             for a in node.actions:
                 s = FG.generate_action(a.action_phrase, a.statements)
@@ -52,8 +53,8 @@ def generate_classes(tree):
                 constructor_string += "\t\tself.action_list.append('%s')\n" %a.action_phrase
 
         # create a list of functions if there is any
-        function_string = ""
         if node.functions is not None:
+            function_string = ""
             FG = FunctionGenerator(node.id_, tree)
             for f in node.functions:
                 s = FG.generate_function(f)
