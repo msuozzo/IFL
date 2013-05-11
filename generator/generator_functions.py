@@ -69,7 +69,20 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_remove(self, node):
-        return "remove statement"
+        target = self.resolve_target(node.target)
+
+        return_stmt = ""
+
+        if self.get_type(node.id_) == 'ITEM':
+            original_count = "{target}.items[{id_}][1]".format(target=target, id_=node.id_)
+            new_count = original_count - 1
+            return_stmt ="if {id_} in {target}.items:\n" \
+                        "\t{target}.items['{id_}'][1] = {new_count}\n".format(target=target, id_=node.id_, new_count = new_count)
+        elif node.primitive:
+            attr = node.primitive.name
+            return_stmt = "del {target}.{attr}".format(target=target, attr=attr)
+
+        return return_stmt
 
     # moves player
     def generate_move(self, node):
@@ -175,30 +188,6 @@ class FunctionGenerator():
 # 			targ = n.target[0]
 #
 # 	return "" + targ + ".appened(" + n["X"] + ")" +"\n"
-#
-#
-#
-# def generate_remove(n)
-#
-# 	targ=""
-# 	if(len(n.target) > 1):
-# 		temp = 0
-# 		for iString in n.target:
-# 			if(iString == "SELF"):
-# 				iString = iString.lower()
-#
-# 			if (temp == 0):
-# 				targ = targ + iString
-# 				temp += 1
-# 			else:
-# 				targ = targ + "." + iString
-#
-# 		else:
-# 			if (n.target[0] == "SELF"):
-# 				targ = n.target[0].lower()
-# 			targ = n.target[0]
-#
-# 	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
 #
 #
 # def generate_increase(n):
