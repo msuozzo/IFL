@@ -93,10 +93,15 @@ class FunctionGenerator():
     def generate_execute(self, node):
         target = self.resolve_target(node.func)
         param = ""
+        int counter = 0
 
         for arg in node.args:
             for argArg in arg:
-                param = param + argArg[1]
+                if counter == 0:
+                    param = param + argArg[1]
+                    counter+= 1
+                else:
+                    param = param + "," + argArg[1]
 
         return_stmt = "" + target + "({param})\n".format(param=param)
 
