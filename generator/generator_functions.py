@@ -1,3 +1,5 @@
+from analyzer.nodes1 import Conditional
+
 # generates a print statement
 #'print : PRINT string_expression'
 #node is the statement node
@@ -124,7 +126,6 @@ class FunctionGenerator():
                 elif_condition = cases[counter][0]
                 elif_stmt_list = cases[counter][1]
 
-
         #test nested statements
         return output
 
@@ -134,11 +135,26 @@ class FunctionGenerator():
             output += self.generate_statement(stmt, 0)
         return output
 
+    # def generate_function(name, arg_names, statement_list, id, tree):
+    #
+    #     function_string = "def %s(self" % name
+    #     for arg in arg_names:
+    #         function_string += ", " + arg
+    #     function_string += "):\n"
+    #
+    #     for statement in statement_list:
+    #         s = generate_code(statement, id, tree)
+    #         for line in s.splitlines():
+    #             function_string += "\t" + line + "\n"
+    #
+    #
+    #     function_string += "\tpass\n"
+    #     return function_string
 
 
 # above works for sure
 
-# def generate_append(n)
+# def generate_append(n):
 #
 #     targ=""
 # 	if(len(n.target) > 1):

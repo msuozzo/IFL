@@ -180,7 +180,7 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_print(p):
-    'print : PRINT string_expression'
+    'print : PRINT printable_string'
     p[0] = (p[1], p[2])
 
   def p_add(p):
@@ -261,6 +261,15 @@ def generate_parser(lexer, tokens):
                       | object_chain'''
     p[0] = p[1]
 
+  def p_printable_string(p):
+    '''printable_string : string_value
+                      | object_chain
+                      | INTEGER_VAL
+                      | DECIMAL_VAL
+                      | TRUE
+                      | FALSE'''
+    p[0] = p[1]
+
   def p_tf_expression(p):
     '''tf_expression : tf_expression OR tf_expression
                      | tf_expression AND tf_expression
@@ -325,7 +334,7 @@ def generate_parser(lexer, tokens):
 
   def p_arithmetic_or_object(p):
       '''arithmetic_or_object : arithmetic_expression
-                            | object_chain'''
+                              | object_chain'''
       p[0] = p[1]
 
   def p_increase(p):
