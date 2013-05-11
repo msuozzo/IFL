@@ -1,6 +1,6 @@
 #TODO location remove
 #TODO Error handling for some methods like remove
-#TODO Figure out strings/decimals
+#TODO String concatenation
 
 class FunctionGenerator():
     def __init__(self, id_, tree):
@@ -19,6 +19,8 @@ class FunctionGenerator():
             target_list = target_list[1:]
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
+        if target_list[0] == 'PLAYER':
+            target_list[0] = 'player'
         elif target_list[0] == 'LOCATION':
             target_list[0] = 'settings[PLAYER.location]'
         target_string = '.'.join(target_list)
