@@ -106,7 +106,7 @@ class Statement:
   USING="USING"
 
   def __init__(self, tup, tlt_name):
-    tup = deep_sub_self(tup, tlt_name)
+    tup = deep_sub_self(tup, tlt_name, [])
     self.type_ = tup[0]
     if self.type_ == Statement.ADD:
       self.primitive = None
