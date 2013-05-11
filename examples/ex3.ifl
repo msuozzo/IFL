@@ -1,27 +1,27 @@
 TRAIT health:
 	START:
-		ADD {INTEGER current=50}
-		ADD {INTEGER max=100}
+		ADD {INTEGER current=50} TO SELF
+		ADD {INTEGER max=100} TO SELF
 	FUNCTIONS:
 		update WITH amount:
-			INCREASE current BY amount
-			IF current > max:
-				SET current TO max
+			INCREASE current ON SELF BY amount
+			IF current ON SELF > max:
+				SET current ON SELF TO max
 TRAIT experience:
 	START:
-		ADD {INTEGER current=0}
-		ADD {INTEGER level=1}
+		ADD {INTEGER current=0} TO SELF
+		ADD {INTEGER level=1} TO SELF
 	FUNCTIONS:
 		update WITH amount:
-			INCREASE current BY amount
-			IF current > level ^ 2:
+			INCREASE current ON SELF BY amount
+			IF current ON SELF > level ON SELF ^ 2:
 				INCREASE level BY 1
 				PRINT "You gained a level!"
 				PRINT "You are now level " . level
 ITEM apple:
 	START:
-		ADD {INTEGER healing_value=100}
-		ADD {INTEGER experience_value=5}
+		ADD {INTEGER healing_value=100} TO SELF
+		ADD {INTEGER experience_value=5} TO SELF
 	ACTIONS:
 		"get":
 			REMOVE apple FROM LOCATION ON apple
@@ -36,7 +36,7 @@ CHARACTER maid:
 	"I am a maid of the house."
 	START:
 		USING "Text.txt"
-		ADD apple
+		ADD apple TO SELF
 	ACTIONS:
 		"talk":
 			IF HAS apple:
@@ -51,7 +51,7 @@ CHARACTER maid:
 				GOTO #LABEL C#
 		#LABEL B#:
 			IF LAST_INPUT EQUALS "1":
-				REMOVE apple
+				REMOVE apple FROM SELF
 				ADD apple TO PLAYER
 				GOTO #LABEL C#
 			ELSE IF LAST_INPUT EQUALS "2":
@@ -72,9 +72,9 @@ CHARACTER maid:
 SETTING house:
 	"You are at the house."
 	START:
-		ADD maid
+		ADD maid TO SELF
 CHARACTER PLAYER:
 	START:
-		ADD health
-		ADD experience
-		MOVE TO House
+		ADD health TO SELF
+		ADD experience TO SELF
+		MOVE SELF TO House

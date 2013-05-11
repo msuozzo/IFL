@@ -26,6 +26,8 @@ class Program:
       if type_ == TLT.UNKNOWN:
         try: type_ = tlt_name_map[id_].type_
         except KeyError:
+          print id_
+          print tlt_name_map
           raise Exception #TODO non-tlt name added to object 
       if id_ in tlt_name_map and type_ != tlt_name_map[id_].type_:
         raise Exception #TODO Duplicate name error
@@ -68,9 +70,9 @@ class TLT:
     self.id_ = id_
     self.desc = desc if desc is None else gen_desc(type_, id_)
     self.start = [stat_or_cond(tup, self.id_) for tup in start[1]]
-    self.actions = [Action(tup, self.id_) for tup in action[1]] if action else None
-    self.functions = [Function(tup, self.id_) for tup in function[1]] if function else None
-    self.dialogue = Dialogue(dialogue, self.id_) if dialogue else None
+    self.actions = [Action(tup, self.id_) for tup in action[1]] if action else []
+    self.functions = [Function(tup, self.id_) for tup in function[1]] if function else []
+    self.dialogues = [Dialogue(tup, self.id_) for tup in dialogue[1]] if dialogue else []
 
   def gen_possible_fields(self):
     names = []
@@ -84,7 +86,8 @@ class TLT:
       for action in self.actions: ret.extend(action.get_add_fields())
     if self.functions:
       for function in self.functions: ret.extend(function.get_add_fields())
-    if self.dialogue: ret.extend(self.dialogue.get_add_fields())
+    if self.dialogues:
+      for dialogue in self.dialogues: ret.extend(dialogue.get_add_fields())
     return ret
 
 
@@ -188,18 +191,9 @@ class Primitive:
 
 class Dialogue:
   def __init__(self, tup, tlt_name):
-    self.label_map = {}
-    for pair in tup[1:]:
-      label = pair[0]
-      statements = [stat_or_cond(stat, tlt_name) for stat in pair[1]]
-      if label in self.label_map:
-        raise Exception #TODO label used multiple times
-      self.label_map[label] = statements
-    self.labels = self.label_map.keys()
-    self.all_statements = []
-    for label, statements in self.label_map.iteritems():
-      self.all_statements.extend(statements)
-    self.get_add_fields = lambda: get_add_fields(self.all_statements)
+    self.label = tup[0]
+    self.statements = [stat_or_cond(stat, tlt_name) for stat in tup[1]]
+    self.get_add_fields = lambda: get_add_fields(self.statements)
 
 
 def gen_desc(type_, id_):
