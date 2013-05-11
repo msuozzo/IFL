@@ -5,8 +5,8 @@ TRAIT health:
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
-			IF current > max:
-				SET current ON SELF TO max
+			IF current ON SELF > max ON SELF:
+				SET current ON SELF TO max ON SELF
 
 TRAIT experience:
 	START:
