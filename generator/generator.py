@@ -195,7 +195,7 @@ while True:
             print "noun: " + noun
 
             if noun in player.items:
-                getattr(player.items[noun][0], action)()
+                getattr(player.items[noun][0], action)(settings)
 
 
 

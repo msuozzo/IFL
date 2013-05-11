@@ -19,7 +19,7 @@ class FunctionGenerator():
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
         elif target_list[0] == 'LOCATION':
-            target_list[0] = 'settings[PLAYER.location]'
+            target_list[0] = 'settings[player.location]'
         target_string = '.'.join(target_list)
         return target_string
 
@@ -88,7 +88,7 @@ class FunctionGenerator():
     # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
-        return "" + target + ".location = " + node.new_loc[1] + "\n"
+        return "" + target + ".location = '" + node.new_loc[1] + "'\n"
 
     # generates code for execute statement
     def generate_execute(self, node):
@@ -204,7 +204,7 @@ class FunctionGenerator():
         return output
 
     def generate_action(self, action_phrase, stmt_list):
-        output = "def {action_phrase}(self):\n".format(action_phrase=action_phrase)
+        output = "def {action_phrase}(self, settings):\n".format(action_phrase=action_phrase)
         for stmt in stmt_list:
             s = self.generate_statement(stmt)
             for line in s.splitlines():
@@ -215,7 +215,7 @@ class FunctionGenerator():
         function_string = "def %s(self" % node.name
         for arg in node.arg_names:
             function_string += ", " + arg
-        function_string += "):\n"
+        function_string += ", settings):\n"
 
         for stmt in node.statements:
             s =  self.generate_statement(stmt)
