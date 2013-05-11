@@ -93,7 +93,9 @@ class FunctionGenerator():
 
     # moves player
     def generate_move(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.target)
+
+        return "" + target + ".location = " + node.new_loc[1]
 
     def generate_execute(self, node):
         return "pass\n"
