@@ -86,6 +86,10 @@ def generate_lexer():
     r'[a-zA-Z][\w]*'
     t.type = reserved.get(t.value, 'ID')
     return t
+
+  def t_DECIMAL_VAL(t):
+    r'\d+\.\d+'
+    return t
   
   def t_newline(t):
     r'\n+'
@@ -105,7 +109,6 @@ def generate_lexer():
   t_ignore_COMMENT = r'//.*'
   t_CONCAT = r'\.'
   t_INTEGER_VAL = r'([1-9]\d*|0)'
-  t_DECIMAL_VAL = r'\d+\.\d+'
   t_STRING_VAL = r'"([^\\"]|\\")*"'
   t_LBRACE = r'{'
   t_RBRACE = r'}'
