@@ -8,7 +8,7 @@ def generate_classes(tree):
     # loop through all of the Definition Nodes in the tlts
     for node in tree.tlts:
 
-        # create the file
+        # create the file, ex: /game/PLAYER.py
         file = open("./game/" + node.id_ + ".py", 'w')
 
         # add the appropriate imports by looping through all of the definition nodes in tlts
@@ -28,6 +28,10 @@ def generate_classes(tree):
             constructor_string += "\t\tself.location = None\n"
             constructor_string += "\t\tself.items = {}\n"
 
+        # add the description if it has any
+        if node.desc is not None:
+            constructor_string += "\t\tself.description = '%s'" % node.desc
+
         # iterate through each statement in start and add it to constructor
         for statement in node.start:
 
@@ -37,38 +41,39 @@ def generate_classes(tree):
             for line in s.splitlines():
                 constructor_string += "\t\t" + line + "\n"
 
-        # add the description if it has any
-        if node.desc is not None:
-            constructor_string += "\t\tself.description = '%s'" % node.desc
-
-
-
-        # add the action_list of all the items in setting to self.action_list
-
-        # add the action_list of all the characters in setting to self.action_list
-
-        # create a list of actions if there is any
+        # create a list of actions if there is any and append them to the action_list
         action_string = ""
         if node.actions is not None:
             for a in node.actions:
-                s = generate_action(a.action_phrase, a.statements)
+                s = generate_action(a.action_phrase, a.statements, node.id_, tree)
                 for line in s.splitlines():
-                    action_string += "\t\t" + line + "\n"
-            # create a self.action_list in the class
-            # file.write("\t\tself.action_list.append(..)")
+                    action_string += "\t" + line + "\n"
+                constructor_string += "\t\tself.action_list.append('%s')\n" %a.action_phrase
+
 
         # create a list of functions if there is any
-        if hasattr(node, "FUNCTIONS"):
-            pass
+        function_string = ""
+        if node.functions is not None:
+            for f in node.functions:
+                s = generate_function(f.name, f.arg_names, f.statements, node.id_, tree)
+                for line in s.splitlines():
+                    function_string += "\t" + line + "\n"
 
         # create a list of dialogues if there is any
-        if hasattr(node, "DIALOGUE"):
+        dialogue_string = ""
+        if node.dialogue is not None:
             pass
+
+        # add the action_list of all the items in setting to self.action_list in setting
+
+        # add the action_list of all the characters in setting to self.action_list
+
 
         file.write(import_string)
         file.write(class_string)
         file.write(constructor_string)
-
+        file.write(action_string)
+        file.write(function_string)
 
         file.close()
 
@@ -107,7 +112,6 @@ while True:
         help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
         help_string += "The following actions are available: "
 
-
         print help_string
 
     elif input == "inventory":
@@ -122,6 +126,9 @@ while True:
         traits_string = "You have the following traits:\\n"
 
         print traits_string
+
+    elif input == "inspect":
+        pass
 
     elif input == "quit":
         print "Game Over"

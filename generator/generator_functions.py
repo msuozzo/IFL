@@ -1,3 +1,5 @@
+from analyzer.nodes1 import Conditional
+
 # generates a print statement
 #'print : PRINT string_expression'
 def generate_print(n, name, tree):
@@ -64,7 +66,6 @@ def generate_set(n, name, tree):
     return "" + targ + "=" + n.val[1] +"\n"
 
 
-
 def generate_remove(n):
 
 	targ="" 
@@ -118,17 +119,45 @@ def generate_move(n, name, tree):
     return "" + targ + ".location = " + n.new_loc[1]
 
 def generate_conditionals(n):
-    pass
+    return "pass\n"
 
 
-def generate_function(n):
-    pass
+def generate_action(action_phrase, statement_list, id, tree):
 
-def generate_action(action_phrase, statement_list):
-    return "pass"
+    action_string = "def %s(self):\n" % action_phrase
+
+    for statement in statement_list:
+        s = generate_code(statement, id, tree)
+        for line in s.splitlines():
+            action_string += "\t" + line + "\n"
+
+
+    action_string += "\tpass\n"
+    return action_string
+
+
+def generate_function(name, arg_names, statement_list, id, tree):
+
+    function_string = "def %s(self" % name
+    for arg in arg_names:
+        function_string += ", " + arg
+    function_string += "):\n"
+
+    for statement in statement_list:
+        s = generate_code(statement, id, tree)
+        for line in s.splitlines():
+            function_string += "\t" + line + "\n"
+
+
+    function_string += "\tpass\n"
+    return function_string
+
 
 def generate_code(node, id, tree):
     """Select the appropriate function based on the type of the node"""
+
+    if isinstance(node, Conditional):
+        return generate_conditionals(node)
 
     if node.type_ == "ADD":
         return generate_add(node, id, tree)
@@ -138,13 +167,12 @@ def generate_code(node, id, tree):
 
     elif node.type_ == "PRINT":
         return generate_print(node, id, tree)
-    elif node.typ
     else:
-        return "pass"
+        return "pass\n"
 
 # above works for sure
 
-# def generate_append(n)
+# def generate_append(n):
 #
 #     targ=""
 # 	if(len(n.target) > 1):
