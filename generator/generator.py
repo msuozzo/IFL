@@ -1,6 +1,5 @@
-from generator_functions import *
+from generator_functions import FunctionGenerator
 import os
-
 
 def generate_classes(tree):
     """Traverse through the tlts in the tree to generate code for classes"""
@@ -8,7 +7,7 @@ def generate_classes(tree):
     # loop through all of the Definition Nodes in the tlts
     for node in tree.tlts:
 
-        # create the file
+        # create the file, ex: /game/PLAYER.py
         file = open("./game/" + node.id_ + ".py", 'w')
 
         # add the appropriate imports by looping through all of the definition nodes in tlts
@@ -23,52 +22,79 @@ def generate_classes(tree):
         # constructor begins here
         constructor_string = "\tdef __init__(self):\n"
 
-        # set the initial location of the player to None and items to empty
-        if node.id_ == "PLAYER":
+        # set the initial location and items of Characters and Settings to empty
+        if node.type_ == "CHARACTER" or node.type_ == "SETTING":
             constructor_string += "\t\tself.location = None\n"
             constructor_string += "\t\tself.items = {}\n"
 
-        # iterate through each statement in start and add it to constructor
-        for statement in node.start:
-
-            # get the code, add the appropriate tabs, and write to file
-            # (Note that the code might be multi-lined)
-            s = generate_code(statement, node.id_, tree)
-            for line in s.splitlines():
-                constructor_string += "\t\t" + line + "\n"
 
         # add the description if it has any
         if node.desc is not None:
-            constructor_string += "\t\tself.description = '%s'" % node.desc
+            constructor_string += "\t\tself.description = '%s'\n" % node.desc
 
 
+        # iterate through each statement in start and add it to constructor
+        for statement in node.start:
+            # get the code, add the appropriate tabs, and write to file
+            # (Note that the code might be multi-lined)
+            FG = FunctionGenerator(node.id_, tree)
+            s = FG.generate_statement(statement)
+            for line in s.splitlines():
+                constructor_string += "\t\t" + line + "\n"
 
-        # add the action_list of all the items in setting to self.action_list
 
-        # add the action_list of all the characters in setting to self.action_list
+        # create a list of actions if there is any and append them to the action_list
+        if node.type_ != "TRAIT":
+            constructor_string += "\t\tself.action_list = []\n"
 
-        # create a list of actions if there is any
         action_string = ""
-        if node.actions is not None:
+        if len(node.actions) > 0:
+            FG = FunctionGenerator(node.id_, tree)
             for a in node.actions:
-                s = generate_action(a.action_phrase, a.statements)
+                s = FG.generate_action(a.action_phrase, a.statements)
                 for line in s.splitlines():
-                    action_string += "\t\t" + line + "\n"
-            # create a self.action_list in the class
-            # file.write("\t\tself.action_list.append(..)")
+                    action_string += "\t" + line + "\n"
+                constructor_string += "\t\tself.action_list.append('%s')\n" %a.action_phrase
+
 
         # create a list of functions if there is any
-        if hasattr(node, "FUNCTIONS"):
-            pass
+        function_string = ""
+        if len(node.functions) > 0:
+            FG = FunctionGenerator(node.id_, tree)
+            for f in node.functions:
+                s = FG.generate_function(f)
+                for line in s.splitlines():
+                    function_string += "\t" + line + "\n"
+
 
         # create a list of dialogues if there is any
-        if hasattr(node, "DIALOGUE"):
+        dialogues_string = ""
+        if len(node.dialogues) > 0:
             pass
+
+        # add the action_list of all the items and characters in SETTING to SETTING.action_list
+        if node.type_ == "SETTING":
+            constructor_string += """
+		for v in self.items.values():
+			self.action_list.extend(v[0].action_list)
+
+		for a in vars(self):
+			if hasattr(a, "action_list"):
+				self.action_list.extend(a.action_list)
+
+"""
+
+
+        # add the action_list of all the characters in SETTING to SETTING.action_list
+
+
+        # add all of the traits of PLAYER to self.traits
 
         file.write(import_string)
         file.write(class_string)
         file.write(constructor_string)
-
+        file.write(action_string)
+        file.write(function_string)
 
         file.close()
 
@@ -97,16 +123,17 @@ player = Player()
 
 while True:
     if player.location is not None:
-        print "You are at a " + settings[player.location].description
+        print "\\nYou are at a " + settings[player.location].description
 
-    print "\\nWhat would you like to do? (Enter 'help' for more):"
+    print "What would you like to do? (Enter 'help' for more):"
     input = raw_input(">>")
 
     if input == "help":
-        help_string = "The following basic commands are supported: 'help', 'inventory', 'traits', 'inspect' 'quit'.\\n"
+        help_string = "The following basic commands are supported: 'help'; 'inventory'; 'traits'; 'inspect'; 'quit';\\n"
         help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
         help_string += "The following actions are available: "
-
+        for action in settings[player.location].action_list:
+            help_string += "'" + action + "'; "
 
         print help_string
 
@@ -114,7 +141,7 @@ while True:
         inventory_string = "The following items are in your inventory:\\n"
         for k, v in player.items.iteritems():
             # ex: "3 apples"
-            inventory_string += v[1] + " " + k + "\\n"
+            inventory_string += "\\t" + str(v[1]) + " " + k + "\\n"
 
         print inventory_string
 
@@ -122,6 +149,9 @@ while True:
         traits_string = "You have the following traits:\\n"
 
         print traits_string
+
+    elif input == "inspect":
+        pass
 
     elif input == "quit":
         print "Game Over"
@@ -131,12 +161,15 @@ while True:
         input = input.split()
         action = input[0]
         noun = input[1]
+
+        # searchs through all of the available actions in items
+
         print "action is " + action
         print "noun is " + noun
 
     else:
         print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
-	    """
+        """
 
     file.write(main)
 

@@ -1,243 +1,225 @@
-# generates a print statement
-#'print : PRINT string_expression'
-def generate_print(n, name, tree):
-    return "print \"" + n.string_expr[0] + "\"\n"
+#TODO location remove
+#TODO Error handling for some methods like remove
 
-# generates add statement
-def generate_add(n, name, tree):
-    targ = ""
+class FunctionGenerator():
+    def __init__(self, id_, tree):
+        self.id_ = id_
+        self.tree = tree
 
-    #if(n is None): --- IGNORE FOR NOW - need to fix quantity
+    def get_type(self, id_):
+        try:
+            return self.tree.def_types[id_]
+        except KeyError:
+            return None
 
-    # checks to see how many parts of target list
-    if len(n.to) > 1 :
-        temp = 0
-        # iterates through list of target
-        for iString in n.to:
-            # special case of first one
-            if(iString == name):
-                iString = "self"
+    def resolve_target(self, target_list):
+        target_list = list(target_list)
+        if target_list[0] == 'OBJ':
+            target_list = target_list[1:]
+        if target_list[0] == self.id_ or target_list[0] == 'SELF':
+            target_list[0] = 'self'
+        elif target_list[0] == 'LOCATION':
+            target_list[0] = 'settings[PLAYER.location]'
+        target_string = '.'.join(target_list)
+        return target_string
 
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
-            else: # all other iterations
-                targ = targ + "." + iString
+    def generate_has(self, node):
+        holdee = node[2]
+        holder = self.resolve_target(node[1])
 
-    else: # only one target
-        if n.to[0] == name:
-            targ = "self"
+        if self.get_type(holdee) == 'ITEM':
+            return_stmt = "'{holdee}' in {holder}.items and {holder}.items['{holdee}'][1] > 0".format(holder=holder, holdee=holdee)
         else:
-            targ = n.to[0]
+            return_stmt = "hasattr({holder}, {holdee})".format(holder=holder, holdee=holdee)
 
-    # checks what type of add it is
-    if n.primitive is None: # not a primitive add
-        if tree.def_types[n.id_] == "TRAIT":
-            return "" + targ + "." + n.id_ + " = " + n.id_.capitalize()  + "()\n"
-    else: # primitive add
-        return "" + targ + "." + n.primitive.name + " = " + n.primitive.val[1]  + "\n"
+        return '(' + return_stmt + ')'
 
-    return ""
+    def generate_print(self, node):
+        return "print \"" + node.string_expr[0] + "\"\n"
 
+    #TODO test if add and set work for strings and decimals, differentiate between strings and ints
+    def generate_add(self, node):
+        target = self.resolve_target(node.to)
 
-def generate_set(n, name, tree):
-    targ = ""
+        if node.primitive:
+            attr = node.primitive.name
+            val = node.primitive.val[1]
+            return_stmt = "{target}.{attr} = {value}".format(target=target, attr=attr, value=val)
+        elif self.get_type(node.id_) == 'ITEM':
+            original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
+            new_thing = node.id_.capitalize() + "()"
+            return_stmt =\
+                "if '{id_}' in {target}.items:\n" \
+                    "\t{target}.items['{id_}'][1] = {original_count} + {quantity}\n" \
+                "else:\n" \
+                    "\t{target}.items['{id_}'] = [{new_item}, {quantity}]\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant, new_item=new_thing)
+        else:
+            attr = node.id_
+            new_thing = node.id_.capitalize() + "()"
+            return_stmt = "{target}.{attr} = {new_obj}".format(target=target, attr=attr, new_obj=new_thing)
 
-    if(len(n.target) > 1):
-        temp = 0
-        for iString in n.target:
-            if(iString == name):
-                iString = "self"
+        return return_stmt
 
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
+    def generate_set(self, node):
+        target = self.resolve_target(node.target)
+        try:
+            if node.val[0][0] == 'OBJ':
+                value = self.resolve_target(node.val[0])
+        except IndexError:
+            value = node.val[1]
+
+        return_stmt = "{target} = {value}\n".format(target=target, value=value)
+        return return_stmt
+
+    def generate_remove(self, node):
+        target = self.resolve_target(node.from_)
+
+        if self.get_type(node.id_) == 'ITEM':
+            original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
+            return_stmt = \
+                "if '{id_}' in {target}.items:\n" \
+                    "\t{target}.items['{id_}'][1] = {original_count} - {quantity}\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant)
+        else:
+            attr = node.id_
+            return_stmt = "del {target}.{attr}".format(target=target, attr=attr)
+
+        return return_stmt
+
+    # generates code for move statement
+    def generate_move(self, node):
+        target = self.resolve_target(node.target)
+        return "" + target + ".location = " + node.new_loc[1] + "\n"
+
+    # generates code for execute statement
+    def generate_execute(self, node):
+        target = self.resolve_target(node.func)
+        param = ""
+
+        for (counter,arg) in enumerate(node.args):
+            for argArg in arg:
+                if counter == 0:
+                    param = param + argArg[1]
+                    counter+= 1
+                else:
+                    param = param + "," + argArg[1]
+
+        return_stmt = "" + target + "({param})\n".format(param=param)
+        return return_stmt
+
+    # creates code for increase
+    def generate_increase(self, node):
+        target = self.resolve_target(node.target)
+        return_stmt = "" + target + "+=" + node.val[1]
+
+        return return_stmt
+
+    # creates code for decrease
+    def generate_decrease(self, node):
+        target = self.resolve_target(node.target)
+        return_stmt = "" + target + "-=" + node.val[1]
+
+        return return_stmt
+
+    #Parses a TF or arithmetic expression
+    def parse_expr(self, expr):
+        ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
+        if expr[0] in ['OBJ', 'LIT']: #TODO string literal?
+            if expr[0] == 'OBJ':
+                return self.resolve_target(expr)
+            elif expr[0] == 'LIT':
+                return expr[1]
+
+        output = ""
+        operands = []
+        operator = expr[0]
+
+        if len(expr) == 2: #unary op
+            operands.append(expr[1][0])
+        else:
+            operands.append(expr[1])
+            operands.append(expr[2])
+
+        if operator == 'HAS':
+            output += self.generate_has(expr)
+        elif operator in ops:
+            if len(operands) == 1:
+                output += operator
+                output += "(" +  self.parse_expr(operands[0]) + ")"
             else:
-                targ = targ + "." + iString
+                output += "(" +  self.parse_expr(operands[0]) + ")"
+                output += " " + operator + " "
+                output += "(" + self.parse_expr(operands[1]) + ")"
 
-    else:
-        if n.target[0] == name:
-            targ = "self"
+        return output
+
+    def generate_statement(self, node):
+        stmt_map = {
+            'ADD': self.generate_add,
+            'PRINT': self.generate_print,
+            'SET': self.generate_set,
+            'REMOVE': self.generate_remove,
+            'EXECUTE': self.generate_execute,
+            'MOVE': self.generate_move,
+            'INCREASE': self.generate_increase,
+            'DECREASE': self.generate_decrease,
+        }
+
+        if node.__class__.__name__ == 'Conditional':
+            return self.generate_conditionals(node)
         else:
-            targ = n.target[0]
+            return stmt_map[node.type_](node)
 
-    return "" + targ + "=" + n.val[1] +"\n"
+    def generate_conditionals(self, case_inst):
+        cases = case_inst.cases
+        output = ""
 
+        for (counter, conditional) in enumerate(cases):
+            if counter == 0:
+                if_condition = cases[0][0]
+                if_stmt_list = cases[0][1]
+                output += "if {condition}:\n".format(condition=self.parse_expr(if_condition))
 
+                for stmt in if_stmt_list:
+                    s = self.generate_statement(stmt)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
+            elif counter == len(cases) - 1 and True:
+                else_stmt_list = cases[-1][1]
+                output += 'else:\n'
+                for stmt in else_stmt_list:
+                    s = self.generate_statement(stmt)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
+            else:
+                elif_condition = cases[counter][0]
+                elif_stmt_list = cases[counter][1]
 
-def generate_remove(n):
+                output += "elif {condition}:\n".format(condition=self.parse_expr(elif_condition))
 
-	targ="" 
-	if(len(n.target) > 1): 
-		temp = 0
-		for iString in n.target: 
-			if(iString == "SELF"): 
-				iString = iString.lower()
-	
-			if (temp == 0): 
-				targ = targ + iString
-				temp += 1
-			else: 
-				targ = targ + "." + iString
+                for stmt in elif_stmt_list:
+                    s = self.generate_statement(stmt)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
 
-		else: 
-			if (n.target[0] == "SELF"): 
-				targ = n.target[0].lower()
-			targ = n.target[0]
+        return output
 
-	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
+    def generate_action(self, action_phrase, stmt_list):
+        output = "def {action_phrase}():\n".format(action_phrase=action_phrase)
+        for stmt in stmt_list:
+            s = self.generate_statement(stmt)
+            for line in s.splitlines():
+                output += "\t" + line + "\n"
+        return output
 
-def generate_increase(n):
-    pass
+    def generate_function(self, node):
+        function_string = "def %s(self" % node.name
+        for arg in node.arg_names:
+            function_string += ", " + arg
+        function_string += "):\n"
 
-# moves player
-def generate_move(n, name, tree):
-    targ = ""
+        for stmt in node.statements:
+            s =  self.generate_statement(stmt)
+            for line in s.splitlines():
+                function_string +=  '\t' + line + '\n'
 
-     # checks to see how many parts of target list
-    if len(n.target) > 1 :
-        temp = 0
-        # iterates through list of target
-        for iString in n.target:
-            # special case of first one
-            if(iString == name):
-                iString = "self"
-
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
-            else: # all other iterations
-                targ = targ + "." + iString
-
-    else: # only one target
-        if n.target[0] == name:
-            targ = "self"
-        else:
-            targ = n.target[0]
-
-    return "" + targ + ".location = " + n.new_loc[1]
-
-def generate_conditionals(n):
-    pass
-
-
-def generate_function(n):
-    pass
-
-def generate_action(action_phrase, statement_list):
-    return "pass"
-
-def generate_code(node, id, tree):
-    """Select the appropriate function based on the type of the node"""
-
-    if node.type_ == "ADD":
-        return generate_add(node, id, tree)
-
-    elif node.type_ == "SET":
-        return generate_set(node, id, tree)
-
-    elif node.type_ == "PRINT":
-        return generate_print(node, id, tree)
-    elif node.typ
-    else:
-        return "pass"
-
-# above works for sure
-
-# def generate_append(n)
-#
-#     targ=""
-# 	if(len(n.target) > 1):
-# 		temp = 0
-# 		for iString in n.target:
-# 			if(iString == "SELF"):
-# 				iString = iString.lower()
-#
-# 			if (temp == 0):
-# 				targ = targ + iString
-# 				temp += 1
-# 			else:
-# 				targ = targ + "." + iString
-#
-# 		else:
-# 			if (n.target[0] == "SELF"):
-# 				targ = n.target[0].lower()
-# 			targ = n.target[0]
-#
-# 	return "" + targ + ".appened(" + n["X"] + ")" +"\n"
-#
-#
-#
-# def generate_remove(n)
-#
-# 	targ=""
-# 	if(len(n.target) > 1):
-# 		temp = 0
-# 		for iString in n.target:
-# 			if(iString == "SELF"):
-# 				iString = iString.lower()
-#
-# 			if (temp == 0):
-# 				targ = targ + iString
-# 				temp += 1
-# 			else:
-# 				targ = targ + "." + iString
-#
-# 		else:
-# 			if (n.target[0] == "SELF"):
-# 				targ = n.target[0].lower()
-# 			targ = n.target[0]
-#
-# 	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
-#
-#
-# def generate_increase(n):
-#     targ = ""
-#
-#     if(len(n.target) > 1):
-#         temp = 0
-#         for iString in n.target:
-#             if(iString == "SELF"):
-#                 iString = iString.lower()
-#
-#             if(temp == 0):
-#                 targ = targ + iString
-#                 temp += 1
-#             else:
-#                 targ = targ + "." + iString
-#
-#     else:
-#         if (n.target[0] == "SELF"):
-#             targ = n.target[0].lower()
-#         targ = n.target[0]
-#
-#     return "" + targ + "+=" + n.val[1] +"\n"
-#
-#
-#
-# def generate_decrease(n):
-#     targ = ""
-#
-#     if(len(n["target"]) > 1):
-#         temp = 0
-#         for iString in n.target:
-#             if(iString == "SELF"):
-#                 iString = iString.lower()
-#
-#             if(temp == 0):
-#                 targ = targ + iString
-#                 temp += 1
-#             else:
-#                 targ = targ + "." + iString
-#
-#     else:
-#         if (n.target[0] == "SELF"):
-#             targ = n.target[0].lower()
-#         targ = n.target[0]
-#
-#     return "" + targ + "-=" + n.val[1] +"\n"
-
-
-
-
-
+        return function_string
