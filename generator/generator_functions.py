@@ -1,5 +1,6 @@
 #TODO location remove
 #TODO Error handling for some methods like remove
+#TODO Figure out strings/decimals
 
 class FunctionGenerator():
     def __init__(self, id_, tree):
@@ -43,7 +44,10 @@ class FunctionGenerator():
 
         if node.primitive:
             attr = node.primitive.name
-            val = node.primitive.val[1]
+            if node.primitive.type_ == 'STRING':
+                val = "'" + node.primitive.val[0] + "'"
+            else:
+                val = node.primitive.val[1]
             return_stmt = "{target}.{attr} = {value}".format(target=target, attr=attr, value=val)
         elif self.get_type(node.id_) == 'ITEM':
             original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
@@ -62,10 +66,9 @@ class FunctionGenerator():
 
     def generate_set(self, node):
         target = self.resolve_target(node.target)
-        try:
-            if node.val[0][0] == 'OBJ':
-                value = self.resolve_target(node.val[0])
-        except IndexError:
+        if node.val[0][0] == 'OBJ':
+            value = self.resolve_target(node.val[0])
+        else:
             value = node.val[1]
 
         return_stmt = "{target} = {value}\n".format(target=target, value=value)
@@ -120,6 +123,12 @@ class FunctionGenerator():
 
         return return_stmt
 
+    def generate_using(self, node):
+        return "pass\n"
+
+    def generate_initiate(self, node):
+        return "pass\n"
+
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
         ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
@@ -162,6 +171,8 @@ class FunctionGenerator():
             'MOVE': self.generate_move,
             'INCREASE': self.generate_increase,
             'DECREASE': self.generate_decrease,
+            'USING': self.generate_using,
+            'INITIATE': self.generate_initiate,
         }
 
         if node.__class__.__name__ == 'Conditional':
@@ -223,3 +234,6 @@ class FunctionGenerator():
                 function_string +=  '\t' + line + '\n'
 
         return function_string
+
+    def generate_dialogue(self, node):
+        pass

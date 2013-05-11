@@ -214,7 +214,6 @@ def generate_parser(lexer, tokens):
 
   def p_object_chain(p):
     '''object_chain : object_chain ON ID
-                    | LOCATION
                     | ID'''
     if len(p) == 4: p[0] = ("OBJ", p[3],) + p[1][1:]
     elif len(p) == 2: p[0] = ("OBJ", p[1],)
@@ -278,8 +277,8 @@ def generate_parser(lexer, tokens):
                      | LPAREN tf_expression RPAREN
                      | tf_literal'''
     if len(p) == 4:
-      if p[1] == '(': p[0] = p[2]
-      else: p[0] = (p[1], p[2]) + p[3]
+      if p[1] == '(': p[0] = (p[2],)
+      else: p[0] = (p[2], p[1], p[3])
     elif len(p) == 3: p[0] = (p[1], p[2])
     elif len(p) == 2: p[0] = p[1]
 
@@ -298,10 +297,8 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_has_expression(p):
-    '''has_expression : object_chain HAS ID
-                      | HAS ID'''
-    if len(p) == 4: p[0] = (p[2], p[1], p[3])
-    else: p[0] = (p[1], None, p[2])
+    '''has_expression : object_chain HAS ID'''
+    p[0] = (p[2], p[1], p[3])
 
   def p_relational_expression(p):
     'relational_expression : relational_operand relational_operator relational_operand'

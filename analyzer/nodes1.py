@@ -106,11 +106,12 @@ class Statement:
   USING="USING"
 
   def __init__(self, tup, tlt_name):
+    tup = deep_sub_self(tup, tlt_name)
     self.type_ = tup[0]
     if self.type_ == Statement.ADD:
       self.primitive = None
       if isinstance(tup[2], tuple):
-        self.primitive = Primitive(tup[2])
+        self.primitive = Primitive(tup[2], tlt_name)
         self.id_ = self.primitive.name
       else: self.id_ = tup[2]
       self.quant = tup[1] if tup[1] else 1
@@ -183,7 +184,7 @@ class Action:
 
 
 class Primitive:
-  def __init__(self, tup):
+  def __init__(self, tup, tlt_name):
     self.type_ = tup[0]
     self.name = tup[1]
     self.val = tup[2]
@@ -210,3 +211,13 @@ def stat_or_cond(tup, tlt_name):
 def self_replace(lst, tlt_name):
   return [tlt_name if elem=="SELF" else elem for elem in lst[1:]]
 
+def deep_sub_self(lst, tlt_name, new_lst=[]):
+  for elem in lst:
+    if isinstance(elem, tuple):
+      if elem[0] == "OBJ": new_lst.append(tuple([tlt_name if e=="SELF" else e for e in elem]))
+      else:
+        new = []
+        deep_sub_self(elem, tlt_name, new)
+        new_lst.append(tuple(new))
+    else: new_lst.append(elem)
+  return tuple(new_lst)
