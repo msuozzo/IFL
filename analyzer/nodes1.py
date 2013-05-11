@@ -157,6 +157,7 @@ class Statement:
 
 class Conditional(Statement):
   def __init__(self, tup, tlt_name):
+    tup = deep_sub_self(tup, tlt_name, [])
     # contains 2-tuples of (case, statement_list)
     self.cases = []
     for sec in tup[1:]:
