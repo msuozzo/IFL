@@ -19,9 +19,10 @@ class FunctionGenerator():
             return None
 
     def resolve_target(self, target_list):
+        target_list = list(target_list)
         if target_list[0] == 'OBJ':
             target_list = target_list[1:]
-        if target_list[0] == self.id_:
+        if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
         target_string = '.'.join(target_list)
         return target_string
@@ -64,7 +65,12 @@ class FunctionGenerator():
 
     def generate_set(self, node):
         target = self.resolve_target(node.target)
-        value = node.val[1]
+        try:
+            if node.val[0][0] == 'OBJ':
+                value = self.resolve_target(node.val[0])
+        except IndexError:
+            value = node.val[1]
+
         return_stmt = "{target} = {value}".format(target=target, value=value)
 
         return return_stmt
