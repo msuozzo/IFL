@@ -30,14 +30,14 @@ def generate_classes(tree):
 
         # add the description if it has any
         if node.desc is not None:
-            constructor_string += "\t\tself.description = '%s'" % node.desc
+            constructor_string += "\t\tself.description = '%s'\n" % node.desc
 
         # iterate through each statement in start and add it to constructor
         for statement in node.start:
             # get the code, add the appropriate tabs, and write to file
             # (Note that the code might be multi-lined)
             FG = FunctionGenerator(node.id_, tree)
-            s = FG.generate_statement(statement, 0)
+            s = FG.generate_statement(statement)
             for line in s.splitlines():
                 constructor_string += "\t\t" + line + "\n"
 
