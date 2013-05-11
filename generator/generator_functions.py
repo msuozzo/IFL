@@ -19,9 +19,10 @@ class FunctionGenerator():
             return None
 
     def resolve_target(self, target_list):
+        target_list = list(target_list)
         if target_list[0] == 'OBJ':
             target_list = target_list[1:]
-        if target_list[0] == self.id_:
+        if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
         target_string = '.'.join(target_list)
         return target_string
@@ -63,13 +64,16 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_set(self, node):
-        # target = self.resolve_target(node.target)
-        # value = node.val[1]
-        # return_stmt = "{target} = {value}".format(target=target, value=value)
-        #
-        # return return_stmt
+        target = self.resolve_target(node.target)
+        try:
+            if node.val[0][0] == 'OBJ':
+                value = self.resolve_target(node.val[0])
+        except IndexError:
+            value = node.val[1]
 
-        return "pass\n"
+        return_stmt = "{target} = {value}".format(target=target, value=value)
+
+        return return_stmt
 
     def generate_remove(self, node):
         target = self.resolve_target(node.from_)
@@ -79,7 +83,7 @@ class FunctionGenerator():
         if self.get_type(node.id_) == 'ITEM':
             original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
             new_count = original_count + " - 1"
-            return_stmt ="if {id_} in {target}.items:\n" \
+            return_stmt ="if '{id_}' in {target}.items:\n" \
                         "\t{target}.items['{id_}'][1] = {new_count}\n".format(target=target, id_=node.id_, new_count = new_count)
         elif node.primitive:
             attr = node.primitive.name

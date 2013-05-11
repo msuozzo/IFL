@@ -1,7 +1,6 @@
 from generator_functions import FunctionGenerator
 import os
 
-
 def generate_classes(tree):
     """Traverse through the tlts in the tree to generate code for classes"""
 
@@ -28,9 +27,11 @@ def generate_classes(tree):
             constructor_string += "\t\tself.location = None\n"
             constructor_string += "\t\tself.items = {}\n"
 
+
         # add the description if it has any
         if node.desc is not None:
             constructor_string += "\t\tself.description = '%s'\n" % node.desc
+
 
         # iterate through each statement in start and add it to constructor
         for statement in node.start:
@@ -40,6 +41,7 @@ def generate_classes(tree):
             s = FG.generate_statement(statement)
             for line in s.splitlines():
                 constructor_string += "\t\t" + line + "\n"
+
 
         # create a list of actions if there is any and append them to the action_list
         if node.actions is not None:
@@ -52,6 +54,7 @@ def generate_classes(tree):
                     action_string += "\t" + line + "\n"
                 constructor_string += "\t\tself.action_list.append('%s')\n" %a.action_phrase
 
+
         # create a list of functions if there is any
         if node.functions is not None:
             function_string = ""
@@ -61,15 +64,17 @@ def generate_classes(tree):
                 for line in s.splitlines():
                     function_string += "\t" + line + "\n"
 
+
         # create a list of dialogues if there is any
-        dialogues_string = ""
         if node.dialogues is not None:
+            dialogues_string = ""
             pass
 
         # add the action_list of all the items in setting to self.action_list in setting
 
         # add the action_list of all the characters in setting to self.action_list
 
+        # add all of the traits of PLAYER to self.traits
 
         file.write(import_string)
         file.write(class_string)
@@ -119,8 +124,8 @@ while True:
     elif input == "inventory":
         inventory_string = "The following items are in your inventory:\\n"
         for k, v in player.items.iteritems():
-            # ex: "3 apples"
-            inventory_string += v[1] + " " + k + "\\n"
+            # ex: "3 apples"g
+            inventory_string += "\t" + str(v[1]) + " " + k + "\\n"
 
         print inventory_string
 
@@ -140,6 +145,9 @@ while True:
         input = input.split()
         action = input[0]
         noun = input[1]
+
+        # searchs through all of the available actions in items
+
         print "action is " + action
         print "noun is " + noun
 

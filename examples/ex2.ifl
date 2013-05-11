@@ -45,4 +45,5 @@ CHARACTER PLAYER:
 		ADD {INTEGER max=5} TO SELF
 		ADD experience TO SELF
 		MOVE SELF TO house
+		ADD apple TO SELF
 
