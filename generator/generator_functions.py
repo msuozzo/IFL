@@ -95,7 +95,7 @@ class FunctionGenerator():
     def generate_move(self, node):
         target = self.resolve_target(node.target)
 
-        return "" + target + ".location = " + node.new_loc[1]
+        return "" + target + ".location = \"" + node.new_loc[1] + "\"\n"
 
     def generate_execute(self, node):
         return "pass\n"
