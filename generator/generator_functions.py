@@ -63,6 +63,33 @@ def generate_set(n, name, tree):
 
     return "" + targ + "=" + n.val[1] +"\n"
 
+
+
+def generate_remove(n):
+
+	targ="" 
+	if(len(n.target) > 1): 
+		temp = 0
+		for iString in n.target: 
+			if(iString == "SELF"): 
+				iString = iString.lower()
+	
+			if (temp == 0): 
+				targ = targ + iString
+				temp += 1
+			else: 
+				targ = targ + "." + iString
+
+		else: 
+			if (n.target[0] == "SELF"): 
+				targ = n.target[0].lower()
+			targ = n.target[0]
+
+	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
+
+def generate_increase(n):
+    pass
+
 # moves player
 def generate_move(n, name, tree):
     targ = ""
@@ -90,6 +117,30 @@ def generate_move(n, name, tree):
 
     return "" + targ + ".location = " + n.new_loc[1]
 
+def generate_conditionals(n):
+    pass
+
+
+def generate_function(n):
+    pass
+
+def generate_action(action_phrase, statement_list):
+    return "pass"
+
+def generate_code(node, id, tree):
+    """Select the appropriate function based on the type of the node"""
+
+    if node.type_ == "ADD":
+        return generate_add(node, id, tree)
+
+    elif node.type_ == "SET":
+        return generate_set(node, id, tree)
+
+    elif node.type_ == "PRINT":
+        return generate_print(node, id, tree)
+    elif node.typ
+    else:
+        return "pass"
 
 # above works for sure
 
