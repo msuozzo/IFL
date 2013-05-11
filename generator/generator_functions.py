@@ -2,8 +2,6 @@ class FunctionGenerator():
     def __init__(self, id_, tree):
         self.id_ = id_
         self.tree = tree
-        self.bool_ops = ['<', '>', '<=', '>=', '==', '!=']
-        self.arith_ops = ['+', '-', '*', '/', '%', '^']
 
     def get_type(self, id_):
         try:
@@ -102,6 +100,7 @@ class FunctionGenerator():
 
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
+        ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
         if expr[0] in ['OBJ', 'LIT']: #TODO string literal?
             if expr[0] == 'OBJ':
                 return self.resolve_target(expr)
@@ -120,7 +119,7 @@ class FunctionGenerator():
 
         if operator == 'HAS':
             output += self.generate_has(expr)
-        elif operator in self.bool_ops + self.arith_ops:
+        elif operator in ops:
             if len(operands) == 1:
                 output += operator
                 output += "(" +  self.parse_expr(operands[0]) + ")"
