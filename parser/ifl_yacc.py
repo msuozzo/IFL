@@ -214,7 +214,6 @@ def generate_parser(lexer, tokens):
 
   def p_object_chain(p):
     '''object_chain : object_chain ON ID
-                    | LOCATION
                     | ID'''
     if len(p) == 4: p[0] = ("OBJ", p[3],) + p[1][1:]
     elif len(p) == 2: p[0] = ("OBJ", p[1],)
