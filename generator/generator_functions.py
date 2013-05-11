@@ -83,14 +83,24 @@ class FunctionGenerator():
 
         return return_stmt
 
-    # moves player
+    # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
 
-        return "" + target + ".location = \"" + node.new_loc[1] + "\"\n"
+        return "" + target + ".location = " + node.new_loc[1] + "\n"
 
+    # generates code for execute statement
     def generate_execute(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.func)
+        param = ""
+
+        for arg in node.args:
+            for argArg in arg:
+                param = param + argArg[1]
+
+        return_stmt = "" + target + "({param})\n".format(param=param)
+
+        return return_stmt
 
     def generate_increase(self, node):
         return "pass\n"
