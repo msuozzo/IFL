@@ -46,7 +46,7 @@ def generate_lexer():
 #TODO: Player and Last_Input will be handled by the semantic analyzer
 #      'PLAYER' : 'PLAYER',
 #      'LAST_INPUT' : 'LAST_INPUT',
-#      'LOCATION' : 'LOCATION',
+      'LOCATION' : 'LOCATION',
       'EXIT' : 'EXIT',
       'END_BLOCK' : 'END_BLOCK'
   }
