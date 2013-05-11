@@ -1,4 +1,4 @@
-from generator_functions import *
+from generator_functions import FunctionGenerator
 import os
 
 
@@ -30,10 +30,10 @@ def generate_classes(tree):
 
         # iterate through each statement in start and add it to constructor
         for statement in node.start:
-
             # get the code, add the appropriate tabs, and write to file
             # (Note that the code might be multi-lined)
-            s = generate_code(statement, node.id_, tree)
+            FG = FunctionGenerator(node.id_, tree)
+            s = FG.generate_statement(statement, 0)
             for line in s.splitlines():
                 constructor_string += "\t\t" + line + "\n"
 
@@ -50,8 +50,9 @@ def generate_classes(tree):
         # create a list of actions if there is any
         action_string = ""
         if node.actions is not None:
+            FG = FunctionGenerator(node.id_, tree)
             for a in node.actions:
-                s = generate_action(a.action_phrase, a.statements)
+                s = FG.generate_action(a.action_phrase, a.statements)
                 for line in s.splitlines():
                     action_string += "\t\t" + line + "\n"
             # create a self.action_list in the class

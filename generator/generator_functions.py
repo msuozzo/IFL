@@ -1,146 +1,140 @@
 # generates a print statement
 #'print : PRINT string_expression'
-def generate_print(n, name, tree):
-    return "print \"" + n.string_expr[0] + "\"\n"
+#node is the statement node
+#id is the id of the top level in which the statement is defined in
+#tree is the semantic tree
 
-# generates add statement
-def generate_add(n, name, tree):
-    targ = ""
 
-    #if(n is None): --- IGNORE FOR NOW - need to fix quantity
+class FunctionGenerator():
+    def __init__(self, id_, tree):
+        self.id_ = id_
+        self.tree = tree
 
-    # checks to see how many parts of target list
-    if len(n.to) > 1 :
-        temp = 0
-        # iterates through list of target
-        for iString in n.to:
-            # special case of first one
-            if(iString == name):
-                iString = "self"
+    def get_type(self, id_):
+        try:
+            return self.tree.def_types[id_]
+        except KeyError:
+            return None
 
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
-            else: # all other iterations
-                targ = targ + "." + iString
+    def resolve_target(self, target_list):
+        if target_list[0] == 'OBJ':
+            target_list = target_list[1:]
+        if target_list[0] == self.id_:
+            target_list[0] = 'self'
+        target_string = '.'.join(target_list)
+        return target_string
 
-    else: # only one target
-        if n.to[0] == name:
-            targ = "self"
+    def generate_has(self, node):
+        holdee = node[2]
+        holder = self.resolve_target(node[1])
+
+        if self.get_type(holdee) == 'ITEM':
+            a = "'{holdee}' in {holder}.items and {holder}.items['{holdee}'][1] > 0".format(holder=holder, holdee=holdee)
+            print a
         else:
-            targ = n.to[0]
+            return "hasattr({holder}, {holdee})".format(holder=holder, holdee=holdee)
 
-    # checks what type of add it is
-    if n.primitive is None: # not a primitive add
-        if tree.def_types[n.id_] == "TRAIT":
-            return "" + targ + "." + n.id_ + " = " + n.id_.capitalize()  + "()\n"
-    else: # primitive add
-        return "" + targ + "." + n.primitive.name + " = " + n.primitive.val[1]  + "\n"
+    def generate_print(self, node):
+        return "print \"" + node.string_expr[0] + "\"\n"
 
-    return ""
+    #TODO test if add and set work for strings and decimals, differentiate between strings and ints
+    def generate_add(self, node):
+        target = self.resolve_target(node.to)
 
+        if node.primitive:
+            attr = node.primitive.name
+            val = node.primitive.val[1]
+            return_stmt = "{target}.{attr} = {value}".format(target=target, attr=attr, value=val)
+        elif self.get_type(node.id_) == 'ITEM':
+            original_count = "{target}.items[{id_}][1]".format(target=target, id_=node.id_)
+            new_thing = node.id_.capitalize() + "()"
+            return_stmt ="if {id_} in {target}.items:\n" \
+                        "\t{target}.items['{id_}'][1] = {original_count} + {quantity}\n" \
+                   "else:\n" \
+                        "\t{target}.items['{id_}'] = ({new_item}, {quantity})\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant, new_item=new_thing)
+        else:
+            attr = node.id_
+            new_thing = node.id_.capitalize() + "()"
+            return_stmt = "{target}.{attr} = {new_obj}".format(target=target, attr=attr, new_obj=new_thing)
 
-def generate_set(n, name, tree):
-    targ = ""
+        return return_stmt
 
-    if(len(n.target) > 1):
-        temp = 0
-        for iString in n.target:
-            if(iString == name):
-                iString = "self"
+    def generate_set(self, node):
+        target = self.resolve_target(node.target)
+        value = node.val[1]
+        return_stmt = "{target} = {value}".format(target=target, value=value)
 
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
+        return return_stmt
+
+    def generate_remove(self, node):
+        return "remove statement"
+
+    # moves player
+    def generate_move(self, node):
+        return "generate move"
+
+    def generate_execute(self, node):
+        return "generate execute"
+
+    def generate_function(self, node):
+        pass
+
+    def generate_statement(self, node, level):
+        stmt_map = {
+            'ADD': self.generate_add,
+            'PRINT': self.generate_print,
+            'SET': self.generate_set,
+            'REMOVE': self.generate_remove,
+            'EXECUTE': self.generate_execute,
+            'MOVE': self.generate_move
+        }
+
+        tabs = level * '\t'
+        if node.__class__.__name__ == 'Conditional':
+            return tabs + self.generate_conditionals(node, level)
+        else:
+            return tabs + stmt_map[node.type_](node)
+
+    def parse_tf_expr(self, expr):
+        if expr[0] == 'HAS':
+            return self.generate_has(expr)
+        else:
+            #TODO parse other TF expressions here
+            pass
+
+    def generate_conditionals(self, case_inst, level):
+        cases = case_inst.cases
+        output = ""
+        tabs = level * '\t'
+
+        for (counter, conditional) in enumerate(cases):
+            if counter == 0:
+                if_condition = cases[0][0]
+                if_stmt_list = cases[0][1]
+                output += "if {condition}:\n".format(condition=self.parse_tf_expr(if_condition))
+
+                for stmt in if_stmt_list:
+                    output += self.generate_statement(stmt, level + 1)
+            elif counter == len(cases) - 1 and True:
+                else_stmt_list = cases[-1][1]
+                output += 'else:\n'
+                for stmt in else_stmt_list:
+                    output += self.generate_statement(stmt, level + 1)
             else:
-                targ = targ + "." + iString
-
-    else:
-        if n.target[0] == name:
-            targ = "self"
-        else:
-            targ = n.target[0]
-
-    return "" + targ + "=" + n.val[1] +"\n"
+                elif_condition = cases[counter][0]
+                elif_stmt_list = cases[counter][1]
 
 
+        #test nested statements
+        return output
 
-def generate_remove(n):
-
-	targ="" 
-	if(len(n.target) > 1): 
-		temp = 0
-		for iString in n.target: 
-			if(iString == "SELF"): 
-				iString = iString.lower()
-	
-			if (temp == 0): 
-				targ = targ + iString
-				temp += 1
-			else: 
-				targ = targ + "." + iString
-
-		else: 
-			if (n.target[0] == "SELF"): 
-				targ = n.target[0].lower()
-			targ = n.target[0]
-
-	return "" + targ + ".remove(" + n["X"] + ")" +"\n"
-
-def generate_increase(n):
-    pass
-
-# moves player
-def generate_move(n, name, tree):
-    targ = ""
-
-     # checks to see how many parts of target list
-    if len(n.target) > 1 :
-        temp = 0
-        # iterates through list of target
-        for iString in n.target:
-            # special case of first one
-            if(iString == name):
-                iString = "self"
-
-            if(temp == 0):
-                targ = targ + iString
-                temp += 1
-            else: # all other iterations
-                targ = targ + "." + iString
-
-    else: # only one target
-        if n.target[0] == name:
-            targ = "self"
-        else:
-            targ = n.target[0]
-
-    return "" + targ + ".location = " + n.new_loc[1]
-
-def generate_conditionals(n):
-    pass
+    def generate_action(self, action_phrase, stmt_list):
+        output = ""
+        for stmt in stmt_list:
+            output += self.generate_statement(stmt, 0)
+        return output
 
 
-def generate_function(n):
-    pass
-
-def generate_action(action_phrase, statement_list):
-    return "pass"
-
-def generate_code(node, id, tree):
-    """Select the appropriate function based on the type of the node"""
-
-    if node.type_ == "ADD":
-        return generate_add(node, id, tree)
-
-    elif node.type_ == "SET":
-        return generate_set(node, id, tree)
-
-    elif node.type_ == "PRINT":
-        return generate_print(node, id, tree)
-    elif node.typ
-    else:
-        return "pass"
 
 # above works for sure
 
@@ -236,8 +230,3 @@ def generate_code(node, id, tree):
 #         targ = n.target[0]
 #
 #     return "" + targ + "-=" + n.val[1] +"\n"
-
-
-
-
-
