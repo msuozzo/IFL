@@ -1,16 +1,9 @@
-from analyzer.nodes1 import Conditional
-
-# generates a print statement
-#'print : PRINT string_expression'
-#node is the statement node
-#id is the id of the top level in which the statement is defined in
-#tree is the semantic tree
-
-
 class FunctionGenerator():
     def __init__(self, id_, tree):
         self.id_ = id_
         self.tree = tree
+        self.bool_ops = ['<', '>', '<=', '>=', '==', '!=']
+        self.arith_ops = ['+', '-', '*', '/', '%', '^']
 
     def get_type(self, id_):
         try:
@@ -32,10 +25,11 @@ class FunctionGenerator():
         holder = self.resolve_target(node[1])
 
         if self.get_type(holdee) == 'ITEM':
-            a = "'{holdee}' in {holder}.items and {holder}.items['{holdee}'][1] > 0".format(holder=holder, holdee=holdee)
-            print a
+            return_stmt = "'{holdee}' in {holder}.items and {holder}.items['{holdee}'][1] > 0".format(holder=holder, holdee=holdee)
         else:
-            return "hasattr({holder}, {holdee})".format(holder=holder, holdee=holdee)
+            return_stmt = "hasattr({holder}, {holdee})".format(holder=holder, holdee=holdee)
+
+        return '(' + return_stmt + ')'
 
     def generate_print(self, node):
         return "print \"" + node.string_expr[0] + "\"\n"
@@ -104,11 +98,37 @@ class FunctionGenerator():
     def generate_decrease(self, node):
         return "pass\n"
 
-    def parse_tf_expr(self, expr):
-        if expr[0] == 'HAS':
-            return self.generate_has(expr)
+    #Parses a TF or arithmetic expression
+    def parse_expr(self, expr):
+        if expr[0] in ['OBJ', 'LIT']: #TODO string literal?
+            if expr[0] == 'OBJ':
+                return self.resolve_target(expr)
+            elif expr[0] == 'LIT':
+                return expr[1]
+
+        output = ""
+        operands = []
+        operator = expr[0]
+
+        if len(expr) == 2: #unary op
+            operands.append(expr[1][0])
         else:
-            pass
+            operands.append(expr[1])
+            operands.append(expr[2])
+
+        if operator == 'HAS':
+            output += self.generate_has(expr)
+        elif operator in self.bool_ops + self.arith_ops:
+            if len(operands) == 1:
+                output += operator
+                output += "(" +  self.parse_expr(operands[0]) + ")"
+            else:
+                output += "(" +  self.parse_expr(operands[0]) + ")"
+                output += " " + operator + " "
+                output += "(" + self.parse_expr(operands[1]) + ")"
+
+        print output
+        return output
 
     def generate_statement(self, node):
         stmt_map = {
@@ -135,7 +155,7 @@ class FunctionGenerator():
             if counter == 0:
                 if_condition = cases[0][0]
                 if_stmt_list = cases[0][1]
-                output += "if {condition}:\n".format(condition=self.parse_tf_expr(if_condition))
+                output += "if {condition}:\n".format(condition=self.parse_expr(if_condition))
 
                 for stmt in if_stmt_list:
                     s = self.generate_statement(stmt)
@@ -152,7 +172,13 @@ class FunctionGenerator():
                 elif_condition = cases[counter][0]
                 elif_stmt_list = cases[counter][1]
 
-        #test nested statements
+                output += "elif {condition}:\n".format(condition=self.parse_expr(elif_condition))
+
+                for stmt in elif_stmt_list:
+                    s = self.generate_statement(stmt)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
+
         return output
 
     def generate_action(self, action_phrase, stmt_list):
