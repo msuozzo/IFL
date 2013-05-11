@@ -69,19 +69,19 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_remove(self, node):
-        return "remove statement"
+        return "remove statement\n"
 
     # moves player
     def generate_move(self, node):
-        return "generate move"
+        return "generate move\n"
 
     def generate_execute(self, node):
-        return "generate execute"
+        return "generate execute\n"
 
     def generate_function(self, node):
-        pass
+        return "pass\n"
 
-    def generate_statement(self, node, level):
+    def generate_statement(self, node):
         stmt_map = {
             'ADD': self.generate_add,
             'PRINT': self.generate_print,
@@ -91,11 +91,10 @@ class FunctionGenerator():
             'MOVE': self.generate_move
         }
 
-        tabs = level * '\t'
         if node.__class__.__name__ == 'Conditional':
-            return tabs + self.generate_conditionals(node, level)
+            return self.generate_conditionals(node)
         else:
-            return tabs + stmt_map[node.type_](node)
+            return stmt_map[node.type_](node)
 
     def parse_tf_expr(self, expr):
         if expr[0] == 'HAS':
@@ -104,11 +103,9 @@ class FunctionGenerator():
             #TODO parse other TF expressions here
             pass
 
-    def generate_conditionals(self, case_inst, level):
+    def generate_conditionals(self, case_inst):
         cases = case_inst.cases
         output = ""
-        tabs = level * '\t'
-
         for (counter, conditional) in enumerate(cases):
             if counter == 0:
                 if_condition = cases[0][0]
@@ -116,12 +113,18 @@ class FunctionGenerator():
                 output += "if {condition}:\n".format(condition=self.parse_tf_expr(if_condition))
 
                 for stmt in if_stmt_list:
-                    output += self.generate_statement(stmt, level + 1)
+                    s = self.generate_statement(stmt)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
+
             elif counter == len(cases) - 1 and True:
                 else_stmt_list = cases[-1][1]
                 output += 'else:\n'
                 for stmt in else_stmt_list:
-                    output += self.generate_statement(stmt, level + 1)
+                    s = self.generate_statement(stmt)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
+
             else:
                 elif_condition = cases[counter][0]
                 elif_stmt_list = cases[counter][1]
@@ -130,9 +133,11 @@ class FunctionGenerator():
         return output
 
     def generate_action(self, action_phrase, stmt_list):
-        output = "def {action_phrase}():".format(action_phrase=action_phrase)
+        output = "def {action_phrase}():\n".format(action_phrase=action_phrase)
         for stmt in stmt_list:
-            output += "\t" + self.generate_statement(stmt, 0)
+            s = self.generate_statement(stmt)
+            for line in s.splitlines():
+                output += "\t" + line + "\n"
         return output
 
     # def generate_function(name, arg_names, statement_list, id, tree):
