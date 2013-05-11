@@ -130,9 +130,9 @@ class FunctionGenerator():
         return output
 
     def generate_action(self, action_phrase, stmt_list):
-        output = ""
+        output = "def {action_phrase}():".format(action_phrase=action_phrase)
         for stmt in stmt_list:
-            output += self.generate_statement(stmt, 0)
+            output += "\t" + self.generate_statement(stmt, 0)
         return output
 
     # def generate_function(name, arg_names, statement_list, id, tree):
