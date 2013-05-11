@@ -46,4 +46,7 @@ CHARACTER PLAYER:
 		ADD experience TO SELF
 		MOVE SELF TO house
 		ADD apple TO SELF
+		ADD apple TO SELF
+		ADD apple TO SELF
+		ADD apple TO SELF
 

@@ -44,8 +44,8 @@ def generate_classes(tree):
 
 
         # create a list of actions if there is any and append them to the action_list
-        if node.actions is not None:
-            action_string = ""
+        action_string = ""
+        if len(node.actions) > 0:
             constructor_string += "\t\tself.action_list = []\n"
             FG = FunctionGenerator(node.id_, tree)
             for a in node.actions:
@@ -56,8 +56,8 @@ def generate_classes(tree):
 
 
         # create a list of functions if there is any
-        if node.functions is not None:
-            function_string = ""
+        function_string = ""
+        if len(node.functions) > 0:
             FG = FunctionGenerator(node.id_, tree)
             for f in node.functions:
                 s = FG.generate_function(f)
@@ -66,13 +66,25 @@ def generate_classes(tree):
 
 
         # create a list of dialogues if there is any
-        if node.dialogues is not None:
-            dialogues_string = ""
+        dialogues_string = ""
+        if len(node.dialogues) > 0:
             pass
 
-        # add the action_list of all the items in setting to self.action_list in setting
+        # add the action_list of all the items and characters in SETTING to SETTING.action_list
+        if node.type_ == "SETTING":
+            constructor_string += """
+        for v in self.items.values():
+            self.action_list.extend(v[0].action_list)
 
-        # add the action_list of all the characters in setting to self.action_list
+        for a in vars(self):
+            if hasattr(a, "action_list):
+                self.action_list.extend(a.action_list)
+
+"""
+
+
+        # add the action_list of all the characters in SETTING to SETTING.action_list
+
 
         # add all of the traits of PLAYER to self.traits
 
@@ -118,13 +130,15 @@ while True:
         help_string = "The following basic commands are supported: 'help', 'inventory', 'traits', 'inspect' 'quit'.\\n"
         help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
         help_string += "The following actions are available: "
+        for action in player.setting.action_list:
+            help_string += action + ", "
 
         print help_string
 
     elif input == "inventory":
         inventory_string = "The following items are in your inventory:\\n"
         for k, v in player.items.iteritems():
-            # ex: "3 apples"g
+            # ex: "3 apples"
             inventory_string += "\t" + str(v[1]) + " " + k + "\\n"
 
         print inventory_string
@@ -153,7 +167,7 @@ while True:
 
     else:
         print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
-	    """
+        """
 
     file.write(main)
 
