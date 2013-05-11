@@ -1,3 +1,6 @@
+#TODO location remove
+#TODO Error handling for some methods like remove
+
 class FunctionGenerator():
     def __init__(self, id_, tree):
         self.id_ = id_
@@ -15,6 +18,8 @@ class FunctionGenerator():
             target_list = target_list[1:]
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
+        elif target_list[0] == 'LOCATION':
+            target_list[0] = 'settings[PLAYER.location]'
         target_string = '.'.join(target_list)
         return target_string
 
@@ -63,22 +68,19 @@ class FunctionGenerator():
         except IndexError:
             value = node.val[1]
 
-        return_stmt = "{target} = {value}".format(target=target, value=value)
-
+        return_stmt = "{target} = {value}\n".format(target=target, value=value)
         return return_stmt
 
     def generate_remove(self, node):
         target = self.resolve_target(node.from_)
 
-        return_stmt = ""
-
         if self.get_type(node.id_) == 'ITEM':
             original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
-            new_count = original_count + " - 1"
-            return_stmt ="if '{id_}' in {target}.items:\n" \
-                        "\t{target}.items['{id_}'][1] = {new_count}\n".format(target=target, id_=node.id_, new_count = new_count)
-        elif node.primitive:
-            attr = node.primitive.name
+            return_stmt = \
+                "if '{id_}' in {target}.items:\n" \
+                    "\t{target}.items['{id_}'][1] = {original_count} - {quantity}\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant)
+        else:
+            attr = node.id_
             return_stmt = "del {target}.{attr}".format(target=target, attr=attr)
 
         return return_stmt
@@ -86,27 +88,37 @@ class FunctionGenerator():
     # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
-
-        return "" + target + ".location = '" + node.new_loc[1] + "'\n"
+        return "" + target + ".location = " + node.new_loc[1] + "\n"
 
     # generates code for execute statement
     def generate_execute(self, node):
         target = self.resolve_target(node.func)
         param = ""
 
-        for arg in node.args:
+        for (counter,arg) in enumerate(node.args):
             for argArg in arg:
-                param = param + argArg[1]
+                if counter == 0:
+                    param = param + argArg[1]
+                    counter+= 1
+                else:
+                    param = param + "," + argArg[1]
 
         return_stmt = "" + target + "({param})\n".format(param=param)
+        return return_stmt
+
+    # creates code for increase
+    def generate_increase(self, node):
+        target = self.resolve_target(node.target)
+        return_stmt = "" + target + "+=" + node.val[1]
 
         return return_stmt
 
-    def generate_increase(self, node):
-        return "pass\n"
-
+    # creates code for decrease
     def generate_decrease(self, node):
-        return "pass\n"
+        target = self.resolve_target(node.target)
+        return_stmt = "" + target + "-=" + node.val[1]
+
+        return return_stmt
 
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
@@ -138,7 +150,6 @@ class FunctionGenerator():
                 output += " " + operator + " "
                 output += "(" + self.parse_expr(operands[1]) + ")"
 
-        print output
         return output
 
     def generate_statement(self, node):

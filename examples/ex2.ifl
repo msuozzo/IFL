@@ -25,7 +25,7 @@ ITEM apple:
 		ADD {INTEGER experience_value=5} TO SELF
 	ACTIONS:
 		"get":
-			REMOVE apple FROM LOCATION ON apple
+			REMOVE apple FROM LOCATION
 			ADD apple TO PLAYER
 
 		"eat":
@@ -33,6 +33,8 @@ ITEM apple:
 				EXECUTE update ON health ON PLAYER WITH healing_value
 				EXECUTE update ON experience ON PLAYER WITH experience_value
 			ELSE:
+				REMOVE current FROM HEALTH
+				REMOVE health FROM PLAYER
 				REMOVE apple FROM PLAYER
 
 SETTING house:
