@@ -87,7 +87,7 @@ class FunctionGenerator():
     def generate_move(self, node):
         target = self.resolve_target(node.target)
 
-        return "" + target + ".location = " + node.new_loc[1] + "\n"
+        return "" + target + ".location = '" + node.new_loc[1] + "'\n"
 
     # generates code for execute statement
     def generate_execute(self, node):
