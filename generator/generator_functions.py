@@ -104,7 +104,6 @@ class FunctionGenerator():
             for argArg in arg:
                 if counter == 0:
                     param = param + argArg[1]
-                    counter+= 1
                 else:
                     param = param + "," + argArg[1]
 
