@@ -55,7 +55,7 @@ class FunctionGenerator():
                 "if '{id_}' in {target}.items:\n" \
                     "\t{target}.items['{id_}'][1] = {original_count} + {quantity}\n" \
                 "else:\n" \
-                    "\t{target}.items['{id_}'] = ({new_item}, {quantity})\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant, new_item=new_thing)
+                    "\t{target}.items['{id_}'] = [{new_item}, {quantity}]\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant, new_item=new_thing)
         else:
             attr = node.id_
             new_thing = node.id_.capitalize() + "()"
@@ -108,7 +108,6 @@ class FunctionGenerator():
         if expr[0] == 'HAS':
             return self.generate_has(expr)
         else:
-            #TODO parse other TF expressions here
             pass
 
     def generate_statement(self, node):
