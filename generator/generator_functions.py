@@ -1,7 +1,6 @@
 #TODO location remove
-#TODO Error handling for some methods like remove
-#TODO String literals vs other literals
 #TODO String concatenation
+#TODO comments
 
 class FunctionGenerator():
     def __init__(self, id_, tree):
@@ -26,6 +25,8 @@ class FunctionGenerator():
             target_list[0] = 'self'
         elif target_list[0] == 'PLAYER':
             target_list[0] = 'player'
+        elif self.get_type(target_list[0]) == 'CHARACTER':
+            target_list[0] = "settings[player.location].characters['%s']" %target_list[0]
         elif target_list[0] == 'LOCATION':
             target_list[0] = 'settings[player.location]'
         target_string = '.'.join(target_list)
@@ -106,7 +107,9 @@ class FunctionGenerator():
         args = []
 
         for arg in node.args:
-            if arg[0] == 'LIT':
+            if type(arg[0]) == str:
+                args.append("'" + arg[0] + "'")
+            elif arg[0] == 'LIT':
                 args.append(arg[1])
             else:
                 args.append(self.resolve_target(arg[0]))
@@ -129,22 +132,27 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_using(self, node):
-        return "pass\n"
+        return "self.using={filename}".format(filename=node.filename)
 
     def generate_initiate(self, node):
-        return "pass\n"
+        label = node.label.replace('#', '').replace(' ', '_').lower()
+        return "Dialogue(self.using).start_dialogue('{label}')".format(label=label)
 
     def generate_goto(self, node):
-        return "pass\n"
+        label = node.label.replace('#', '').replace(' ', '_').lower()
+        return_stmt = "self.goto('{label}')".format(label=label)
+        return return_stmt
 
     def generate_exit(self, node):
         return "pass\n"
 
     def generate_label(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()
-        return_stmt = "def {label}():\n".format(label=label)
+        return_stmt = "def {label}(self):\n".format(label=label)
         for stmt in node.statements:
-            return_stmt += self.generate_statement(stmt)
+            s = self.generate_statement(stmt)
+            for line in s.splitlines():
+                return_stmt += '\t' + line + "\n"
 
         return return_stmt
 
@@ -152,9 +160,9 @@ class FunctionGenerator():
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
         ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
-        if len(expr) == 1:
-            return expr
-        if expr[0] in ['OBJ', 'LIT']: #TODO string literal?
+        if len(expr) == 1: #String literal
+            return "'" + expr + "'"
+        if expr[0] in ['OBJ', 'LIT']:
             if expr[0] == 'OBJ':
                 return self.resolve_target(expr)
             elif expr[0] == 'LIT':
@@ -262,9 +270,20 @@ class FunctionGenerator():
     def generate_dialogue(self, node):
         output = ""
         f = open('generator/dialogue.py')
+        theLabels = ""
         for line in f:
             output += line
-            if line.strip() == "###": #Start generating labels here
+            if line.strip() == "#1#": #Start generating labels here
+                for lab in node:
+                    lab = lab.label.replace('#', '').replace(' ', '_').lower()
+                    theLabels = theLabels + "\t\tself.labels['{label}'] = self.{label}\n".format(label=lab)
+                output += theLabels
+            elif line.strip() == "#2#":
                 for dialogue_node in node:
-                    output += self.generate_label(dialogue_node)
-                    print output
+                    s = self.generate_label(dialogue_node)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
+
+        output = output.replace("LAST_INPUT", "self.last_input")
+        print output
+            #replace with self.last_input

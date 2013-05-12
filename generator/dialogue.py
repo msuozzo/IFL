@@ -6,9 +6,8 @@ class Dialogue():
         self.labels = {}
         self.parse_using_file(); #Create the dialogue map from the text file
 
-        ###
-        self.labels['label_a'] = self.label_a
-        self.labels['label_b'] = self.label_b
+        #insert label markings here
+        #1#
 
     def parse_using_file(self):
         try:
@@ -47,24 +46,7 @@ class Dialogue():
         except KeyError:
             raise Exception #TODO Label in dialogue doesn't exist
 
-    pass
+    #Generate label functions below
+    #2#
 
-    #Generate all those functions
-    ############
-    def label_a(self):
-        if self.last_input == "1":
-            self.goto('label_b')
-        elif self.last_input == "2":
-            self.goto('label_c')
-
-    def label_b(self):
-        if self.last_input == "1":
-            pass
-        elif self.last_input == "2":
-            pass
-
-    def label_c(self):
-        pass
-    ############
-
-Dialogue('text.txt').start_dialogue('label_a')
+# Dialogue('text.txt').start_dialogue('label_a')
