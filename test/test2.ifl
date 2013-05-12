@@ -1,15 +1,15 @@
 TRAIT Heatlth: 
-  START: 
-		ADD{INTEGER current = 150} 
-		ADD{INTEGER max = 200}
+	START: 
+		ADD{INTEGER current = 150} TO SELF
+		ADD{INTEGER max = 200} TO SELF
 	FUNCTION: 
 		update1 WITH amount: 
-			INCREASE current BY amount
+			INCREASE current ON SELF BY amount
 			IF current > max: 
-				SET current TO max
+				SET current ON SELF TO max
 
 		update2 WITH amount: 
-			DECREASE current BY amount
+			DECREASE current ON SELF BY amount
 			IF current < 0 
 				SET current TO 0 
 
@@ -22,7 +22,7 @@ ITEM Medicine:
 			ADD medicine TO PLAYER
 		"eat" : 
 			IF PLAYER HAS Medicine 
-				EXECUTE update ON health ON PLAYER WITH heal_value
+				EXECUTE update ON Health ON PLAYER WITH heal_value
 			REMOVE medicine from PLAYER
 		"drop" : 
 			IF PLAYER HAS Medicine 
@@ -30,7 +30,7 @@ ITEM Medicine:
 
 ITEM Weapon: 
 	START: 
-		ADD {INTEGER hurt_value = -15}
+		ADD {INTEGER hurt_value = 15}
 	ACTIONS: 
 		"get": 
 			REMOVE Weapon FROM LOCATION ON Weapon
