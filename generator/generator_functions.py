@@ -286,4 +286,5 @@ class FunctionGenerator():
 
         output = output.replace("LAST_INPUT", "self.last_input")
         print output
+        return output
             #replace with self.last_input
