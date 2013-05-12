@@ -136,7 +136,7 @@ class FunctionGenerator():
 
     def generate_initiate(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()
-        return "Dialogue(self.using, settings, player).start_dialogue('{label}')".format(label=label)
+        return "Dialogue(self.using, settings, player, self).start_dialogue('{label}')".format(label=label)
 
     def generate_goto(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()

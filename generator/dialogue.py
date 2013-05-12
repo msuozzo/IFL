@@ -1,8 +1,10 @@
 class Dialogue:
-	def __init__(self, using, settings, player):
+	def __init__(self, using, settings, player, character):
 		self.using = using
 		self.settings = settings
 		self.player = player
+		self.character = character
+		self.items = character.items
 		self.last_input = ""
 		self.dialogue_map = {} #Maps label names to text in the using file
 		self.labels = {}
@@ -38,11 +40,11 @@ class Dialogue:
 		try:
 			for choice in self.dialogue_map[label]:
 				print choice
-			self.last_input = raw_input()
+			self.last_input = raw_input(">>")
 			a = len(self.dialogue_map[label])
 			while abs(int(self.last_input)) not in range(1, len(self.dialogue_map[label])):
 				print "Invalid choice entered, please try again"
-				self.last_input = raw_input()
+				self.last_input = raw_input(">>")
 			else:
 				self.labels[label]()
 		except KeyError:
