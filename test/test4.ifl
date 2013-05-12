@@ -1,13 +1,11 @@
 TRAIT Health: 
-  START: 
+	START: 
 		ADD{INTEGER current=50} TO SELF
+		ADD{INTEGER max=200} TO SELF
 		ADD{INTEGER min=0} TO SELF
-	FUNCTIONS:
+	FUNCTIONS: 
 		update WITH amount: 
 			INCREASE current ON SELF BY amount
 			IF current ON SELF > max ON SELF: 
 				SET current ON SELF TO max ON SELF
 
-CHARACTER PLAYER:
-	START:
-		ADD Health TO SELF
