@@ -70,7 +70,8 @@ def generate_classes(tree):
         # create a list of dialogues if there is any
         dialogues_string = ""
         if len(node.dialogues) > 0:
-            pass
+            FG = FunctionGenerator(node.id_, tree)
+            FG.generate_dialogue(node.dialogues)
 
         # add the action_list of all the items and characters in SETTING to SETTING.action_list
         if node.type_ == "SETTING":

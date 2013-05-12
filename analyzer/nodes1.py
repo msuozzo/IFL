@@ -104,6 +104,7 @@ class Statement:
   EXECUTE="EXECUTE"
   GOTO="GOTO"
   USING="USING"
+  EXIT="EXIT"
 
   def __init__(self, tup, tlt_name):
     tup = deep_sub_self(tup, tlt_name, [])
@@ -146,6 +147,8 @@ class Statement:
       self.label = tup[1]
     elif self.type_ == Statement.USING:
       self.filename = tup[1]
+    elif self.type_ == Statement.EXIT: pass
+    else: raise Exception #TODO unrecognized type [self.type_]
 
   def get_add_fields(self):
     if self.type_ == Statement.ADD:
