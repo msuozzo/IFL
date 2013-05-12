@@ -203,8 +203,6 @@ while True:
 				getattr(player.items[noun][0], action)(settings, player)
 
 
-
-
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
 
