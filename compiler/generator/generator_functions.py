@@ -126,23 +126,25 @@ class FunctionGenerator():
         return_stmt = "{function}({args}, settings, player)".format(function=function, args=",".join(args))
         return return_stmt
 
-    # creates code for increase
     def generate_increase(self, node):
         target = self.resolve_target(node.target)
         val = self.parse_expr(node.val)
-        if type(val) == int:
+        try:
+            int(val)
             return_stmt = "" + target + "+=int(" + self.parse_expr(node.val) + ")"
-        else:
+        except ValueError:
             return_stmt = "" + target + "+=float(" + self.parse_expr(node.val) + ")"
 
         return return_stmt
 
-    # creates code for decrease
     def generate_decrease(self, node):
         target = self.resolve_target(node.target)
-        return_stmt = "" + target + "-=float(" + self.parse_expr(node.val) + ")"
-
-        return return_stmt
+        val = self.parse_expr(node.val)
+        try:
+            int(val)
+            return_stmt = "" + target + "-=int(" + self.parse_expr(node.val) + ")"
+        except ValueError:
+            return_stmt = "" + target + "-=float(" + self.parse_expr(node.val) + ")"
 
     def generate_using(self, node):
         return "self.using='{filename}'".format(filename=node.filename)
