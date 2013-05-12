@@ -157,7 +157,7 @@ def generate_parser(lexer, tokens):
   def p_else_conditional(p):
     '''else_conditional : ELSE COLON statement_list END_BLOCK
                         | empty'''
-    p[0] = (True, ()) if len(p) == 2 else (True, p[3])
+    p[0] = ('TRUE', ()) if len(p) == 2 else ('TRUE', p[3])
 
   def p_goto(p):
     'goto : GOTO LABEL'
@@ -210,7 +210,7 @@ def generate_parser(lexer, tokens):
                              | INTEGER_VAL
                              | DECIMAL_VAL'''
     if len(p) == 4:
-      if p[1] == '(': p[0] = (p[2],)
+      if p[1] == '(': p[0] = (p[1], p[2],)
       else: p[0] = (p[2], p[1], p[3])
     elif len(p) == 3:
       p[0] = (p[1], p[2])
