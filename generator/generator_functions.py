@@ -111,13 +111,13 @@ class FunctionGenerator():
                         tempTarg = self.resolve_target(argArg[1:])
                         param = param + tempTarg
                     else:
-                        param = param + argArg[1]
+                        param = param + arg[1]
                 else:
                     if argArg[0] == "OBJ":
                         tempTarg = self.resolve_target(argArg[1:])
                         param = param + "," + tempTarg
                     else:
-                        param = param + "," + argArg[1]
+                        param = param + "," + arg[1]
 
         return_stmt = "" + target + "({param},settings,player)\n".format(param=param)
         return return_stmt
