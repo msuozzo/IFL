@@ -4,22 +4,21 @@ if [ $# -ne 1 ]; then
 	echo "Usage: ./ifl file_to_be_compiled.ifl"
 	echo "Enter ./ifl [1-3] to compile example 1, 2 or 3"
 else
-
 	[ -f parser.out ] && rm parser.out
 	[ -f parsetab.py ] && rm parsetab.py
 	[ -f parsetab.pyc ] && rm parsetab.pyc
-	rm games/*.py
-	rm analyzer/*.pyc
-	rm game/*.pyc
-	rm generator/*.pyc
-	rm parser/*.pyc
+	rm -f games/*.py
+	rm -f analyzer/*.pyc
+	rm -f game/*.pyc
+	rm -f generator/*.pyc
+	rm -f parser/*.pyc
 
 	FILENAME="$1"
 	if [ -f $FILENAME ]; then
-		echo "File $FILENAME does not exist"
-	else
 		python compiler.py $FILENAME
 		cd game/
 		python game.py
+	else
+		echo "File $FILENAME does not exist"
 	fi
 fi
