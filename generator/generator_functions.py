@@ -106,8 +106,8 @@ class FunctionGenerator():
         args = []
 
         for arg in node.args:
-            if len(arg[0]) == 1 and type(arg) != tuple:
-                args.append(arg[0])
+            if type(arg[0]) == str:
+                args.append("'" + arg[0] + "'")
             elif arg[0] == 'LIT':
                 args.append(arg[1])
             else:
