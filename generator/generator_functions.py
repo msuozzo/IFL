@@ -16,14 +16,17 @@ class FunctionGenerator():
     #settings[player.location].characters[%s] %last
     def resolve_target(self, target_list):
         target_list = list(target_list)
-        if target_list[0] == 'OBJ':
+        last = target_list[0]
+        if last == 'OBJ':
             target_list = target_list[1:]
+            last = target_list[0]
+            target_list[0] = 'settings[player.location].characters[%s]' %last
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
-        if target_list[0] == 'PLAYER':
+        elif last == 'PLAYER':
             target_list[0] = 'player'
-        elif target_list[0] == 'LOCATION':
-            target_list[0] = 'settings[PLAYER.location]'
+        elif last == 'LOCATION':
+            target_list[0] = 'settings[player.location]'
         target_string = '.'.join(target_list)
         return target_string
 
@@ -94,7 +97,7 @@ class FunctionGenerator():
     # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
-        return "" + target + ".location = " + node.new_loc[1] + "\n"
+        return "" + target + ".location = '" + node.new_loc[1] + "'\n"
 
     # generates code for execute statement
     def generate_execute(self, node):
@@ -232,7 +235,7 @@ class FunctionGenerator():
         return output
 
     def generate_action(self, action_phrase, stmt_list):
-        output = "def {action_phrase}():\n".format(action_phrase=action_phrase)
+        output = "def {action_phrase}(self, settings, player):\n".format(action_phrase=action_phrase)
         for stmt in stmt_list:
             s = self.generate_statement(stmt)
             for line in s.splitlines():
@@ -243,7 +246,7 @@ class FunctionGenerator():
         function_string = "def %s(self" % node.name
         for arg in node.arg_names:
             function_string += ", " + arg
-        function_string += "):\n"
+        function_string += ", settings, player):\n"
 
         for stmt in node.statements:
             s =  self.generate_statement(stmt)
@@ -261,4 +264,3 @@ class FunctionGenerator():
                 for dialogue_node in node:
                     output += self.generate_label(dialogue_node)
                     print output
-

@@ -54,7 +54,7 @@ def generate_classes(tree):
                 s = FG.generate_action(a.action_phrase, a.statements)
                 for line in s.splitlines():
                     action_string += "\t" + line + "\n"
-                constructor_string += "\t\tself.action_list.append('%s')\n" %a.action_phrase
+                constructor_string += "\t\tself.action_list.append('%s %s')\n" % (a.action_phrase, node.id_)
 
 
         # create a list of functions if there is any
@@ -85,8 +85,22 @@ def generate_classes(tree):
 
 """
 
+        if node.type_ != "TRAIT":
+            constructor_string += "\t\tself._update_()\n"
 
-        # add the action_list of all the characters in SETTING to SETTING.action_list
+            function_string += """
+	def _update_(self):
+		for a in vars(self):
+			if hasattr(a, "action_list"):
+				self.action_list.extend(a.action_list)
+"""
+
+        # add a update method to characters and settings
+        if node.type_ == "SETTING" or node.type_ == "CHARACTER":
+            function_string += """
+		for v in self.items.values():
+			self.action_list.extend(v[0].action_list)
+"""
 
 
         # add all of the traits of PLAYER to self.traits
@@ -123,53 +137,80 @@ def generate_game(tree):
 player = Player()
 
 while True:
-    if player.location is not None:
-        print "\\nYou are at a " + settings[player.location].description
+	if player.location is not None:
+		print "\\nYou are at a " + settings[player.location].description
 
-    print "What would you like to do? (Enter 'help' for more):"
-    input = raw_input(">>")
+	print "What would you like to do? (Enter 'help' for more):"
+	input = raw_input(">>")
 
-    if input == "help":
-        help_string = "The following basic commands are supported: 'help'; 'inventory'; 'traits'; 'inspect'; 'quit';\\n"
-        help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
-        help_string += "The following actions are available: "
-        for action in settings[player.location].action_list:
-            help_string += "'" + action + "'; "
+	if input == "help":
+		help_string = "The following basic commands are supported: 'help'; 'inventory'; 'traits'; 'inspect'; 'quit';\\n"
+		help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
 
-        print help_string
+		if player.location in settings:
+			help_string += "The following actions are available: "
+			for action in settings[player.location].action_list:
+				help_string += "'" + action.split()[0] + "'; "
 
-    elif input == "inventory":
-        inventory_string = "The following items are in your inventory:\\n"
-        for k, v in player.items.iteritems():
-            # ex: "3 apples"
-            inventory_string += "\\t" + str(v[1]) + " " + k + "\\n"
+		print help_string
 
-        print inventory_string
+	elif input == "inventory":
+		inventory_string = "The following items are in your inventory:\\n"
+		for k, v in player.items.iteritems():
+			# ex: "3 apples"
+			inventory_string += "\\t" + str(v[1]) + " " + k
 
-    elif input == "traits":
-        traits_string = "You have the following traits:\\n"
+		print inventory_string
 
-        print traits_string
+	elif input == "traits":
+		traits_string = "You have the following traits:\\n"
 
-    elif input == "inspect":
-        pass
+		print traits_string
 
-    elif input == "quit":
-        print "Game Over"
-        quit()
+	elif input == "inspect":
+		if player.location is None or player.location not in settings:
+			inspect_string = "You are nowhere!"
+		else:
+			inspect_string = "You see the following items in the %s: " % player.location
+			for k, v in settings[player.location].items.iteritems():
+				inspect_string += "'" + k + "' "
 
-    elif " " in input:
-        input = input.split()
-        action = input[0]
-        noun = input[1]
+		print inspect_string
 
-        # searchs through all of the available actions in items
+	elif input == "quit":
+		print "Game Over"
+		quit()
 
-        print "action is " + action
-        print "noun is " + noun
+	elif " " in input:
 
-    else:
-        print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
+		# searches through all of the available actions in items
+		# searches through the player first, then the setting
+
+		print "input is: " + input
+		print player.action_list
+
+		if input in player.action_list:
+
+			print "in player.action_list!"
+
+			input = input.split()
+			action = input[0]
+			noun = input[1]
+
+			print "action: " + action
+			print "noun: " + noun
+
+			if noun in player.items:
+				getattr(player.items[noun][0], action)(settings, player)
+
+
+	else:
+		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
+
+
+	# updating all of actions_list in player and setting
+	player._update_()
+
         """
 
     file.write(main)

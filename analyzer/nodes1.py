@@ -104,6 +104,7 @@ class Statement:
   EXECUTE="EXECUTE"
   GOTO="GOTO"
   USING="USING"
+  EXIT="EXIT"
 
   def __init__(self, tup, tlt_name):
     tup = deep_sub_self(tup, tlt_name, [])
@@ -146,6 +147,8 @@ class Statement:
       self.label = tup[1]
     elif self.type_ == Statement.USING:
       self.filename = tup[1]
+    elif self.type_ == Statement.EXIT: pass
+    else: raise Exception #TODO unrecognized type [self.type_]
 
   def get_add_fields(self):
     if self.type_ == Statement.ADD:
@@ -157,6 +160,7 @@ class Statement:
 
 class Conditional(Statement):
   def __init__(self, tup, tlt_name):
+    tup = deep_sub_self(tup, tlt_name, [])
     # contains 2-tuples of (case, statement_list)
     self.cases = []
     for sec in tup[1:]:
@@ -214,7 +218,7 @@ def self_replace(lst, tlt_name):
 def deep_sub_self(lst, tlt_name, new_lst=[]):
   for elem in lst:
     if isinstance(elem, tuple):
-      if elem[0] == "OBJ": new_lst.append(tuple([tlt_name if e=="SELF" else e for e in elem]))
+      if len(elem) > 0 and elem[0] == "OBJ": new_lst.append(tuple([tlt_name if e=="SELF" else e for e in elem]))
       else:
         new = []
         deep_sub_self(elem, tlt_name, new)
