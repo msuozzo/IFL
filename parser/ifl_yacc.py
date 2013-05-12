@@ -184,7 +184,7 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_print(p):
-    'print : PRINT printable_string'
+    'print : PRINT printable_expression'
     p[0] = (p[1], p[2])
 
   def p_add(p):
@@ -257,13 +257,19 @@ def generate_parser(lexer, tokens):
   def p_string_expression(p):
     '''string_expression : string_expression CONCAT string_literal
                          | string_literal'''
-    if len(p) == 4: p[0] = (p[3],) + p[1]
+    if len(p) == 4: p[0] = p[1] + (p[3],)
     else: p[0] = (p[1],)
 
   def p_string_literal(p):
     '''string_literal : string_value
                       | object_chain'''
     p[0] = p[1]
+
+  def p_printable_expression(p):
+    '''printable_expression : printable_expression CONCAT printable_string
+                            | printable_string'''
+    if len(p) == 4: p[0] = p[1] + (p[3],)
+    else: p[0] = (p[1],)
 
   def p_printable_string(p):
     '''printable_string : string_value

@@ -1,6 +1,8 @@
 import itertools
-reserved_terms = (("SELF", ("LOCATION", "SETTING")),
-                  )
+
+class CompilationException(Exception):
+  def __init__(self, reason): self.reason = reason
+  def __str__(self): return self.reason
 
 class Program:
   def __init__(self, tree):
@@ -27,15 +29,15 @@ class Program:
         except KeyError:
           print id_
           print self.tlt_name_map
-          raise Exception #TODO non-tlt name added to object 
+          raise CompilationException("non-tlt name added to object")
       if id_ in self.tlt_name_map and type_ != self.tlt_name_map[id_].type_:
-        raise Exception #TODO Duplicate name error
+        raise CompilationException("Duplicate name error")
       #FIX:possibility that 2 fields be added with same name but different type
       if fullname in self.def_types: 
         self.def_types[fullname] = None
         #TODO: warn that initiated with 2 different types
       else: self.def_types[fullname] = type_
-    if "PLAYER" not in self.tlt_names: raise Exception #TODO no PLAYER Character found
+    if "PLAYER" not in self.tlt_names: raise CompilationException("no PLAYER Character found")
     self.def_names.setdefault("PLAYER", [])
     self.def_types["PLAYER.LOCATION"] = "SETTING"
     self.def_names["PLAYER"].append("LOCATION")
@@ -45,23 +47,23 @@ class Program:
     for name, fields in self.def_names.iteritems():
       name_parts = name.split(".")
       if "LAST_INPUT" in name_parts + fields + self.tlt_names:
-        raise Exception #TODO improper use of reserved word LAST_INPUT
+        raise CompilationException("improper use of reserved word LAST_INPUT")
       if "SELF" in name_parts and name_parts[0] != "SELF":
-        raise Exception #TODO SELF used as a non-root field
+        raise CompilationException("SELF used as a non-root field")
       if "SELF" in fields + self.tlt_names:
-        raise Exception #TODO improper use of reserved word SELF
+        raise CompilationException("improper use of reserved word SELF")
       if "LOCATION" in self.tlt_names:
-        raise Exception #TODO improper use of reserved word LOCATION
+        raise CompilationException("improper use of reserved word LOCATION")
       if len(name_parts) == 1:
         if name_parts[0] not in self.tlt_names and name_parts[0] not in ["SELF", "LAST_INPUT", "LOCATION"]:
-          raise Exception #TODO invalid root object
+          raise CompilationException("invalid root object")
       if len(name_parts) > 1:
         previous = ".".join(name_parts[:-1])
         current = name_parts[-1]
         if previous not in self.def_names:
-          raise Exception #TODO invalid path
+          raise CompilationException("invalid path")
         if current not in self.def_names[previous]:
-          raise Exception #TODO invalid path, current never added to previous
+          raise CompilationException("invalid path " + current + " never added to " + previous)
 
 
 class TLT:
@@ -124,7 +126,7 @@ class Statement:
       self.quant = tup[1] if tup[1] else 1
       self.to = tup[3][1:]
     elif self.type_ == Statement.PRINT:
-      self.string_expr = tup[1]
+      self.string_exprs = tup[1]
     elif self.type_ == Statement.REMOVE:
       self.id_ = tup[2]
       self.quant = tup[1] if tup[1] else 1
@@ -154,7 +156,7 @@ class Statement:
     elif self.type_ == Statement.USING:
       self.filename = tup[1]
     elif self.type_ == Statement.EXIT: pass
-    else: raise Exception #TODO unrecognized type [self.type_]
+    else: raise CompilationException("unrecognized type " + self.type_)
 
   def get_add_fields(self):
     if self.type_ == Statement.ADD:
