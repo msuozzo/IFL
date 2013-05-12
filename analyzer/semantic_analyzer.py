@@ -40,7 +40,7 @@ def type_check(stat, type_map):
         elif prim_type == "BOOLEAN":
           pass
         elif prim_type_ == "STRING":
-          pass
+          string_check(stat, type_map)
       else:
         target_type = type_map[".".join(stat.to)]
         add_type = type_map[stat.id_]
@@ -78,6 +78,64 @@ def type_check(stat, type_map):
     elif self.type_ == Statement.USING:
       pass
 
+
+def boolean_check(stat, type_map):
+  if stat in ['TRUE', 'FALSE']: pass
+  #TODO maybe loose typechecking on Equals?
+  elif stat[0] in ["==", "!="]: pass
+  elif stat[0] in [">=", "<=", ">", "<"]:
+    op = stat[0]
+    int_fail, dec_fail = False, False
+    name1 = get_dummy_name(stat[1])
+    if not name1:
+      try: arithmetic_check(stat[1], "INTEGER", type_map)
+      except: int_fail = True
+      try: arithmetic_check(stat[1], "DECIMAL", type_map)
+      except: dec_fail = True
+      if int_fail and dec_fail: raise Exception #TODO cannot determine ordering of non-integral values
+      elif not int_fail and not dec_fail: raise Exception #TODO numeric type could not be determined
+      else: pass
+    else:
+      if type_map[".".join(stat[1][1:])] not in ["INTEGER", "DECIMAL"]: raise Exception #TODO cannot determine ordering of non-integral values 
+    name2 = get_dummy_name(stat[2])
+    if not name2:
+      try: arithmetic_check(stat[2], "INTEGER", type_map)
+      except: int_fail = True
+      try: arithmetic_check(stat[2], "DECIMAL", type_map)
+      except: dec_fail = True
+      if int_fail and dec_fail: raise Exception #TODO cannot determine ordering of non-integral values
+      elif not int_fail and not dec_fail: raise Exception #TODO numeric type could not be determined
+      else: pass
+    else:
+      if type_map[".".join(stat[2][1:])] not in ["INTEGER", "DECIMAL"]: raise Exception #TODO cannot determine ordering of non-integral values 
+  elif stat[0] == "HAS":
+    target_type = type_map[".".join(stat[1][1:])]
+    has_type = type_map[stat[2]]
+    if not target_type: raise Exception #TODO add target had duplicate types
+    if not has_type: raise Exception #TODO add must be TLT
+    if target_type == "CHARACTER":
+      if has_type not in ["TRAIT", "ITEM"]: raise Exception #TODO cannot add [has_type] to [target_type]
+    elif target_type == "SETTING":
+      if has_type not in ["TRAIT", "ITEM", "CHARACTER"]: raise Exception #TODO cannot add [has_type] to [target_type]
+    elif target_type == "TRAIT":
+      if has_type not in ["ITEM"]: raise Exception #TODO cannot add [has_type] to [target_type]
+    elif target_type == "ITEM": raise Exception #TODO cannot add [has_type] to [target_type]
+    else: raise Exception #TODO invalid target type [target_type]
+  elif stat[0] == "NOT": boolean_check(stat[1], type_map)
+  elif stat[0] == "(": boolean_check(stat[1], type_map)
+  elif stat[0] in ["OR", "AND"]:
+    op = stat[0]
+    int_fail, dec_fail = False, False
+    if get_dummy_name(stat[1]):
+      if type_map[".".join(stat[1][1:])] != "TF": raise Exception #TODO non-true/false used in and/or expression
+    else: boolean_check(stat[1], type_map)
+    if get_dummy_name(stat[2]):
+      if type_map[".".join(stat[2][1:])] != "TF": raise Exception #TODO non-true/false used in and/or expression
+    else: boolean_check(stat[2], type_map)
+  else:
+    print stat
+    raise Exception #TODO invalid formation of boolean statement
+
 def string_check(stat, type_map):
   obj_list = []
   for expr in stat:
@@ -87,14 +145,17 @@ def string_check(stat, type_map):
   for obj_name in obj_list:
     if type_map[obj_name] not in ["STRING", None]: raise Exception #TODO [obj_name] not of type [target_type]
 
-def print_string_sub(exprs, obj_list):
-  for expr in exprs:
+def print_string_sub(stat, type_map):
+  obj_list = []
+  for expr in stat:
     if expr in ["TRUE", "FALSE"]: pass #cmd_list.append(expr)
     elif expr[0] == "LIT": pass #cmd_list.append(str(expr[1]))
     elif expr[0] == "OBJ": obj_list.append(".".join(expr[1:]))
     else:
       if not isinstance(expr, str): raise Exception #TODO invalid print string
       pass #cmd_list.append(expr)
+  for obj_name in obj_list:
+    if type_map[obj_name] not in ["STRING", "INTEGER", "DECIMAL", "TF", None]: raise Exception #TODO [obj_name] not of type [target_type]
 
 def arithmetic_check(stat, target_type, type_map):
   obj_list, cmd_list = [], []
@@ -166,3 +227,8 @@ arithmetic_check(stat, "DECIMAL", map_)
 map_ = {'health' : 'TRAIT', 'health.current' : 'STRING', 'PLAYER' : 'CHARACTER', 'PLAYER.pops' : 'STRING'}
 stat = ('hello muy ajfbkasbf ', ('OBJ', 'health', 'current'), ' and I like to fish')
 string_check(stat, map_)
+
+
+map_ = {'health' : 'TRAIT', 'health.current' : 'STRING', 'PLAYER' : 'CHARACTER', 'PLAYER.pops' : 'STRING', 'pop' : 'INTEGER', 'nopop' : 'DECIMAL', 'abool' : 'TF', 'anitem' : 'ITEM'}
+stat = ('NOT', ('HAS', ('OBJ', 'health'), 'anitem'))
+boolean_check(stat, map_)
