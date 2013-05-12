@@ -83,19 +83,18 @@ def generate_classes(tree):
 
             function_string += """
 	def _update_(self):
-		for a in vars(self):
-			if hasattr(a, "action_list"):
-				self.action_list.extend(a.action_list)
+		for attribute in vars(self):
+			if hasattr(attribute, "action_list"):
+			    self.action_list.append(attribute.action_list)
+			    self.action_list = list(set(self.action_list))
 """
-        # add a update method to characters and settings
+        # allow characters and settings to update their items as well
         if node.type_ == "SETTING" or node.type_ == "CHARACTER":
             function_string += """
 		for v in self.items.values():
 			self.action_list.extend(v[0].action_list)
 """
 
-
-        # add all of the traits of PLAYER to self.traits
 
         file.write(import_string)
         file.write(class_string)
