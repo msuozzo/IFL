@@ -136,66 +136,71 @@ def generate_game(tree):
 player = Player()
 
 while True:
-    if player.location is not None:
-        print "\\nYou are at a " + settings[player.location].description
+	if player.location is not None:
+		print "\\nYou are at a " + settings[player.location].description
 
-    print "What would you like to do? (Enter 'help' for more):"
-    input = raw_input(">>")
+	print "What would you like to do? (Enter 'help' for more):"
+	input = raw_input(">>")
 
-    if input == "help":
-        help_string = "The following basic commands are supported: 'help'; 'inventory'; 'traits'; 'inspect'; 'quit';\\n"
-        help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
-        help_string += "The following actions are available: "
-        for action in settings[player.location].action_list:
-            help_string += "'" + action.split()[0] + "'; "
+	if input == "help":
+		help_string = "The following basic commands are supported: 'help'; 'inventory'; 'traits'; 'inspect'; 'quit';\\n"
+		help_string += "You can also type 'inspect item' to inspect a particular item.\\n"
 
-        print help_string
+		if player.location in settings:
+			help_string += "The following actions are available: "
+			for action in settings[player.location].action_list:
+				help_string += "'" + action.split()[0] + "'; "
 
-    elif input == "inventory":
-        inventory_string = "The following items are in your inventory:\\n"
-        for k, v in player.items.iteritems():
-            # ex: "3 apples"
-            inventory_string += "\\t" + str(v[1]) + " " + k
+		print help_string
 
-        print inventory_string
+	elif input == "inventory":
+		inventory_string = "The following items are in your inventory:\\n"
+		for k, v in player.items.iteritems():
+			# ex: "3 apples"
+			inventory_string += "\\t" + str(v[1]) + " " + k
 
-    elif input == "traits":
-        traits_string = "You have the following traits:\\n"
+		print inventory_string
 
-        print traits_string
+	elif input == "traits":
+		traits_string = "You have the following traits:\\n"
 
-    elif input == "inspect":
-        inspect_string = "You see the following items in the %s: " % player.location
-        for k, v in settings[player.location].items.iteritems():
-            inspect_string += "'" + k + "' "
+		print traits_string
 
-        print inspect_string
+	elif input == "inspect":
+		if player.location is None or player.location not in settings:
+			inspect_string = "You are nowhere!"
+		else:
+			inspect_string = "You see the following items in the %s: " % player.location
+			for k, v in settings[player.location].items.iteritems():
+				inspect_string += "'" + k + "' "
 
-    elif input == "quit":
-        print "Game Over"
-        quit()
+		print inspect_string
 
-    elif " " in input:
+	elif input == "quit":
+		print "Game Over"
+		quit()
 
-        # searches through all of the available actions in items
-        # searches through the player first, then the setting
+	elif " " in input:
 
-        print "input is: " + input
-        print player.action_list
+		# searches through all of the available actions in items
+		# searches through the player first, then the setting
 
-        if input in player.action_list:
+		print "input is: " + input
+		print player.action_list
 
-            print "in player.action_list!"
+		if input in player.action_list:
 
-            input = input.split()
-            action = input[0]
-            noun = input[1]
+			print "in player.action_list!"
 
-            print "action: " + action
-            print "noun: " + noun
+			input = input.split()
+			action = input[0]
+			noun = input[1]
 
-            if noun in player.items:
-                getattr(player.items[noun][0], action)(settings)
+			print "action: " + action
+			print "noun: " + noun
+
+			if noun in player.items:
+				getattr(player.items[noun][0], action)(settings, player)
 
 
 
