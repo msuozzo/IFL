@@ -313,8 +313,8 @@ def generator(tree):
 	"""Generate Python code based on the tree that's given"""
 
 	# create the game directory if it does not already exist
-	if not os.path.exists("./game"):
-		os.mkdir("./game")
+	if not os.path.exists("./game/"):
+		os.mkdir("./game/")
 
 	# create the classes for each ITEM, CHARACTER, TRAIT, and SETTING in the tlts
 	generate_classes(tree)

@@ -1,16 +1,16 @@
 import sys
-from parser.ifl import generate_lexer
-from parser.ifl_yacc import generate_parser
-from parser.preprocessor import clean_input
-from analyzer.nodes import Program
-from analyzer.semantic_analyzer import gen_tree
-from generator.generator import generator
+from compiler.parser.ifl import generate_lexer
+from compiler.parser.ifl_yacc import generate_parser
+from compiler.parser.preprocessor import clean_input
+from compiler.analyzer.nodes import Program
+from compiler.analyzer.semantic_analyzer import gen_tree
+from compiler.generator.generator import generator
 
 lexer, tokens = generate_lexer()
 
 parser = generate_parser(lexer, tokens)
 data = open(sys.argv[1]).read()
-# data = open('examples/ex2.ifl').read()
+# data = open('examples/ex3.ifl').read()
 cleaned_data = '\n'.join(clean_input(data))
 
 lexer.input(cleaned_data)

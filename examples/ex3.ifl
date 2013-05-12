@@ -43,7 +43,7 @@ ITEM apple:
 				PRINT "Sorry, you have no apples."
 CHARACTER maid:
 	START:
-		USING "Text.txt"
+		USING "ex3dialogues.txt"
 		ADD apple TO SELF
 		MOVE SELF TO house
 	ACTIONS:

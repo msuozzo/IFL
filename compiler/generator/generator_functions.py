@@ -1,3 +1,5 @@
+import os
+
 class FunctionGenerator():
     def __init__(self, id_, tree):
         self.id_ = id_
@@ -281,7 +283,10 @@ class FunctionGenerator():
 
     def generate_dialogue(self, node):
         output = ""
-        f = open('generator/dialogue.py')
+
+        print os.path.realpath(__file__)
+
+        f = open('compiler/generator/dialogue.py')
         theLabels = ""
         for line in f:
             output += line
