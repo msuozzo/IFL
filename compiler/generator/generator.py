@@ -150,20 +150,21 @@ def generate_game(tree):
 
 	characters_string = "characters = ["
 	character_initialization = ""
+	character_setup = ""
 	for c in characters:
 		characters_string += "\"" + c + "\","
 		character_initialization += "%s = %s()\n" %(c, c.title())
-		character_initialization += "settings[%s.location].characters['%s'] = %s\n" %(c, c, c)
+		character_setup += "settings[%s.location].characters['%s'] = %s\n" %(c, c, c)
 	characters_string += "]\n"
 
 	file.write(settings_string)
 	file.write(traits_string)
 	file.write(characters_string)
 	file.write(character_initialization)
+	file.write(character_setup)
 
 	# main body of the game file begins here
 	main = """
-
 for k, v in settings.iteritems():
 	v._update_()
 
@@ -299,10 +300,18 @@ while True:
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
 
-	# updating all of actions_list in player and setting
+	# update all of the players in their respectively locations
+"""
+
+	for line in character_setup.splitlines():
+		main += "\t" + line + "\n"
+
+	main += """
+	# update all of the action_list in players
 	for k, v in settings[player.location].characters.iteritems():
 		v._update_()
 
+	# update all of the action_list in each settings
 	settings[player.location]._update_()
 		"""
 

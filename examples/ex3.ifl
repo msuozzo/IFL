@@ -15,7 +15,7 @@ TRAIT experience:
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
-			IF current ON SELF > current ^ 2:
+			IF current ON SELF > current ON SELF ^ 2:
 				INCREASE level ON SELF BY 3
 				DECREASE multiplier ON SELF BY multiplier ON SELF * 0.33
 				PRINT "You gained a level!"
