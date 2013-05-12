@@ -76,7 +76,7 @@ class TLT:
   def __init__(self, type_, id_, desc, start, action=None, function=None, dialogue=None):
     self.type_ = type_
     self.id_ = id_
-    self.desc = desc if desc is None else gen_desc(type_, id_)
+    self.desc = desc if desc else gen_desc(type_, id_)
     self.start = [stat_or_cond(tup, self.id_) for tup in start[1]]
     self.actions = [Action(tup, self.id_) for tup in action[1]] if action else []
     self.functions = [Function(tup, self.id_) for tup in function[1]] if function else []
