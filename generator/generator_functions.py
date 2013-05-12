@@ -1,5 +1,6 @@
 #TODO location remove
 #TODO Error handling for some methods like remove
+#TODO String literals vs other literals
 #TODO String concatenation
 
 class FunctionGenerator():
@@ -16,8 +17,13 @@ class FunctionGenerator():
     #settings[player.location].characters[%s] %last
     def resolve_target(self, target_list):
         target_list = list(target_list)
+
+        if target_list[0] == 'LIT':
+            return target_list[1]
+
         if target_list[0] == 'OBJ':
             target_list = target_list[1:]
+
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
         if target_list[0] == 'PLAYER':
@@ -98,25 +104,35 @@ class FunctionGenerator():
 
     # generates code for execute statement
     def generate_execute(self, node):
-        target = self.resolve_target(node.func)
+        function = self.resolve_target(node.func)
         param = ""
+        args = []
 
-        for (counter,arg) in enumerate(node.args):
-            for argArg in arg:
-                if counter == 0:
-                    if argArg[0] == "OBJ":
-                        tempTarg = self.resolve_target(argArg[1:])
-                        param = param + tempTarg
-                    else:
-                        param = param + argArg[1]
-                else:
-                    if argArg[0] == "OBJ":
-                        tempTarg = self.resolve_target(argArg[1:])
-                        param = param + "," + tempTarg
-                    else:
-                        param = param + "," + argArg[1]
+        for arg in node.args:
+            if arg[0] == 'LIT':
+                args.append(arg[1])
+            else:
+                args.append(self.resolve_target(arg[0]))
 
-        return_stmt = "" + target + "({param},settings,player)\n".format(param=param)
+
+        # for (counter,arg) in enumerate(node.args):
+        #     for argArg in arg:
+        #         if counter == 0:
+        #             if argArg[0] == "OBJ":
+        #                 tempTarg = self.resolve_target(argArg[1:])
+        #                 param = param + tempTarg
+        #             else:
+        #                 param = param + argArg[1]
+        #         else:
+        #             if argArg[0] == "OBJ":
+        #                 tempTarg = self.resolve_target(argArg[1:])
+        #                 param = param + "," + tempTarg
+        #             else:
+        #                 param = param + "," + argArg[1]
+        #
+        # return_stmt = "" + target + "({param},settings,player)\n".format(param=param)
+
+        return_stmt = "{function}({args})".format(function=function, args=",".join(args))
         return return_stmt
 
     # creates code for increase
@@ -140,6 +156,9 @@ class FunctionGenerator():
         return "pass\n"
 
     def generate_goto(self, node):
+        return "pass\n"
+
+    def generate_exit(self, node):
         return "pass\n"
 
     def generate_label(self, node):
@@ -198,6 +217,7 @@ class FunctionGenerator():
             'USING': self.generate_using,
             'INITIATE': self.generate_initiate,
             'GOTO': self.generate_goto,
+            'EXIT': self.generate_exit,
         }
 
         if node.__class__.__name__ == 'Conditional':
