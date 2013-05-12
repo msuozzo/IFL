@@ -1,0 +1,13 @@
+TRAIT Heatlth: 
+  START: 
+		ADD{INTEGER max = 200}
+	FUNCTION: 
+		update1 WITH amount: 
+			INCREASE current BY amount
+			IF current > max: 
+				SET current TO max
+
+		update2 WITH amount: 
+			DECREASE current BY amount
+			IF current < 0 
+				SET current TO 0 

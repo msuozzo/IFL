@@ -1,0 +1,50 @@
+TRAIT Heatlth: 
+  START: 
+		ADD{INTEGER current = 150} 
+		ADD{INTEGER max = 200}
+	FUNCTION: 
+		update1 WITH amount: 
+			INCREASE current BY amount
+			IF current > max: 
+				SET current TO max
+
+		update2 WITH amount: 
+			DECREASE current BY amount
+			IF current < 0 
+				SET current TO 0 
+
+ITEM Medicine:
+	START: 
+		ADD {INTEGER heal_value = 25}
+	ACTIONS: 
+		"get" :
+			REMOVE medicine FROM LOCATION ON medicine
+			ADD medicine TO PLAYER
+		"eat" : 
+			IF PLAYER HAS Medicine 
+				EXECUTE update ON health ON PLAYER WITH heal_value
+			REMOVE medicine from PLAYER
+		"drop" : 
+			IF PLAYER HAS Medicine 
+			REMOVE Medicine from PLAYER
+
+ITEM Weapon: 
+	START: 
+		ADD {INTEGER hurt_value = -15}
+	ACTIONS: 
+		"get": 
+			REMOVE Weapon FROM LOCATION ON Weapon
+			ADD Weapon TO PLAYER
+		"use": 
+			IF PLAYER HAS Weapon 
+				EXECUTE update2 ON health ON ENEMY WITH hurt_value
+		"drop": 
+			IF PLAYER HAS Weapon
+				REMOVE Weapon FROM PALYER				  
+
+SETTING Store: 
+	 
+		ADD Clerk
+		ADD Medicine  
+		ADD Weapon
+		
