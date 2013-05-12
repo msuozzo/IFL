@@ -252,7 +252,8 @@ while True:
 					print k.description
 			for k, v in settings[player.location].items.iteritems():
 				if k == noun:
-					print k.description
+					if hasattr(v[0], 'description'):
+						print v[0].description
 		elif input in player.action_list:
 
 			print "in player.action_list!"

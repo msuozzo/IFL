@@ -1,5 +1,4 @@
 #TODO String concatenation
-#TODO comments
 
 class FunctionGenerator():
     def __init__(self, id_, tree):
@@ -12,7 +11,6 @@ class FunctionGenerator():
         except KeyError:
             return None
 
-    #settings[player.location].characters[%s] %last
     def resolve_target(self, target_list):
         target_list = list(target_list)
 
@@ -299,6 +297,4 @@ class FunctionGenerator():
 
         output = output.replace("LAST_INPUT", "self.last_input")
         output = output.replace("player.", "self.player.")
-        print output
         return output
-            #replace with self.last_input
