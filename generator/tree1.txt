@@ -1,1 +1,0 @@
-(('CHARACTER', 'PLAYER', None, ('START', (('ADD', None, 'health', None), ('SET', ('health', 'current'), '100'), ('PRINT', ('Hello, I am a character',)))), None, None, None), ('TRAIT', 'health', None, ('START', (('ADD', None, ('INTEGER', 'current', '50'), None),)), None))

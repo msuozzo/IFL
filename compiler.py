@@ -1,24 +1,25 @@
-from parser import ifl, ifl_yacc, preprocessor
-######from generator import generator #not sure if this is the module to import
 import sys
-filename = sys.argv[1]
-try:
-  program_code = open(filename).read()
-except:
-  print "Couldn't load program at location '"+filename+"'"
-  sys.exit()
-l = ifl.generate_lexer()
-lexer = l[0]
-tokens = l[1]
-parser = ifl_yacc.generate_parser(lexer, tokens)
-cleaned = '\n'.join(preprocessor.clean_input(program_code))
-lexer.input(cleaned)
-#while True:
-#  tok = lexer.token()
-#  if not tok: break
-#  print tok
+from parser.ifl import generate_lexer
+from parser.ifl_yacc import generate_parser
+from parser.preprocessor import clean_input
+from analyzer.nodes import Program
+from analyzer.semantic_analyzer import gen_tree
+from generator.generator import generator
 
-lst = parser.parse(cleaned, debug=0)
+lexer, tokens = generate_lexer()
 
-### lst is the AST data structure
-### pass this in to your generator function (ie. generator(lst))
+parser = generate_parser(lexer, tokens)
+data = open(sys.argv[1]).read()
+cleaned_data = '\n'.join(clean_input(data))
+
+lexer.input(cleaned_data)
+
+while True:
+    tok = lexer.token()
+    if not tok: break
+
+tree = parser.parse(cleaned_data)
+
+t = gen_tree(tree)
+
+generator(t)
