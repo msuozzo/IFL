@@ -15,8 +15,8 @@ TRAIT experience:
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
-			IF current ON SELF > level ON SELF ^ 2:
-				INCREASE level ON SELF BY 2+1^3
+			IF (3+5)*4 > 5:
+				INCREASE level ON SELF BY 3
 				DECREASE multiplier ON SELF BY multiplier ON SELF * 0.33
 				PRINT "You gained a level!"
 				PRINT "You are now level "
@@ -53,28 +53,33 @@ CHARACTER maid:
 	DIALOGUE:
 		#LABEL A#:
 			IF LAST_INPUT EQUALS "1":
-				GOTO #LABEL B#
-			ELSE IF LAST_INPUT EQUALS "2":
 				GOTO #LABEL C#
-		#LABEL B#:
-			IF LAST_INPUT EQUALS "1":
+			ELSE IF LAST_INPUT EQUALS "2":
 				REMOVE apple FROM SELF
 				ADD apple TO PLAYER
-				GOTO #LABEL C#
+				GOTO #LABEL B#
+		#LABEL B#:
+			IF LAST_INPUT EQUALS "1":
+				GOTO #LABEL E#
 			ELSE IF LAST_INPUT EQUALS "2":
 				EXIT
 		#LABEL C#:
 			IF LAST_INPUT EQUALS "1":
-				GOTO #LABEL A#
+				REMOVE apple FROM SELF
+				ADD apple TO PLAYER
+				GOTO #LABEL F#
 			ELSE IF LAST_INPUT EQUALS "2":
 				EXIT
 			ELSE:
 				GOTO #LABEL D#
 		#LABEL D#:
 			IF LAST_INPUT EQUALS "1":
-				GOTO #LABEL B#
+				GOTO #LABEL E#
 		#LABEL E#:
-			IF LAST_INPUT EQUALS "2":
+			IF LAST_INPUT EQUALS "1":
+				EXIT
+		#LABEL F#:
+			IF LAST_INPUT EQUALS "1":
 				EXIT
 SETTING house:
 	"You are at the house."

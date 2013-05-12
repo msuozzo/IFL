@@ -1,5 +1,4 @@
 #TODO String concatenation
-#TODO comments
 
 class FunctionGenerator():
     def __init__(self, id_, tree):
@@ -12,22 +11,25 @@ class FunctionGenerator():
         except KeyError:
             return None
 
-    #settings[player.location].characters[%s] %last
     def resolve_target(self, target_list):
         target_list = list(target_list)
 
         if target_list[0] == 'LIT':
             return target_list[1]
+
         if target_list[0] == 'OBJ': #It is an object chain, strip out the first word
             target_list = target_list[1:]
+
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
         elif target_list[0] == 'PLAYER':
             target_list[0] = 'player'
         elif self.get_type(target_list[0]) == 'CHARACTER':
             target_list[0] = "settings[player.location].characters['%s']" %target_list[0]
-        elif target_list[0] == 'LOCATION':
-            target_list[0] = 'settings[player.location]'
+
+        if target_list == ['player', 'LOCATION']:
+            target_list = ['settings[player.location]']
+
         target_string = '.'.join(target_list)
         return target_string
 
@@ -100,7 +102,7 @@ class FunctionGenerator():
     # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
-        return "" + target + ".location = '" + node.new_loc[1].lower() + "'\n"
+        return "" + target + ".location = '" + node.new_loc[0].lower() + "'\n"
 
     # generates code for execute statement
     def generate_execute(self, node):
@@ -121,14 +123,14 @@ class FunctionGenerator():
     # creates code for increase
     def generate_increase(self, node):
         target = self.resolve_target(node.target)
-        return_stmt = "" + target + "+=" + node.val[1]
+        return_stmt = "" + target + "+=" + self.parse_expr(node.val)
 
         return return_stmt
 
     # creates code for decrease
     def generate_decrease(self, node):
         target = self.resolve_target(node.target)
-        return_stmt = "" + target + "-=" + node.val[1]
+        return_stmt = "" + target + "-=" + self.parse_expr(node.val)
 
         return return_stmt
 
@@ -160,7 +162,9 @@ class FunctionGenerator():
 
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
-        ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
+        unary_ops = ['-']
+        binary_ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
+        parens = ['(', ')']
         if len(expr) == 1: #String literal
             return "'" + expr + "'"
         if expr[0] in ['OBJ', 'LIT']:
@@ -173,22 +177,28 @@ class FunctionGenerator():
         operands = []
         operator = expr[0]
 
-        if len(expr) == 2: #unary op
+        if len(expr) == 2 and operator in unary_ops: #unary operator
             operands.append(expr[1][0])
+        elif operator in parens:
+            pass
         else:
             operands.append(expr[1])
             operands.append(expr[2])
 
         if operator == 'HAS':
             output += self.generate_has(expr)
-        elif operator in ops:
+        elif operator in binary_ops:
             if len(operands) == 1:
                 output += operator
                 output += "(" +  self.parse_expr(operands[0]) + ")"
             else:
+                if operator == "^":
+                    operator = "**"
                 output += "(" +  self.parse_expr(operands[0]) + ")"
                 output += " " + operator + " "
                 output += "(" + self.parse_expr(operands[1]) + ")"
+        elif operator in parens:
+            output += "(" + self.parse_expr(expr[1]) + ")"
 
         return output
 
@@ -227,7 +237,7 @@ class FunctionGenerator():
                     s = self.generate_statement(stmt)
                     for line in s.splitlines():
                         output += "\t" + line + "\n"
-            elif counter == len(cases) - 1 and True:
+            elif counter == len(cases) - 1 and conditional[0] == 'TRUE':
                 else_stmt_list = cases[-1][1]
                 output += 'else:\n'
                 for stmt in else_stmt_list:
@@ -287,6 +297,4 @@ class FunctionGenerator():
 
         output = output.replace("LAST_INPUT", "self.last_input")
         output = output.replace("player.", "self.player.")
-        print output
         return output
-            #replace with self.last_input
