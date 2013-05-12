@@ -8,7 +8,7 @@ class SuccessTest(unittest.TestCase):
 	def test_succ2(self):
 		os.system("python compiler.py examples/ex2.ifl")
 	def test_succ3(self): 
-		os.system("pyton compiler.py examples/ex3.ifl")
+		os.system("python compiler.py examples/ex3.ifl")
 
 class ExpectedFailureTestCase(unittest.TestCase): 
 	def test_fail(self): 
