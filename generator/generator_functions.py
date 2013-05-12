@@ -1,4 +1,3 @@
-#TODO location remove
 #TODO String concatenation
 #TODO comments
 

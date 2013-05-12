@@ -1,0 +1,22 @@
+#LABEL A
+Maid: Hi, can I help you?
+(1) Ask where you are
+(2) Ask for an item
+
+#LABEL B
+Maid: You are in the bedroom of a old house.
+(1) Ask for an item
+(2) Exit
+
+#LABEL C
+The maid gives you an apple
+(1) Ask where you are
+(2) Exit
+
+#LABEL D
+Maid: Hi, can I help you?
+(1) Ask where you are
+
+#LABEL E
+Maid: You are in the bedroom of a old house.
+(1) Exit
