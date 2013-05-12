@@ -268,10 +268,14 @@ class FunctionGenerator():
     def generate_dialogue(self, node):
         output = ""
         f = open('generator/dialogue.py')
+        theLabels = ""
         for line in f:
             output += line
             if line.strip() == "#1#": #Start generating labels here
-                pass
+                for lab in node:
+                    lab = lab.label.replace('#', '').replace(' ', '_').lower()
+                    theLabels = theLabels + "self.labels['{label}'] = self.{label}\n".format(label=lab)
+                print theLabels
             elif line.strip() == "#2#":
                 for dialogue_node in node:
                     s = self.generate_label(dialogue_node)
