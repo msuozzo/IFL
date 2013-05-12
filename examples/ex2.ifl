@@ -38,6 +38,11 @@ SETTING house:
 	"You are at the house."
 	START:
 		ADD apple TO SELF
+		ADD maid TO SELF
+
+CHARACTER maid:
+	START:
+		ADD {INTEGER max=10} TO SELF
 
 CHARACTER PLAYER:
 	START:
