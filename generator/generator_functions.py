@@ -137,7 +137,9 @@ class FunctionGenerator():
         return "pass\n"
 
     def generate_goto(self, node):
-        return "pass\n"
+        label = node.label.replace('#', '').replace(' ', '_').lower()
+        return_stmt = "self.goto('{label}')".format(label=label)
+        return return_stmt
 
     def generate_exit(self, node):
         return "pass\n"
@@ -146,7 +148,9 @@ class FunctionGenerator():
         label = node.label.replace('#', '').replace(' ', '_').lower()
         return_stmt = "def {label}(self):\n".format(label=label)
         for stmt in node.statements:
-            return_stmt += '\t' + self.generate_statement(stmt)
+            s = self.generate_statement(stmt)
+            for line in s.splitlines():
+                return_stmt += '\t' + line + "\n"
 
         return return_stmt
 
@@ -154,9 +158,9 @@ class FunctionGenerator():
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
         ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
-        if len(expr) == 1:
-            return expr
-        if expr[0] in ['OBJ', 'LIT']: #TODO string literal?
+        if len(expr) == 1: #String literal
+            return "'" + expr + "'"
+        if expr[0] in ['OBJ', 'LIT']:
             if expr[0] == 'OBJ':
                 return self.resolve_target(expr)
             elif expr[0] == 'LIT':
@@ -270,5 +274,11 @@ class FunctionGenerator():
                 pass
             elif line.strip() == "#2#":
                 for dialogue_node in node:
-                    output += self.generate_label(dialogue_node)
+                    s = self.generate_label(dialogue_node)
+                    for line in s.splitlines():
+                        output += "\t" + line + "\n"
                     print output
+
+        for line in output:
+            pass
+            #replace with self.last_input
