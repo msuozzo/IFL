@@ -1,6 +1,8 @@
 class Dialogue:
-	def __init__(self, using):
+	def __init__(self, using, settings, player):
 		self.using = using
+		self.settings = settings
+		self.player = player
 		self.last_input = ""
 		self.dialogue_map = {} #Maps label names to text in the using file
 		self.labels = {}
