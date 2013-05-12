@@ -5,17 +5,19 @@ TRAIT health:
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
-			IF current ON SELF > max:
-				SET current ON SELF TO max
+			IF current ON SELF > max ON SELF:
+				SET current ON SELF TO max ON SELF
 TRAIT experience:
 	START:
 		ADD {INTEGER current=0} TO SELF
 		ADD {INTEGER level=1} TO SELF
+		ADD {DECIMAL multiplier=0.75} TO SELF
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
 			IF current ON SELF > level ON SELF ^ 2:
-				INCREASE level ON SELF BY 1
+				INCREASE level ON SELF BY 2+1^3
+				DECREASE multiplier ON SELF BY multiplier ON SELF * 0.33
 				PRINT "You gained a level!"
 				PRINT "You are now level "
 ITEM apple:
@@ -32,8 +34,9 @@ ITEM apple:
 
 		"eat":
 			IF PLAYER HAS apple:
-				EXECUTE update ON health ON PLAYER WITH 100
-				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
+				EXECUTE update ON health ON PLAYER WITH healing_value
+				EXECUTE update ON health ON PLAYER WITH "777"
+				EXECUTE update ON experience ON PLAYER WITH experience_value
 				REMOVE apple FROM PLAYER
 CHARACTER maid:
 	"I am a maid of the house."
@@ -81,4 +84,5 @@ CHARACTER PLAYER:
 	START:
 		ADD health TO SELF
 		ADD experience TO SELF
-		MOVE SELF TO House
+		MOVE SELF TO house // peaches
+
