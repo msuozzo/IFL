@@ -200,7 +200,7 @@ class FunctionGenerator():
                 output += " " + operator + " "
                 output += "(" + self.parse_expr(operands[1]) + ")"
         elif operator in parens:
-            pass
+            output += "(" + self.parse_expr(expr[1]) + ")"
 
         return output
 
