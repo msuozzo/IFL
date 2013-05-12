@@ -82,7 +82,7 @@ CHARACTER maid:
 			IF LAST_INPUT EQUALS "1":
 				EXIT
 SETTING house:
-	"You are at the house."
+	"Nice house by the beach."
 	START:
 		ADD maid TO SELF
 CHARACTER PLAYER:
