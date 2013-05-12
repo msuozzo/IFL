@@ -32,7 +32,7 @@ def type_check(stat, type_map, tlt_name_map):
       boolean_check(case, type_map)
     for stmt in stat.possible_statements: type_check(stmt, type_map, tlt_name_map)
   else: #Statements
-    print stat.type_
+    #print stat.type_
     if stat.type_ == Statement.ADD:
       if stat.primitive:
         prim_type = stat.primitive.type_

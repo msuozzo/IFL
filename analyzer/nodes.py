@@ -36,6 +36,7 @@ class Program:
         #TODO: warn that initiated with 2 different types
       else: self.def_types[fullname] = type_
     if "PLAYER" not in self.tlt_names: raise Exception #TODO no PLAYER Character found
+    self.def_names.setdefault("PLAYER", [])
     self.def_types["PLAYER.LOCATION"] = "SETTING"
     self.def_names["PLAYER"].append("LOCATION")
 
