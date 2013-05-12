@@ -1,5 +1,5 @@
 import sys
-from compiler.parser.ifl import generate_lexer
+from compiler.parser.ifl_lex import generate_lexer
 from compiler.parser.ifl_yacc import generate_parser
 from compiler.parser.preprocessor import clean_input
 from compiler.analyzer.nodes import Program

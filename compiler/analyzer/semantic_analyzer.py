@@ -297,18 +297,3 @@ def arithmetic_sub(stat, obj_list, cmd_list):
     print "boo"
     raise Exception
 
-#x = []
-#cmds = []
-#map_ = {'health' : 'TRAIT', 'health.current' : 'DECIMAL', 'PLAYER' : 'CHARACTER', 'PLAYER.pops' : 'DECIMAL'}
-#stat = ('/', ('-', ('+', ('OBJ', 'health', 'current'), ('LIT', '50.0')), ('OBJ', 'PLAYER', 'pops')), ('LIT', '0.0'))
-#arithmetic_check(stat, "DECIMAL", map_)
-#
-#
-#map_ = {'health' : 'TRAIT', 'health.current' : 'STRING', 'PLAYER' : 'CHARACTER', 'PLAYER.pops' : 'STRING'}
-#stat = ('hello muy ajfbkasbf ', ('OBJ', 'health', 'current'), ' and I like to fish')
-#string_check(stat, map_)
-#
-#
-#map_ = {'health' : 'TRAIT', 'health.current' : 'STRING', 'PLAYER' : 'CHARACTER', 'PLAYER.pops' : 'STRING', 'pop' : 'INTEGER', 'nopop' : 'DECIMAL', 'abool' : 'TF', 'anitem' : 'ITEM'}
-#stat = ('NOT', ('HAS', ('OBJ', 'health'), 'anitem'))
-#boolean_check(stat, map_)
