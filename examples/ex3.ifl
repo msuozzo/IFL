@@ -26,17 +26,19 @@ ITEM apple:
 		"get":
 			REMOVE apple FROM LOCATION
 			ADD apple TO PLAYER
+			ADD apple TO maid
 
 		"eat":
 			IF PLAYER HAS apple:
-				EXECUTE update ON health ON PLAYER WITH healing_value
-				EXECUTE update ON experience ON PLAYER WITH experience_value
+				EXECUTE update ON health ON PLAYER WITH 100
+				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
 				REMOVE apple FROM PLAYER
 CHARACTER maid:
 	"I am a maid of the house."
 	START:
 		USING "Text.txt"
 		ADD apple TO SELF
+		MOVE SELF TO house
 	ACTIONS:
 		"talk":
 			IF SELF HAS apple:
