@@ -262,8 +262,6 @@ while True:
 						print v[0].description
 		elif input in player.action_list:
 
-			print "in player.action_list!"
-
 			# check if it is an action in player
 			attributes = dir(player)
 			if noun in attributes:
@@ -272,8 +270,6 @@ while True:
 			# check if it is an action in one of player's items
 			elif noun in player.items:
 				getattr(player.items[noun][0], action)(settings, player)
-
-
 
 		elif input in settings[player.location].action_list:
 
@@ -294,7 +290,6 @@ while True:
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
 
-
 	# updating all of actions_list in player and setting
 	for k, v in settings[player.location].characters.iteritems():
 		v._update_()
@@ -303,9 +298,7 @@ while True:
 		"""
 
 	file.write(main)
-
 	file.close()
-
 
 def generator(tree):
 	"""Generate Python code based on the tree that's given"""
@@ -319,4 +312,3 @@ def generator(tree):
 
 	# create the while loop that asks the user for inputs
 	generate_game(tree)
-
