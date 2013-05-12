@@ -1,8 +1,6 @@
-TRAIT health:
+SETTING house:
+	"A House"
 	START:
-		ADD {INTEGER current=50} TO SELF
 CHARACTER PLAYER:
 	START:
-		ADD health TO SELF
-		SET current ON health ON SELF TO 100
-		PRINT "Hello, I am a character"
+		MOVE SELF TO house

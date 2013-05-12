@@ -25,24 +25,30 @@ ITEM apple:
 		ADD {INTEGER experience_value=5} TO SELF
 	ACTIONS:
 		"get":
-			REMOVE apple FROM LOCATION
-			ADD apple TO PLAYER
+			IF LOCATION HAS apple:
+				REMOVE apple FROM LOCATION
+				ADD apple TO PLAYER
+			ELSE:
+				PRINT "Sorry, no apples left."
 
 		"eat":
 			IF PLAYER HAS apple:
 				EXECUTE update ON health ON PLAYER WITH 100
 				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
 				REMOVE apple FROM PLAYER
+				PRINT "You ate an apple"
+			ELSE:
+				PRINT "You don't have an apple!"
 
 SETTING house:
 	"You are at the house."
 	START:
 		ADD apple TO SELF
-		ADD maid TO SELF
 
 CHARACTER maid:
 	START:
 		ADD {INTEGER max=10} TO SELF
+		MOVE SELF TO house
 
 CHARACTER PLAYER:
 	START:

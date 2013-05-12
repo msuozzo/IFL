@@ -9,7 +9,7 @@ from generator.generator import generator
 lexer, tokens = generate_lexer()
 
 parser = generate_parser(lexer, tokens)
-data = open("examples/ex2.ifl").read()
+data = open("examples/ex3.ifl").read()
 cleaned_data = '\n'.join(clean_input(data))
 
 lexer.input(cleaned_data)
