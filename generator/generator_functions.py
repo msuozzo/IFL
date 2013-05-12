@@ -13,6 +13,7 @@ class FunctionGenerator():
         except KeyError:
             return None
 
+    #settings[player.location].characters[%s] %last
     def resolve_target(self, target_list):
         target_list = list(target_list)
         if target_list[0] == 'OBJ':
@@ -130,9 +131,23 @@ class FunctionGenerator():
     def generate_initiate(self, node):
         return "pass\n"
 
+    def generate_goto(self, node):
+        return "pass\n"
+
+    def generate_label(self, node):
+        label = node.label.replace('#', '').replace(' ', '_').lower()
+        return_stmt = "def {label}():\n".format(label=label)
+        for stmt in node.statements:
+            return_stmt += self.generate_statement(stmt)
+
+        return return_stmt
+
+
     #Parses a TF or arithmetic expression
     def parse_expr(self, expr):
         ops = ['<', '>', '<=', '>=', '==', '!=', '+', '-', '*', '/', '%', '^']
+        if len(expr) == 1:
+            return expr
         if expr[0] in ['OBJ', 'LIT']: #TODO string literal?
             if expr[0] == 'OBJ':
                 return self.resolve_target(expr)
@@ -174,6 +189,7 @@ class FunctionGenerator():
             'DECREASE': self.generate_decrease,
             'USING': self.generate_using,
             'INITIATE': self.generate_initiate,
+            'GOTO': self.generate_goto,
         }
 
         if node.__class__.__name__ == 'Conditional':
@@ -237,4 +253,12 @@ class FunctionGenerator():
         return function_string
 
     def generate_dialogue(self, node):
-        pass
+        output = ""
+        f = open('generator/dialogue.py')
+        for line in f:
+            output += line
+            if line.strip() == "###": #Start generating labels here
+                for dialogue_node in node:
+                    output += self.generate_label(dialogue_node)
+                    print output
+
