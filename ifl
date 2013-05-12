@@ -1,22 +1,22 @@
 #!/bin/sh
 
 if [ $# -ne 1 ]; then
-	echo "Usage: ./ifl file_to_be_compiled.ifl"
+	echo "Usage: ./ifl source/file_name.ifl"
 	echo "Enter ./ifl [1-3] to compile example 1, 2 or 3"
 else
 	[ -d game ] && rm -rf game
 
 	mkdir game
 
-	if [ $1 -eq 1 ]; then
+	if [ $1 == "1" ]; then
 		python compiler.py examples/ex1.ifl 2> /dev/null
-	elif [ $1 -eq 2 ]; then
+	elif [ $1 == "2" ]; then
 		python compiler.py examples/ex2.ifl 2> /dev/null
-	elif [ $1 -eq 3 ]; then
+	elif [ $1 == "3" ]; then
 		cp examples/*.txt game/
 		python compiler.py examples/ex3.ifl 2> /dev/null
 	else
-		cp source/* game/
+		[ -f ./souce/*.txt ] && cp ./source/*.txt game/
 		python compiler.py $1 2> /dev/null
 	fi
 
