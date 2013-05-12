@@ -1,4 +1,4 @@
-from parser.ifl import generate_lexer
+from parser.ifl_lex import generate_lexer
 from parser.ifl_yacc import generate_parser
 from parser.preprocessor import clean_input
 from analyzer.nodes import Program
