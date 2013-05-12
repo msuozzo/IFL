@@ -109,7 +109,7 @@ class FunctionGenerator():
         for arg in node.args:
             if type(arg[0]) == str and len(arg) == 1: #is a string literal
                 args.append("'" + arg[0] + "'")
-            if arg[0] == 'LIT':
+            elif arg[0] == 'LIT':
                 args.append(arg[1])
             else:
                 args.append(self.resolve_target(arg[0]))
