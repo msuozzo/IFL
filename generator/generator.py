@@ -198,21 +198,22 @@ while True:
 
 		attributes = vars(player)
 		for a in attributes:
-			if a in traits:
+			if a in traits and a != "description":
 				traits_string += a
 
 				b = getattr(player,a)
 				c = vars(b)
 				count = 0
 				for d in c:
-					if count == 0:
-						traits_string += ": "
-					else:
-						traits_string += ", "
+					if d != "description":
+						if count == 0:
+							traits_string += ": "
+						else:
+							traits_string += ", "
 
-					val = c[d]
-					traits_string += d + " = {val}".format(val=val)
-					count+=1
+						val = c[d]
+						traits_string += d + " = {val}".format(val=val)
+						count+=1
 
 				traits_string += "\\n"
 
@@ -247,19 +248,27 @@ while True:
 		noun = tmp[1]
 
 		if action == "inspect":
+			done = 0
 			if player.location == noun:
 				print settings[player.location].description
+				done = 1
 
 			for k, v in settings[player.location].characters.iteritems():
 				if k == noun:
 					print v.description
+					done = 1
 				else:
 					if noun in v.items:
 						print v.items[noun][0].description
+						done = 1
 			for k, v in settings[player.location].items.iteritems():
 				if k == noun:
 					if hasattr(v[0], 'description'):
 						print v[0].description
+						done = 1
+
+			if done == 0:
+				print "Please choose something that exists to inspect."
 		elif input in player.action_list:
 
 			# check if it is an action in player
