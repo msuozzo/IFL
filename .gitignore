@@ -3,6 +3,7 @@
 .idea
 .DS_Store
 *.bak
-game/*
+game/*.py
+game/*.pyc
 parsetab.py
 parser.out
