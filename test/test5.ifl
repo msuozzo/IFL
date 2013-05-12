@@ -6,7 +6,7 @@ TRAIT Health:
 	FUNCION: 
 		update WITH amount: 
 			INCREASE current ON SELF BY amount
-			IF current > max ON SELF: 
+			IF current ON SELF > max ON SELF: 
 				SET current ON SELF TO max ON SELF
 
 CHARACTER PLAYER:
