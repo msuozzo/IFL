@@ -15,9 +15,9 @@ TRAIT experience:
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
-			IF current ON SELF > -(level ON SELF + 2):
+			IF current ON SELF > level ON SELF + 2:
 				INCREASE level ON SELF BY 1
-				PRINT "You gained a level!"
+				PRINT "You gained a level! You are now level " . level ON SELF
 
 ITEM apple:
 	"shiny red apple"
