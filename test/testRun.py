@@ -1,18 +1,6 @@
 import unittest
 import os
 
-def suite(): 
-  	suite = unittest.TestSuite()
-	suite.addTest(TestCase('test1.ifl'))
-	suite.addTest(TestCase('test2.ifl'))
-	suite.addTest(TestCase('test3.ifl'))
-	suite.addTest(TestCase('test4.ifl'))	
-	suite.addTest(TestCase('test5.ifl'))
-	suite.addTest(TestCase('test6.ifl'))
-	suite.addTest(TestCase('test7.ifl')) 
-	suite.addTest(TestCase('test8.ifl')) 
-	suite.addTest(TestCase('test9.ifl'))
-	return suite
 
 class SuccessTest(unittest.TestCase): 
 	def test_succ1(self): 
@@ -39,4 +27,3 @@ class ExpectedFailureTestCase(unittest.TestCase):
 
 if __name__ == '__main__': 
 	unittest.main()
- 
