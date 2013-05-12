@@ -132,7 +132,7 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_using(self, node):
-        return "self.using={filename}".format(filename=node.filename)
+        return "self.using='{filename}'".format(filename=node.filename)
 
     def generate_initiate(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()

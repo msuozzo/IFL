@@ -72,8 +72,9 @@ def generate_classes(tree):
         if len(node.dialogues) > 0:
             FG = FunctionGenerator(node.id_, tree)
             s = FG.generate_dialogue(node.dialogues)
-            for line in s.splitlines():
-                dialogue_string += "\t" + line + "\n"
+            dialogue_string += s
+            # for line in s.splitlines():
+            #     dialogue_string += "\t" + line + "\n"
 
         # add a characters dictionary to SETTING
         if node.type_ == "SETTING":
