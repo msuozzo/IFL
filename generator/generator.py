@@ -2,89 +2,89 @@ from generator_functions import FunctionGenerator
 import os
 
 def generate_classes(tree):
-    """Traverse through the tlts in the tree to generate code for classes"""
+	"""Traverse through the tlts in the tree to generate code for classes"""
 
-    # loop through all of the Definition Nodes in the tlts
-    for node in tree.tlts:
+	# loop through all of the Definition Nodes in the tlts
+	for node in tree.tlts:
 
-        # create the file, ex: /game/PLAYER.py
-        file = open("./game/" + node.id_ + ".py", 'w')
+		# create the file, ex: /game/PLAYER.py
+		file = open("./game/" + node.id_ + ".py", 'w')
 
-        # add the appropriate imports by looping through all of the definition nodes in tlts
-        import_string = ""
-        for element in tree.tlts:
-            if node.id_ != element.id_:
-                import_string += "from %s import *\n" % element.id_
+		# add the appropriate imports by looping through all of the definition nodes in tlts
+		import_string = ""
+		for element in tree.tlts:
+			if node.id_ != element.id_:
+				import_string += "from %s import *\n" % element.id_
 
-        # class declaration begins here
-        class_string = "\nclass %s:" % node.id_.title() + "\n"
+		# class declaration begins here
+		class_string = "\nclass %s:" % node.id_.title() + "\n"
 
-        # constructor begins here
-        constructor_string = "\tdef __init__(self):\n"
+		# constructor begins here
+		constructor_string = "\tdef __init__(self):\n"
 
-        # set the initial location and items of Characters and Settings to empty
-        if node.type_ == "CHARACTER" or node.type_ == "SETTING":
-            constructor_string += "\t\tself.location = None\n"
-            constructor_string += "\t\tself.items = {}\n"
-
-
-        # add the description if it has any
-        if node.desc is not None:
-            constructor_string += "\t\tself.description = '%s'\n" % node.desc
+		# set the initial location and items of Characters and Settings to empty
+		if node.type_ == "CHARACTER" or node.type_ == "SETTING":
+			constructor_string += "\t\tself.location = None\n"
+			constructor_string += "\t\tself.items = {}\n"
 
 
-        # iterate through each statement in start and add it to constructor
-        for statement in node.start:
-            # get the code, add the appropriate tabs, and write to file
-            # (Note that the code might be multi-lined)
-            FG = FunctionGenerator(node.id_, tree)
-            s = FG.generate_statement(statement)
-            for line in s.splitlines():
-                constructor_string += "\t\t" + line + "\n"
+		# add the description if it has any
+		if node.desc is not None:
+			constructor_string += "\t\tself.description = '%s'\n" % node.desc
 
 
-        # create a list of actions if there is any and append them to the action_list
-        if node.type_ != "TRAIT":
-            constructor_string += "\t\tself.default_action_list = []\n"
-
-        action_string = ""
-        if len(node.actions) > 0:
-            FG = FunctionGenerator(node.id_, tree)
-            for a in node.actions:
-                s = FG.generate_action(a.action_phrase, a.statements)
-                for line in s.splitlines():
-                    action_string += "\t" + line + "\n"
-                constructor_string += "\t\tself.default_action_list.append('%s %s')\n" % (a.action_phrase, node.id_)
+		# iterate through each statement in start and add it to constructor
+		for statement in node.start:
+			# get the code, add the appropriate tabs, and write to file
+			# (Note that the code might be multi-lined)
+			FG = FunctionGenerator(node.id_, tree)
+			s = FG.generate_statement(statement)
+			for line in s.splitlines():
+				constructor_string += "\t\t" + line + "\n"
 
 
-        # create a list of functions if there is any
-        function_string = ""
-        if len(node.functions) > 0:
-            FG = FunctionGenerator(node.id_, tree)
-            for f in node.functions:
-                s = FG.generate_function(f)
-                for line in s.splitlines():
-                    function_string += "\t" + line + "\n"
+		# create a list of actions if there is any and append them to the action_list
+		if node.type_ != "TRAIT":
+			constructor_string += "\t\tself.default_action_list = []\n"
+
+		action_string = ""
+		if len(node.actions) > 0:
+			FG = FunctionGenerator(node.id_, tree)
+			for a in node.actions:
+				s = FG.generate_action(a.action_phrase, a.statements)
+				for line in s.splitlines():
+					action_string += "\t" + line + "\n"
+				constructor_string += "\t\tself.default_action_list.append('%s %s')\n" % (a.action_phrase, node.id_)
 
 
-        # create a list of dialogues if there is any
-        dialogue_string = ""
-        if len(node.dialogues) > 0:
-            FG = FunctionGenerator(node.id_, tree)
-            s = FG.generate_dialogue(node.dialogues)
-            dialogue_string += s
-            # for line in s.splitlines():
-            #     dialogue_string += "\t" + line + "\n"
+		# create a list of functions if there is any
+		function_string = ""
+		if len(node.functions) > 0:
+			FG = FunctionGenerator(node.id_, tree)
+			for f in node.functions:
+				s = FG.generate_function(f)
+				for line in s.splitlines():
+					function_string += "\t" + line + "\n"
 
-        # add a characters dictionary to SETTING
-        if node.type_ == "SETTING":
-            constructor_string += "\t\tself.characters = {}\n"
 
-        # create the _update_() method that updates all of the action_lists
-        if node.type_ != "TRAIT":
-            constructor_string += "\t\tself._update_()\n"
+		# create a list of dialogues if there is any
+		dialogue_string = ""
+		if len(node.dialogues) > 0:
+			FG = FunctionGenerator(node.id_, tree)
+			s = FG.generate_dialogue(node.dialogues)
+			dialogue_string += s
+			# for line in s.splitlines():
+			#     dialogue_string += "\t" + line + "\n"
 
-            function_string += """
+		# add a characters dictionary to SETTING
+		if node.type_ == "SETTING":
+			constructor_string += "\t\tself.characters = {}\n"
+
+		# create the _update_() method that updates all of the action_lists
+		if node.type_ != "TRAIT":
+			constructor_string += "\t\tself._update_()\n"
+
+			function_string += """
 	def _update_(self):
 		self.action_list = []
 		self.action_list.extend(self.default_action_list)
@@ -95,74 +95,74 @@ def generate_classes(tree):
 					if a not in self.action_list:
 						self.action_list.append(a)
 """
-        # allow characters and settings to update their items as well
-        if node.type_ == "SETTING" or node.type_ == "CHARACTER":
-            function_string += """
+		# allow characters and settings to update their items as well
+		if node.type_ == "SETTING" or node.type_ == "CHARACTER":
+			function_string += """
 		for v in self.items.values():
 			for a in v[0].action_list:
 				if a not in self.action_list:
 					self.action_list.append(a)
 """
-        file.write(import_string)
-        file.write(class_string)
-        file.write(constructor_string)
-        file.write(action_string)
-        file.write(function_string)
-        file.write(dialogue_string)
+		file.write(import_string)
+		file.write(class_string)
+		file.write(constructor_string)
+		file.write(action_string)
+		file.write(function_string)
+		file.write(dialogue_string)
 
-        file.close()
+		file.close()
 
-    # end of the for loop here
+	# end of the for loop here
 
 def generate_game(tree):
-    """Generate the main class file for the game"""
+	"""Generate the main class file for the game"""
 
-    # create the file
-    file = open("./game/game.py", 'w')
+	# create the file
+	file = open("./game/game.py", 'w')
 
-    # loop through all of the Definition Nodes in the tlts and add the appropriate imports
-    # also initialize any settings that are available and add them to a dictionary called settings
+	# loop through all of the Definition Nodes in the tlts and add the appropriate imports
+	# also initialize any settings that are available and add them to a dictionary called settings
 
-    # loop through all of the definition nodes and add the appropriate imports, initialize settings
-    # and characters, and create a list of all the traits and characters
-    traits = []
-    characters = []
-    settings = []
+	# loop through all of the definition nodes and add the appropriate imports, initialize settings
+	# and characters, and create a list of all the traits and characters
+	traits = []
+	characters = []
+	settings = []
 
-    for node in tree.tlts:
-        file.write("from %s import *\n" % node.id_)
-        if node.type_ == "SETTING":
-            settings.append(node.id_)
-        if node.type_ == "TRAIT":
-            traits.append(node.id_)
-        if node.type_ == "CHARACTER":
-            characters.append(node.id_.lower())
+	for node in tree.tlts:
+		file.write("from %s import *\n" % node.id_)
+		if node.type_ == "SETTING":
+			settings.append(node.id_)
+		if node.type_ == "TRAIT":
+			traits.append(node.id_)
+		if node.type_ == "CHARACTER":
+			characters.append(node.id_.lower())
 
-    settings_string = "\nsettings = {}\n"
-    for s in settings:
-        # ex: settings['house'] = House()
-        settings_string += "settings['%s'] = %s()\n" %(s, s.title())
+	settings_string = "\nsettings = {}\n"
+	for s in settings:
+		# ex: settings['house'] = House()
+		settings_string += "settings['%s'] = %s()\n" %(s, s.title())
 
-    traits_string = "traits = ["
-    for t in traits:
-        traits_string += "\"" + t + "\","
-    traits_string += "]\n"
+	traits_string = "traits = ["
+	for t in traits:
+		traits_string += "\"" + t + "\","
+	traits_string += "]\n"
 
-    characters_string = "characters = ["
-    character_initialization = ""
-    for c in characters:
-        characters_string += "\"" + c + "\","
-        character_initialization += "%s = %s()\n" %(c, c.title())
-        character_initialization += "settings[%s.location].characters['%s'] = %s\n" %(c, c, c)
-    characters_string += "]\n"
+	characters_string = "characters = ["
+	character_initialization = ""
+	for c in characters:
+		characters_string += "\"" + c + "\","
+		character_initialization += "%s = %s()\n" %(c, c.title())
+		character_initialization += "settings[%s.location].characters['%s'] = %s\n" %(c, c, c)
+	characters_string += "]\n"
 
-    file.write(settings_string)
-    file.write(traits_string)
-    file.write(characters_string)
-    file.write(character_initialization)
+	file.write(settings_string)
+	file.write(traits_string)
+	file.write(characters_string)
+	file.write(character_initialization)
 
-    # main body of the game file begins here
-    main = """
+	# main body of the game file begins here
+	main = """
 
 for k, v in settings.iteritems():
 	v._update_()
@@ -199,9 +199,22 @@ while True:
 		attributes = vars(player)
 		for a in attributes:
 			if a in traits:
-				traits_string += "trait: " + a + "\\n"
+				traits_string += a
 
-				# need to allow user to print more stuff
+				b = getattr(player,a)
+				c = vars(b)
+				count = 0
+				for d in c:
+					if count == 0:
+						traits_string += ": "
+					else:
+						traits_string += ", "
+
+					val = c[d]
+					traits_string += d + " = {val}".format(val=val)
+					count+=1
+
+				traits_string += "\\n"
 
 		print traits_string
 
@@ -275,23 +288,23 @@ while True:
 		v._update_()
 
 	settings[player.location]._update_()
-        """
+		"""
 
-    file.write(main)
+	file.write(main)
 
-    file.close()
+	file.close()
 
 
 def generator(tree):
-    """Generate Python code based on the tree that's given"""
+	"""Generate Python code based on the tree that's given"""
 
-    # create the game directory if it does not already exist
-    if not os.path.exists("./game"):
-        os.mkdir("./game")
+	# create the game directory if it does not already exist
+	if not os.path.exists("./game"):
+		os.mkdir("./game")
 
-    # create the classes for each ITEM, CHARACTER, TRAIT, and SETTING in the tlts
-    generate_classes(tree)
+	# create the classes for each ITEM, CHARACTER, TRAIT, and SETTING in the tlts
+	generate_classes(tree)
 
-    # create the while loop that asks the user for inputs
-    generate_game(tree)
+	# create the while loop that asks the user for inputs
+	generate_game(tree)
 
