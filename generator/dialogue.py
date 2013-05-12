@@ -6,7 +6,7 @@ class Dialogue():
         self.labels = {}
         self.parse_using_file(); #Create the dialogue map from the text file
 
-        ###
+        #1#
         self.labels['label_a'] = self.label_a
         self.labels['label_b'] = self.label_b
 
@@ -49,8 +49,8 @@ class Dialogue():
 
     pass
 
-    #Generate all those functions
-    ############
+    #Generate all below functions
+    #2#
     def label_a(self):
         if self.last_input == "1":
             self.goto('label_b')
@@ -65,6 +65,5 @@ class Dialogue():
 
     def label_c(self):
         pass
-    ############
 
 Dialogue('text.txt').start_dialogue('label_a')
