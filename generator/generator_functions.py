@@ -16,16 +16,13 @@ class FunctionGenerator():
     #settings[player.location].characters[%s] %last
     def resolve_target(self, target_list):
         target_list = list(target_list)
-        last = target_list[0]
-        if last == 'OBJ':
+        if target_list[0] == 'OBJ':
             target_list = target_list[1:]
-            last = target_list[0]
-            target_list[0] = 'settings[player.location].characters[%s]' %last
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
-        elif last == 'PLAYER':
+        if target_list[0] == 'PLAYER':
             target_list[0] = 'player'
-        elif last == 'LOCATION':
+        elif target_list[0] == 'LOCATION':
             target_list[0] = 'settings[player.location]'
         target_string = '.'.join(target_list)
         return target_string
