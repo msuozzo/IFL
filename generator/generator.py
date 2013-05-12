@@ -247,9 +247,15 @@ while True:
 		noun = tmp[1]
 
 		if action == "inspect":
+			if player.location == noun:
+				print settings[player.location].description
+
 			for k, v in settings[player.location].characters.iteritems():
 				if k == noun:
-					print k.description
+					print v.description
+				else:
+					if noun in v.items:
+						print v.items[noun][0].description
 			for k, v in settings[player.location].items.iteritems():
 				if k == noun:
 					if hasattr(v[0], 'description'):
