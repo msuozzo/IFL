@@ -246,7 +246,14 @@ while True:
 		action = tmp[0]
 		noun = tmp[1]
 
-		if input in player.action_list:
+        if action == "inspect":
+            for k, v in settings[player.location].characters.iteritems():
+                if k == noun:
+                    print k.description
+            for k, v in settings[player.location].items.iteritems():
+                if k == noun:
+                    print k.description
+		elif input in player.action_list:
 
 			print "in player.action_list!"
 
@@ -262,8 +269,6 @@ while True:
 
 
 		elif input in settings[player.location].action_list:
-
-			print "in settings.action_list!"
 
 			# check if nonu is an item in current setting
 			if noun in settings[player.location].items:
