@@ -3,12 +3,15 @@ import os
 
 def suite(): 
   	suite = unittest.TestSuite()
-	suite.addTest(TestCase('test-1.py'))
-	suite.addTest(TestCase('test-2.py'))
-	suite.addTest(TestCase('test-3.py'))
-	suite.addTest(TestCase('test-4.py'))	
-	suite.addTest(TestCase('test-5.py'))
-	suite.addTest(TestCase('test-6.py'))
+	suite.addTest(TestCase('test1.ifl'))
+	suite.addTest(TestCase('test2.ifl'))
+	suite.addTest(TestCase('test3.ifl'))
+	suite.addTest(TestCase('test4.ifl'))	
+	suite.addTest(TestCase('test5.ifl'))
+	suite.addTest(TestCase('test6.ifl'))
+	suite.addTest(TestCase('test7.ifl')) 
+	suite.addTest(TestCase('test8.ifl')) 
+	suite.addTest(TestCase('test9.ifl'))
 	return suite
 
 class SuccessTest(unittest.TestCase): 
