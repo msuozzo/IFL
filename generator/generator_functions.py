@@ -136,7 +136,7 @@ class FunctionGenerator():
 
     def generate_initiate(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()
-        return "Dialogue(self.using).start_dialogue('{label}')".format(label=label)
+        return "Dialogue(self.using, settings, player, self).start_dialogue('{label}')".format(label=label)
 
     def generate_goto(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()
@@ -285,6 +285,7 @@ class FunctionGenerator():
                         output += "\t" + line + "\n"
 
         output = output.replace("LAST_INPUT", "self.last_input")
+        output = output.replace("player.", "self.player.")
         print output
         return output
             #replace with self.last_input
