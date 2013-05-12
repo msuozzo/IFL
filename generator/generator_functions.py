@@ -106,11 +106,19 @@ class FunctionGenerator():
         for (counter,arg) in enumerate(node.args):
             for argArg in arg:
                 if counter == 0:
-                    param = param + argArg[1]
+                    if argArg[0] == "OBJ":
+                        tempTarg = self.resolve_target(argArg[1:])
+                        param = param + tempTarg
+                    else:
+                        param = param + argArg[1]
                 else:
-                    param = param + "," + argArg[1]
+                    if argArg[0] == "OBJ":
+                        tempTarg = self.resolve_target(argArg[1:])
+                        param = param + "," + tempTarg
+                    else:
+                        param = param + "," + argArg[1]
 
-        return_stmt = "" + target + "({param})\n".format(param=param)
+        return_stmt = "" + target + "({param},settings,player)\n".format(param=param)
         return return_stmt
 
     # creates code for increase
