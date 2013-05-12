@@ -154,8 +154,6 @@ def generate_game(tree):
     file.write(characters_string)
     file.write(character_initialization)
 
-
-
     # main body of the game file begins here
     main = """
 while True:
@@ -239,6 +237,9 @@ while True:
 				for k, v in settings[player.location].characters.iteritems():
 				    if k != "player" and noun in k.items:
 				        getattr(k.items[noun][0], action)(settings, player)
+
+		else:
+		    print "Can't %s" % input
 
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
