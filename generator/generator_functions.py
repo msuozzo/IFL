@@ -127,14 +127,14 @@ class FunctionGenerator():
     # creates code for increase
     def generate_increase(self, node):
         target = self.resolve_target(node.target)
-        return_stmt = "" + target + "+=" + self.parse_expr(node.val)
+        return_stmt = "" + target + "+=float(" + self.parse_expr(node.val) + ")"
 
         return return_stmt
 
     # creates code for decrease
     def generate_decrease(self, node):
         target = self.resolve_target(node.target)
-        return_stmt = "" + target + "-=" + self.parse_expr(node.val)
+        return_stmt = "" + target + "-=float(" + self.parse_expr(node.val) + ")"
 
         return return_stmt
 
