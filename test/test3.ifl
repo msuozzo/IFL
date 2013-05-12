@@ -1,7 +1,6 @@
-
 ITEM Medicine:
-  START: 
-		ADD {INTEGER heal_value = 25}
+	START: 
+		ADD {INTEGER heal_value = 25} TO SELF
 	ACTIONS: 
 		"get" 
 			REMOVE medicine FROM LOCATION ON medicine
