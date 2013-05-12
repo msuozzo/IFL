@@ -107,9 +107,9 @@ class FunctionGenerator():
         args = []
 
         for arg in node.args:
-            if type(arg[0]) == str:
-                args.append("'" + arg[0] + "'")
-            elif arg[0] == 'LIT':
+            if type(arg[0]) == str and len(arg) == 1:
+                args.append("'" + arg[1] + "'")
+            if arg[0] == 'LIT':
                 args.append(arg[1])
             else:
                 args.append(self.resolve_target(arg[0]))
