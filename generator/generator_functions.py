@@ -131,10 +131,11 @@ class FunctionGenerator():
         return return_stmt
 
     def generate_using(self, node):
-        return "pass\n"
+        return "self.using={filename}".format(filename=node.filename)
 
     def generate_initiate(self, node):
-        return "pass\n"
+        label = node.label.replace('#', '').replace(' ', '_').lower()
+        return "Dialogue(self.using).start_dialogue('{label}')".format(label=label)
 
     def generate_goto(self, node):
         label = node.label.replace('#', '').replace(' ', '_').lower()
@@ -274,15 +275,14 @@ class FunctionGenerator():
             if line.strip() == "#1#": #Start generating labels here
                 for lab in node:
                     lab = lab.label.replace('#', '').replace(' ', '_').lower()
-                    theLabels = theLabels + "self.labels['{label}'] = self.{label}\n".format(label=lab)
-                print theLabels
+                    theLabels = theLabels + "\t\tself.labels['{label}'] = self.{label}\n".format(label=lab)
+                output += theLabels
             elif line.strip() == "#2#":
                 for dialogue_node in node:
                     s = self.generate_label(dialogue_node)
                     for line in s.splitlines():
                         output += "\t" + line + "\n"
-                    print output
 
-        for line in output:
-            pass
+        output = output.replace("LAST_INPUT", "self.last_input")
+        print output
             #replace with self.last_input
