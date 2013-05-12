@@ -25,8 +25,11 @@ ITEM apple:
 		ADD {INTEGER experience_value=5} TO SELF
 	ACTIONS:
 		"get":
-			REMOVE apple FROM LOCATION
-			ADD apple TO PLAYER
+			IF LOCATION HAS apple:
+				REMOVE apple FROM LOCATION
+				ADD apple TO PLAYER
+			ELSE:
+				PRINT "Sorry, no apples left."
 
 		"eat":
 			IF PLAYER HAS apple:
