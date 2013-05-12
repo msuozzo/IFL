@@ -33,16 +33,19 @@ ITEM apple:
 				EXECUTE update ON health ON PLAYER WITH 100
 				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
 				REMOVE apple FROM PLAYER
+				PRINT "You ate an apple"
+			ELSE:
+				PRINT "You don't have an apple!"
 
 SETTING house:
 	"You are at the house."
 	START:
 		ADD apple TO SELF
-		ADD maid TO SELF
 
 CHARACTER maid:
 	START:
 		ADD {INTEGER max=10} TO SELF
+		MOVE SELF TO house
 
 CHARACTER PLAYER:
 	START:

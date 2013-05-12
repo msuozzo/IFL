@@ -43,7 +43,7 @@ class FunctionGenerator():
         return '(' + return_stmt + ')'
 
     def generate_print(self, node):
-        return "print \"" + node.string_expr[0] + "\"\n"
+        return "print \"" + node.string_expr + "\"\n"
 
     #TODO test if add and set work for strings and decimals, differentiate between strings and ints
     def generate_add(self, node):

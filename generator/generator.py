@@ -73,11 +73,10 @@ def generate_classes(tree):
             FG = FunctionGenerator(node.id_, tree)
             FG.generate_dialogue(node.dialogues)
 
+        # add a characters dictionary to SETTING
         if node.type_ == "SETTING":
-            function_string += """
+            constructor_string += "\t\tself.characters = {}\n"
 
-
-"""
         # create the _update_() method that updates all of the action_lists
         if node.type_ != "TRAIT":
             constructor_string += "\t\tself._update_()\n"
@@ -116,19 +115,49 @@ def generate_game(tree):
 
     # loop through all of the Definition Nodes in the tlts and add the appropriate imports
     # also initialize any settings that are available and add them to a dictionary called settings
-    settings = "\nsettings = {}\n"
+
+    # loop through all of the definition nodes and add the appropriate imports, initialize settings
+    # and characters, and create a list of all the traits and characters
+    traits = []
+    characters = []
+    settings = []
+
     for node in tree.tlts:
         file.write("from %s import *\n" % node.id_)
         if node.type_ == "SETTING":
-            # ex: settings['house'] = House()
-            settings = settings + "settings['%s'] = %s()\n" %(node.id_, node.id_.title())
+            settings.append(node.id_)
+        if node.type_ == "TRAIT":
+            traits.append(node.id_)
+        if node.type_ == "CHARACTER":
+            characters.append(node.id_.lower())
 
-    file.write(settings)
+    settings_string = "\nsettings = {}\n"
+    for s in settings:
+        # ex: settings['house'] = House()
+        settings_string += "settings['%s'] = %s()\n" %(s, s.title())
+
+    traits_string = "traits = ["
+    for t in traits:
+        traits_string += "\"" + t + "\","
+    traits_string += "]\n"
+
+    characters_string = "characters = ["
+    character_initialization = ""
+    for c in characters:
+        characters_string += "\"" + c + "\","
+        character_initialization += "%s = %s()\n" %(c, c.title())
+        character_initialization += "settings[%s.location].characters['%s'] = %s\n" %(c, c, c)
+    characters_string += "]\n"
+
+    file.write(settings_string)
+    file.write(traits_string)
+    file.write(characters_string)
+    file.write(character_initialization)
+
+
 
     # main body of the game file begins here
     main = """
-player = Player()
-
 while True:
 	if player.location is not None:
 		print "\\nYou are at a " + settings[player.location].description
@@ -158,6 +187,11 @@ while True:
 	elif input == "traits":
 		traits_string = "You have the following traits:\\n"
 
+		attributes = vars(player)
+		for a in attributes:
+			if a in traits:
+				traits_string += "trait: " + a + "\\n"
+
 		print traits_string
 
 	elif input == "inspect":
@@ -166,7 +200,12 @@ while True:
 		else:
 			inspect_string = "You see the following items in the %s: " % player.location
 			for k, v in settings[player.location].items.iteritems():
-				inspect_string += "'" + k + "' "
+				inspect_string += k + " "
+
+			inspect_string += "\\nYou see the following characters in the %s: " % player.location
+			for k, v in settings[player.location].characters.iteritems():
+				if k != "player":
+					inspect_string += k + " "
 
 		print inspect_string
 
@@ -179,33 +218,37 @@ while True:
 		# searches through all of the available actions in items
 		# searches through the player first, then the setting
 
-		print "input is: " + input
-		print player.action_list
+		tmp = input.split()
+		action = tmp[0]
+		noun = tmp[1]
 
 		if input in player.action_list:
 
 			print "in player.action_list!"
 
-			input = input.split()
-			action = input[0]
-			noun = input[1]
-
-			print "action: " + action
-			print "noun: " + noun
-
 			if noun in player.items:
 				getattr(player.items[noun][0], action)(settings, player)
 
-			print "ENDEND"
+		elif input in settings[player.location].action_list:
 
+			print "in settings.action_list!"
+
+			if noun in settings.items:
+				getattr(settings.items[noun][0], action)(settings, player)
+			else:
+				for k, v in settings[player.location].characters.iteritems():
+				    if k != "player" and noun in k.items:
+				        getattr(k.items[noun][0], action)(settings, player)
 
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
 
 
 	# updating all of actions_list in player and setting
-	player._update_()
+	for k, v in settings[player.location].characters.iteritems():
+		v._update_()
 
+	settings[player.location]._update_()
         """
 
     file.write(main)
