@@ -300,7 +300,10 @@ while True:
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
 
-	# update all of the players in their respectively locations
+	# update all of the players in their respectively locations by first removing the characters in each setting
+	for k, v in settings.iteritems():
+		v.characters.clear()
+
 """
 
 	for line in character_setup.splitlines():
