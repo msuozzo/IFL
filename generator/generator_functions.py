@@ -30,7 +30,7 @@ class FunctionGenerator():
             target_list[0] = "settings[player.location].characters['%s']" %target_list[0]
 
         if target_list == ['player', 'LOCATION']:
-            target_list[0] = 'settings[player.location]'
+            target_list = ['settings[player.location]']
 
         target_string = '.'.join(target_list)
         return target_string
