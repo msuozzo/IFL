@@ -20,13 +20,11 @@ class FunctionGenerator():
 
         if target_list[0] == 'LIT':
             return target_list[1]
-
-        if target_list[0] == 'OBJ':
+        if target_list[0] == 'OBJ': #It is an object chain, strip out the first word
             target_list = target_list[1:]
-
         if target_list[0] == self.id_ or target_list[0] == 'SELF':
             target_list[0] = 'self'
-        if target_list[0] == 'PLAYER':
+        elif target_list[0] == 'PLAYER':
             target_list[0] = 'player'
         elif target_list[0] == 'LOCATION':
             target_list[0] = 'settings[player.location]'
@@ -105,7 +103,6 @@ class FunctionGenerator():
     # generates code for execute statement
     def generate_execute(self, node):
         function = self.resolve_target(node.func)
-        param = ""
         args = []
 
         for arg in node.args:
