@@ -1,4 +1,0 @@
-IFL
-===
-
-PLT Language Project
