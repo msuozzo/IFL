@@ -87,15 +87,17 @@ def generate_classes(tree):
             function_string += """
 	def _update_(self):
 		for attribute in vars(self):
-			if hasattr(attribute, "action_list"):
-			    self.action_list.append(attribute.action_list)
-			    self.action_list = list(set(self.action_list))
+			if hasattr(getattr(self, attribute), "action_list"):
+			    self.action_list.extend(getattr(self, attribute).action_list)
 """
         # allow characters and settings to update their items as well
         if node.type_ == "SETTING" or node.type_ == "CHARACTER":
             function_string += """
 		for v in self.items.values():
 			self.action_list.extend(v[0].action_list)
+
+		# need to go through its own actions and add them to its action list
+
 """
 
 
@@ -159,6 +161,10 @@ def generate_game(tree):
 
     # main body of the game file begins here
     main = """
+
+for k, v in settings.iteritems():
+	v._update_()
+
 while True:
 	if player.location is not None:
 		print "\\nYou are at a " + settings[player.location].description
@@ -227,22 +233,34 @@ while True:
 
 			print "in player.action_list!"
 
-			if noun in player.items:
+			# check if it is an action in player
+			attributes = dir(player)
+			if noun in attributes:
+				getattr(player, action)(settings, player)
+
+			# check if it is an action in one of player's items
+			elif noun in player.items:
 				getattr(player.items[noun][0], action)(settings, player)
+
+
 
 		elif input in settings[player.location].action_list:
 
 			print "in settings.action_list!"
 
-			if noun in settings.items:
-				getattr(settings.items[noun][0], action)(settings, player)
+			# check if nonu is an item in current setting
+			if noun in settings[player.location].items:
+				getattr(settings[player.location].items[noun][0], action)(settings, player)
 			else:
+				# check if noun is an action in one of the characters in the current setting
 				for k, v in settings[player.location].characters.iteritems():
-				    if k != "player" and noun in k.items:
-				        getattr(k.items[noun][0], action)(settings, player)
+					if k == noun:
+						getattr(v, action)(settings, player)
+					elif k != "player" and noun in v.items:
+						getattr(v.items[noun][0], action)(settings, player)
 
 		else:
-		    print "Can't %s" % input
+			print "Can't %s" % input
 
 	else:
 		print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
