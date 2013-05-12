@@ -38,7 +38,7 @@ ITEM apple:
 				EXECUTE update ON health ON PLAYER WITH 100
 				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
 				REMOVE apple FROM PLAYER
-				PRINT "You ate an apple"
+				PRINT "You ate an apple."
 			ELSE:
 				PRINT "You don't have an apple!"
 
