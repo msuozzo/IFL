@@ -30,7 +30,6 @@ ITEM apple:
 
 		"eat":
 			IF PLAYER HAS apple:
-				EXECUTE update ON health ON PLAYER WITH healing_value ON SELF
 				EXECUTE update ON health ON PLAYER WITH 100
 				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
 				REMOVE apple FROM PLAYER

@@ -73,18 +73,12 @@ def generate_classes(tree):
             FG = FunctionGenerator(node.id_, tree)
             FG.generate_dialogue(node.dialogues)
 
-        # add the action_list of all the items and characters in SETTING to SETTING.action_list
         if node.type_ == "SETTING":
-            constructor_string += """
-		for v in self.items.values():
-			self.action_list.extend(v[0].action_list)
+            function_string += """
 
-		for a in vars(self):
-			if hasattr(a, "action_list"):
-				self.action_list.extend(a.action_list)
 
 """
-
+        # create the _update_() method that updates all of the action_lists
         if node.type_ != "TRAIT":
             constructor_string += "\t\tself._update_()\n"
 
@@ -94,7 +88,6 @@ def generate_classes(tree):
 			if hasattr(a, "action_list"):
 				self.action_list.extend(a.action_list)
 """
-
         # add a update method to characters and settings
         if node.type_ == "SETTING" or node.type_ == "CHARACTER":
             function_string += """
@@ -202,6 +195,8 @@ while True:
 
 			if noun in player.items:
 				getattr(player.items[noun][0], action)(settings, player)
+
+			print "ENDEND"
 
 
 	else:
