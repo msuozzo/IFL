@@ -100,7 +100,7 @@ class FunctionGenerator():
     # generates code for move statement
     def generate_move(self, node):
         target = self.resolve_target(node.target)
-        return "" + target + ".location = '" + node.new_loc[1].lower() + "'\n"
+        return "" + target + ".location = '" + node.new_loc[0].lower() + "'\n"
 
     # generates code for execute statement
     def generate_execute(self, node):
@@ -227,7 +227,7 @@ class FunctionGenerator():
                     s = self.generate_statement(stmt)
                     for line in s.splitlines():
                         output += "\t" + line + "\n"
-            elif counter == len(cases) - 1 and True:
+            elif counter == len(cases) - 1 and conditional[0] == 'TRUE':
                 else_stmt_list = cases[-1][1]
                 output += 'else:\n'
                 for stmt in else_stmt_list:
