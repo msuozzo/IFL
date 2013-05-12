@@ -97,7 +97,7 @@ class FunctionGenerator():
             return_stmt = \
                 "if '{id_}' in {target}.items:\n" \
                     "\t{target}.items['{id_}'][1] = {original_count} - {quantity}\n" \
-                    "\tif {target}.items['{id_}'][1] < 0:\n" \
+                    "\tif {target}.items['{id_}'][1] <= 0:\n" \
                         "\t\t{target}.items.pop('{id_}')\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant)
         else:
             attr = node.id_
@@ -129,7 +129,11 @@ class FunctionGenerator():
     # creates code for increase
     def generate_increase(self, node):
         target = self.resolve_target(node.target)
-        return_stmt = "" + target + "+=float(" + self.parse_expr(node.val) + ")"
+        val = self.parse_expr(node.val)
+        if type(val) == int:
+            return_stmt = "" + target + "+=int(" + self.parse_expr(node.val) + ")"
+        else:
+            return_stmt = "" + target + "+=float(" + self.parse_expr(node.val) + ")"
 
         return return_stmt
 

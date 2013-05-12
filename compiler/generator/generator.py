@@ -249,20 +249,20 @@ while True:
 
 		if action == "inspect":
 			done = 0
-			if player.location == noun:
+			if player.location == noun and done == 0:
 				print settings[player.location].description
 				done = 1
 
 			for k, v in settings[player.location].characters.iteritems():
-				if k == noun:
+				if k == noun and done == 0:
 					print v.description
 					done = 1
 				else:
-					if noun in v.items:
+					if noun in v.items and done == 0:
 						print v.items[noun][0].description
 						done = 1
 			for k, v in settings[player.location].items.iteritems():
-				if k == noun:
+				if k == noun and done == 0:
 					if hasattr(v[0], 'description'):
 						print v[0].description
 						done = 1

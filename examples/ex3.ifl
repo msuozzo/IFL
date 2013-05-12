@@ -15,11 +15,11 @@ TRAIT experience:
 	FUNCTIONS:
 		update WITH amount:
 			INCREASE current ON SELF BY amount
-			IF (3+5)*4 > 5:
+			IF current ON SELF > current ^ 2:
 				INCREASE level ON SELF BY 3
 				DECREASE multiplier ON SELF BY multiplier ON SELF * 0.33
 				PRINT "You gained a level!"
-				PRINT "You are now level "
+				PRINT "You are now level " . level ON SELF
 ITEM apple:
 	"shiny red apple"
 	START:
@@ -39,6 +39,7 @@ ITEM apple:
 				EXECUTE update ON health ON PLAYER WITH "777"
 				EXECUTE update ON experience ON PLAYER WITH experience_value ON SELF
 				REMOVE apple FROM PLAYER
+				PRINT "You ate the apple!" . " Congratulations again!"
 			ELSE:
 				PRINT "Sorry, you have no apples."
 CHARACTER maid:
