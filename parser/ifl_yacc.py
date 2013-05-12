@@ -138,8 +138,12 @@ def generate_parser(lexer, tokens):
                  | execute
                  | goto
                  | using
-                 | EXIT'''
+                 | exit'''
     p[0] = p[1]
+
+  def p_exit(p):
+    '''exit : EXIT'''
+    p[0] = (p[1],)
 
   def p_conditional(p):
     '''conditional : IF tf_expression COLON statement_list END_BLOCK else_if_conditional else_conditional'''
@@ -277,7 +281,7 @@ def generate_parser(lexer, tokens):
                      | LPAREN tf_expression RPAREN
                      | tf_literal'''
     if len(p) == 4:
-      if p[1] == '(': p[0] = (p[2],)
+      if p[1] == '(': p[0] = (p[1], p[2])
       else: p[0] = (p[2], p[1], p[3])
     elif len(p) == 3: p[0] = (p[1], p[2])
     elif len(p) == 2: p[0] = p[1]
