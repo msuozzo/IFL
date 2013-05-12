@@ -1,0 +1,1 @@
+Place your .ifl files as well as your corresponding dialogue files in this directory.
