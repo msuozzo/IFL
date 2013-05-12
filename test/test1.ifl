@@ -1,13 +1,13 @@
 TRAIT Heatlth: 
   START: 
-		ADD{INTEGER max = 200}
+		ADD{INTEGER max = 200} TO SELF
 	FUNCTION: 
 		update1 WITH amount: 
-			INCREASE current BY amount
-			IF current > max: 
-				SET current TO max
+			INCREASE current ON SELF BY amount
+			IF current > max ON SELF: 
+				SET current ON SELF TO max ON SELF
 
 		update2 WITH amount: 
-			DECREASE current BY amount
+			DECREASE current ON SELF BY amount
 			IF current < 0 
-				SET current TO 0 
+				SET current ON SELF TO 0 ON SELF 
