@@ -146,6 +146,8 @@ class FunctionGenerator():
         except ValueError:
             return_stmt = "" + target + "-=float(" + self.parse_expr(node.val) + ")"
 
+        return return_stmt
+
     def generate_using(self, node):
         return "self.using='{filename}'".format(filename=node.filename)
 
