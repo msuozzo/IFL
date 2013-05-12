@@ -45,7 +45,7 @@ def generate_classes(tree):
 
         # create a list of actions if there is any and append them to the action_list
         if node.type_ != "TRAIT":
-            constructor_string += "\t\tself.action_list = []\n"
+            constructor_string += "\t\tself.default_action_list = []\n"
 
         action_string = ""
         if len(node.actions) > 0:
@@ -54,7 +54,7 @@ def generate_classes(tree):
                 s = FG.generate_action(a.action_phrase, a.statements)
                 for line in s.splitlines():
                     action_string += "\t" + line + "\n"
-                constructor_string += "\t\tself.action_list.append('%s %s')\n" % (a.action_phrase, node.id_)
+                constructor_string += "\t\tself.default_action_list.append('%s %s')\n" % (a.action_phrase, node.id_)
 
 
         # create a list of functions if there is any
@@ -86,21 +86,23 @@ def generate_classes(tree):
 
             function_string += """
 	def _update_(self):
+		self.action_list = []
+		self.action_list.extend(self.default_action_list)
 		for attribute in vars(self):
-			if hasattr(getattr(self, attribute), "action_list"):
-			    self.action_list.extend(getattr(self, attribute).action_list)
+			n = getattr(self, attribute)
+			if hasattr(n, "action_list"):
+				for a in n.action_list:
+					if a not in self.action_list:
+						self.action_list.append(a)
 """
         # allow characters and settings to update their items as well
         if node.type_ == "SETTING" or node.type_ == "CHARACTER":
             function_string += """
 		for v in self.items.values():
-			self.action_list.extend(v[0].action_list)
-
-		# need to go through its own actions and add them to its action list
-
+			for a in v[0].action_list:
+				if a not in self.action_list:
+					self.action_list.append(a)
 """
-
-
         file.write(import_string)
         file.write(class_string)
         file.write(constructor_string)
@@ -198,6 +200,8 @@ while True:
 		for a in attributes:
 			if a in traits:
 				traits_string += "trait: " + a + "\\n"
+
+				# need to allow user to print more stuff
 
 		print traits_string
 
