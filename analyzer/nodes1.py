@@ -215,7 +215,7 @@ def self_replace(lst, tlt_name):
 def deep_sub_self(lst, tlt_name, new_lst=[]):
   for elem in lst:
     if isinstance(elem, tuple):
-      if elem[0] == "OBJ": new_lst.append(tuple([tlt_name if e=="SELF" else e for e in elem]))
+      if len(elem) > 0 and elem[0] == "OBJ": new_lst.append(tuple([tlt_name if e=="SELF" else e for e in elem]))
       else:
         new = []
         deep_sub_self(elem, tlt_name, new)
