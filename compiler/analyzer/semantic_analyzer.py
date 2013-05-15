@@ -50,7 +50,7 @@ def type_check(stat, type_map, tlt_name_map):
         prim_type = stat.primitive.type_
         if prim_type in ["INTEGER", "DECIMAL"]: arithmetic_check(stat.primitive.val, prim_type, type_map)
         elif prim_type == "BOOLEAN": boolean_check(stat.primitive.val, type_map)
-        elif prim_type_ == "STRING": string_check(stat.primitive.val, type_map)
+        elif prim_type == "STRING": string_check(stat.primitive.val, type_map)
       else:
         if stat.quant <= 0: raise CompilationException("invalid quantity to add: " + stat.quant)
         target_type = get_name(stat.to, type_map)
