@@ -10,7 +10,7 @@ lexer, tokens = generate_lexer()
 
 parser = generate_parser(lexer, tokens)
 data = open(sys.argv[1]).read()
-#data = open('examples/ex3.ifl').read()
+#data = open('examples/ifl.txt').read()
 cleaned_data = '\n'.join(clean_input(data))
 
 lexer.input(cleaned_data)
@@ -19,7 +19,7 @@ while True:
     tok = lexer.token()
     if not tok: break
 
-tree = parser.parse(cleaned_data)
+tree = parser.parse(cleaned_data, debug=0)
 
 t = gen_tree(tree)
 

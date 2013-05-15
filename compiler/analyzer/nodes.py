@@ -41,6 +41,7 @@ class Program:
     self.def_names.setdefault("PLAYER", [])
     self.def_types["PLAYER.LOCATION"] = "SETTING"
     self.def_names["PLAYER"].append("LOCATION")
+    self.def_types["LAST_INPUT"] = "STRING"
 
 
   def validate_defs(self):
@@ -77,7 +78,7 @@ class TLT:
     self.type_ = type_
     self.id_ = id_
     self.desc = desc if desc else gen_desc(type_, id_)
-    self.start = [stat_or_cond(tup, self.id_) for tup in start[1]]
+    self.start = [stat_or_cond(tup, self.id_) for tup in start[1]] if start else []
     self.actions = [Action(tup, self.id_) for tup in action[1]] if action else []
     self.functions = [Function(tup, self.id_) for tup in function[1]] if function else []
     self.dialogues = [Dialogue(tup, self.id_) for tup in dialogue[1]] if dialogue else []
@@ -183,7 +184,7 @@ class Conditional(Statement):
 class Function:
   def __init__(self, tup, tlt_name):
     self.name = tup[0]
-    self.arg_names = tup[1]
+    self.arg_names = tup[1] if tup[1] else []
     self.statements = [stat_or_cond(stat, tlt_name) for stat in tup[2]]
     self.get_add_fields = lambda: get_add_fields(self.statements)
  

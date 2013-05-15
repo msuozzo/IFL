@@ -42,18 +42,25 @@ class Dialogue:
 				print choice
 			self.last_input = raw_input(">>")
 			a = len(self.dialogue_map[label])
+			check_lst = []
+			for choice in self.dialogue_map[label]:
+				check_lst.append(choice.rsplit(")", 1)[0].strip("("))
 			while True:
 				try:
-					int(self.last_input) #test if is integer input
-					if int(self.last_input) not in range(1, len(self.dialogue_map[label])):
-						raise ValueError
-					self.labels[label]()
+					if self.last_input not in check_lst: raise ValueError
+					# int(self.last_input) #test if is integer input
+					# if int(self.last_input) not in range(1, len(self.dialogue_map[label])):
+					# 	raise ValueError
+					self.labels[label](self.settings, self.player)
 					break
 				except ValueError:
 					print "Invalid choice entered, please try again"
 					self.last_input = raw_input(">>")
 		except KeyError:
 			raise Exception #TODO Label in dialogue doesn't exist
+		except KeyboardInterrupt:
+			print ""
+			import sys; sys.exit(0)
 
 	#Generate label functions below
 	#2#

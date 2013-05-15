@@ -16,7 +16,7 @@ else
 		cp examples/*.txt game/
 		python compiler.py examples/ex3.ifl
 	else
-		[ -f ./souce/*.txt ] && cp ./source/*.txt game/
+		cp ./source/* game/
 		python compiler.py $1
 	fi
 

@@ -1,6 +1,5 @@
 SETTING house:
 	"A House"
-	START:
 CHARACTER PLAYER:
 	START:
 		MOVE SELF TO house

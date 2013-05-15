@@ -27,19 +27,19 @@ def generate_parser(lexer, tokens):
     p[0] = p[1]
 
   def p_trait_definition(p):
-    'trait_definition : TRAIT ID COLON desc_or_nothing s_directive f_or_nothing END_BLOCK'
+    'trait_definition : TRAIT ID COLON desc_or_nothing s_or_nothing f_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], None, p[6])
 
   def p_character_definition(p):
-    'character_definition : CHARACTER ID COLON desc_or_nothing s_directive a_or_nothing f_or_nothing d_or_nothing END_BLOCK'
+    'character_definition : CHARACTER ID COLON desc_or_nothing s_or_nothing a_or_nothing f_or_nothing d_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], p[6], p[7], p[8])
 
   def p_setting_definition(p):
-    'setting_definition : SETTING ID COLON desc_or_nothing s_directive END_BLOCK'
+    'setting_definition : SETTING ID COLON desc_or_nothing s_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5])
 
   def p_item_definition(p):
-    'item_definition : ITEM ID COLON desc_or_nothing s_directive a_or_nothing f_or_nothing END_BLOCK'
+    'item_definition : ITEM ID COLON desc_or_nothing s_or_nothing a_or_nothing f_or_nothing END_BLOCK'
     p[0] = (p[1], p[2], p[4], p[5], p[6], p[7])
 
   def p_desc_or_nothing(p):
@@ -55,6 +55,11 @@ def generate_parser(lexer, tokens):
 #    '''id_or_player : ID
 #                    | PLAYER'''
 #    p[0] = p[1]
+
+  def p_s_or_nothing(p):
+    '''s_or_nothing : s_directive
+                    | empty'''
+    p[0] = p[1]
 
   def p_s_directive(p):
     's_directive : START COLON start_list END_BLOCK'

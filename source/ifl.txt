@@ -1,0 +1,120 @@
+CHARACTER John:
+	START:
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			PRINT "Hi, I am the program manager"
+CHARACTER Matthew:
+	START:
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			PRINT "Hi, I am the Language Guru"
+CHARACTER Michael:
+	START:
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			PRINT "Hi, I am the System Architect"
+CHARACTER Qian:
+	START:
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			PRINT "Hi, I am the System Integrator"
+CHARACTER Heather:
+	START:
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			PRINT "Hi, I am the System Tester"
+
+		
+CHARACTER Hobson:
+	"This is an infinite loop, I will present you with Hobson's choice"
+	START:
+		USING "dialogue.txt"
+		MOVE SELF TO IFL
+	FUNCTIONS:
+		getout:
+			INITIATE DIALOGUE AT #LABEL A#
+	DIALOGUE:
+		#LABEL A#:
+			IF LAST_INPUT EQUALS "1":
+				GOTO #LABEL A#		
+
+ITEM key:
+	ACTIONS:
+		"pick":
+			ADD key TO PLAYER
+			PRINT "You got a key!"
+
+ITEM lock:
+	ACTIONS:
+		"open":
+			IF PLAYER HAS key:
+				PRINT "Welcome to IFL"
+				MOVE PLAYER TO IFL
+				REMOVE key FROM PLAYER
+			ELSE:
+				PRINT "Sorry, you don't have the key"
+
+CHARACTER merlin:
+	START:
+		USING "dialogue.txt"
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			INITIATE DIALOGUE AT #LABEL D#
+	DIALOGUE:
+		#LABEL D#:
+			IF LAST_INPUT EQUALS "1":
+				EXECUTE getout ON Hobson
+			ELSE:
+				EXIT	
+
+SETTING IFL:
+	"Interactive Fiction Language"
+	START:
+
+
+CHARACTER narrator:
+	START:
+		USING "dialogue.txt"
+		MOVE SELF TO IFL
+	ACTIONS:
+		"talk":
+			INITIATE DIALOGUE AT #LABEL B#
+	DIALOGUE:
+		#LABEL B#:
+			EXECUTE change_name ON PLAYER WITH LAST_INPUT
+			SET name ON PLAYER TO LAST_INPUT
+			PRINT "Hi " . name ON PLAYER
+			PRINT "IFL has characters, items, traits and settings, these are the TOP LEVEL TYPES"
+			PRINT "The language is designed keeping to have simple English phrases describe what you wanna do, but the language has all features of a programming language like functions and the \"dialogues\" can even simulate any finite state machine"
+			GOTO #LABEL C#
+		#LABEL C#:
+			IF LAST_INPUT EQUALS "1":
+				PRINT "Thanks for having coffee"
+				EXIT
+			ELSE:
+				PRINT "ok, bye"
+				EXIT	  
+
+SETTING main:
+	START:
+		ADD key TO SELF
+		ADD lock TO SELF
+
+CHARACTER PLAYER:
+	START:
+		ADD {STRING name="N/A"} TO SELF		
+		MOVE SELF TO main
+	ACTIONS:
+		"use_secret_passage":
+			MOVE SELF TO IFL
+	FUNCTIONS:	
+		change_name WITH new_name:
+			SET name ON SELF TO new_name
+
+

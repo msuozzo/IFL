@@ -1,0 +1,21 @@
+#LABEL A
+You are stuck in a loop, want to remain stuck?
+(1) Yes
+
+#LABEL B
+What's your name?
+(John)
+(Qian)
+(Michael)
+(Matthew)
+(Heather)
+
+#LABEL C
+Would you like some coffee ?
+(1) Yes
+(2) No
+
+#LABEL D
+Would you like to be trapped inside a loop?
+(1) Yes
+(2) No

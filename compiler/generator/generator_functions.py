@@ -66,7 +66,7 @@ class FunctionGenerator():
 			return_stmt = "{target}.{attr} = {value}".format(target=target, attr=attr, value=val)
 		elif self.get_type(node.id_) == 'ITEM':
 			original_count = "{target}.items['{id_}'][1]".format(target=target, id_=node.id_)
-			new_thing = node.id_.capitalize() + "()"
+			new_thing = node.id_ + "()"
 			return_stmt =\
 				"if '{id_}' in {target}.items:\n" \
 					"\t{target}.items['{id_}'][1] = {original_count} + {quantity}\n" \
@@ -74,7 +74,7 @@ class FunctionGenerator():
 					"\t{target}.items['{id_}'] = [{new_item}, {quantity}]\n".format(target=target, id_=node.id_, original_count = original_count, quantity=node.quant, new_item=new_thing)
 		else:
 			attr = node.id_
-			new_thing = node.id_.capitalize() + "()"
+			new_thing = node.id_ + "()"
 			return_stmt = "{target}.{attr} = {new_obj}".format(target=target, attr=attr, new_obj=new_thing)
 
 		return return_stmt
@@ -108,7 +108,7 @@ class FunctionGenerator():
 	# generates code for move statement
 	def generate_move(self, node):
 		target = self.resolve_target(node.target)
-		return "" + target + ".location = '" + node.new_loc[0].lower() + "'\n"
+		return "" + target + ".location = '" + node.new_loc[0] + "'\n"
 
 	# generates code for execute statement
 	def generate_execute(self, node):
@@ -123,7 +123,10 @@ class FunctionGenerator():
 			else:
 				args.append(self.resolve_target(arg[0]))
 
-		return_stmt = "{function}({args}, settings, player)".format(function=function, args=",".join(args))
+		if len(args) == 0:
+			return_stmt = "{function}(settings, player)".format(function=function)
+		else:
+			return_stmt = "{function}({args}, settings, player)".format(function=function, args=",".join(args))
 		return return_stmt
 
 	def generate_increase(self, node):
@@ -165,7 +168,7 @@ class FunctionGenerator():
 
 	def generate_label(self, node):
 		label = node.label.replace('#', '').replace(' ', '_').lower()
-		return_stmt = "def {label}(self):\n".format(label=label)
+		return_stmt = "def {label}(self, settings, player):\n".format(label=label)
 		for stmt in node.statements:
 			s = self.generate_statement(stmt)
 			for line in s.splitlines():

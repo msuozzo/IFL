@@ -120,6 +120,7 @@ def type_check(stat, type_map, tlt_name_map):
       func_name = None
       try: func_name = stat.func[-2:]
       except: raise CompilationException("full path to function needed")
+      stat.args = stat.args if stat.args else []
       expected_arguments = None
       for func in tlt_name_map[func_name[0]].functions:
         if func.name == func_name[1]:

@@ -17,7 +17,10 @@ def generate_classes(tree):
 				import_string += "from %s import *\n" % element.id_
 
 		# class declaration begins here
-		class_string = "\nclass %s:" % node.id_.title() + "\n"
+		if node.id_ == "PLAYER":
+			class_string = "\nclass %s:" % node.id_.lower() + "\n"
+		else:
+			class_string = "\nclass %s:" % node.id_ + "\n"
 
 		# constructor begins here
 		constructor_string = "\tdef __init__(self):\n"
@@ -30,7 +33,7 @@ def generate_classes(tree):
 
 		# add the description if it has any
 		if node.desc is not None:
-			constructor_string += "\t\tself.description = '%s'\n" % node.desc
+			constructor_string += "\t\tself.description = \"%s\"\n" % node.desc
 
 
 		# iterate through each statement in start and add it to constructor
@@ -54,7 +57,10 @@ def generate_classes(tree):
 				s = FG.generate_action(a.action_phrase, a.statements)
 				for line in s.splitlines():
 					action_string += "\t" + line + "\n"
-				constructor_string += "\t\tself.default_action_list.append('%s %s')\n" % (a.action_phrase, node.id_)
+				if node.id_ == "PLAYER":
+					constructor_string += "\t\tself.default_action_list.append('%s %s')\n" % (a.action_phrase, "player")
+				else:
+					constructor_string += "\t\tself.default_action_list.append('%s %s')\n" % (a.action_phrase, node.id_.lower())
 
 
 		# create a list of functions if there is any
@@ -88,6 +94,11 @@ def generate_classes(tree):
 	def _update_(self):
 		self.action_list = []
 		self.action_list.extend(self.default_action_list)
+		if hasattr(self, "characters"):
+		    for v in self.characters.values():
+		        if hasattr(v, "action_list"):
+		            self.action_list.extend(v.action_list)
+
 		for attribute in vars(self):
 			n = getattr(self, attribute)
 			if hasattr(n, "action_list"):
@@ -136,12 +147,15 @@ def generate_game(tree):
 		if node.type_ == "TRAIT":
 			traits.append(node.id_)
 		if node.type_ == "CHARACTER":
-			characters.append(node.id_.lower())
+			if node.id_ == "PLAYER":
+				characters.append(node.id_.lower())
+			else:
+				characters.append(node.id_)
 
 	settings_string = "\nsettings = {}\n"
 	for s in settings:
 		# ex: settings['house'] = House()
-		settings_string += "settings['%s'] = %s()\n" %(s, s.title())
+		settings_string += "settings['%s'] = %s()\n" %(s, s)
 
 	traits_string = "traits = ["
 	for t in traits:
@@ -153,7 +167,7 @@ def generate_game(tree):
 	character_setup = ""
 	for c in characters:
 		characters_string += "\"" + c + "\","
-		character_initialization += "%s = %s()\n" %(c, c.title())
+		character_initialization += "%s = %s()\n" %(c, c)
 		character_setup += "settings[%s.location].characters['%s'] = %s\n" %(c, c, c)
 	characters_string += "]\n"
 
@@ -182,7 +196,7 @@ while True:
 		if player.location in settings:
 			help_string += "The following actions are available: "
 			for action in settings[player.location].action_list:
-				help_string += "'" + action.split()[0] + "'; "
+				help_string += "'" + action + "'; "
 
 		print help_string
 
@@ -245,8 +259,12 @@ while True:
 		# searches through the player first, then the setting
 
 		tmp = input.split()
-		action = tmp[0]
-		noun = tmp[1]
+		if len(tmp) < 2:
+			print "Command not recognized. Please enter commands in the form of 'action noun' (ex: 'get apple')."
+			continue
+		else:
+			action = tmp[0]
+			noun = tmp[1]
 
 		if action == "inspect":
 			done = 0
@@ -274,7 +292,7 @@ while True:
 
 			# check if it is an action in player
 			attributes = dir(player)
-			if noun in attributes:
+			if action in attributes:
 				getattr(player, action)(settings, player)
 
 			# check if it is an action in one of player's items
