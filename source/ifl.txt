@@ -1,28 +1,28 @@
-CHARACTER John:
+CHARACTER john:
 	START:
 		MOVE SELF TO IFL
 	ACTIONS:
 		"talk":
 			PRINT "Hi, I am the program manager"
-CHARACTER Matthew:
+CHARACTER matthew:
 	START:
 		MOVE SELF TO IFL
 	ACTIONS:
 		"talk":
 			PRINT "Hi, I am the Language Guru"
-CHARACTER Michael:
+CHARACTER michael:
 	START:
 		MOVE SELF TO IFL
 	ACTIONS:
 		"talk":
 			PRINT "Hi, I am the System Architect"
-CHARACTER Qian:
+CHARACTER qian:
 	START:
 		MOVE SELF TO IFL
 	ACTIONS:
 		"talk":
 			PRINT "Hi, I am the System Integrator"
-CHARACTER Heather:
+CHARACTER heather:
 	START:
 		MOVE SELF TO IFL
 	ACTIONS:
@@ -44,6 +44,7 @@ CHARACTER Hobson:
 				GOTO #LABEL A#		
 
 ITEM key:
+	"A shiny metal key"
 	ACTIONS:
 		"pick":
 			ADD key TO PLAYER
